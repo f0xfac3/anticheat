@@ -59,13 +59,20 @@ try{
         "--release", "8", "-encoding", "UTF-8",
         "-cp", "$classes;$ServerJar",
         "-d", $testClasses,
-        "tests/SessionSmokeTest.java"
+        "tests/SessionSmokeTest.java",
+        "tests/FindingReporterTest.java"
     )
     Invoke-Checked (Join-Path $Jdk "bin\java.exe") @(
         "-Xcheck:jni",
         "-cp", "$testClasses;$classes;$ServerJar",
         "dev.fox.anticheat.bridge.SessionSmokeTest",
         (Join-Path $PSScriptRoot "build\native\anticheat_native.dll")
+    )
+
+    # Check console filtering, JSON decoding, and bounded evidence-file output.
+    Invoke-Checked (Join-Path $Jdk "bin\java.exe") @(
+        "-cp", "$testClasses;$classes;$ServerJar",
+        "dev.fox.anticheat.report.FindingReporterTest"
     )
 
     $pluginJar = Join-Path $libs "anticheat.jar"

@@ -11,6 +11,7 @@ import dev.fox.anticheat.bridge.ObservationSink;
 import dev.fox.anticheat.observation.ObservationModule;
 import dev.fox.anticheat.observation.ObservationModules;
 import dev.fox.anticheat.packet.PacketObserver;
+import dev.fox.anticheat.report.FindingReporter;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -41,6 +42,7 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
     private long nextSession = 1;
 
     private NativeBridge engine;
+    private FindingReporter findings;
     private ObservationSink observations;
     private PacketObserver packets;
     private BukkitTask ticker;
@@ -86,13 +88,28 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
             StandardCharsets.UTF_8
         );
         engine = new NativeBridge(configuration);
+        findings = new FindingReporter(
+            getLogger(),
+            getDataFolder(),
+            this::playerName
+        );
 
         observations = new ObservationSink(
             engine,
             this::now,
             this::tick,
-            record->getLogger().info(record)
+            findings
         );
+    }
+
+    // Resolve names only on the server thread; keep UUIDs unchanged in the saved evidence.
+    private String playerName(String uuid){
+        try{
+            Session session = sessions.get(UUID.fromString(uuid));
+            return session == null ? uuid : session.player.getName();
+        }catch(IllegalArgumentException error){
+            return uuid;
+        }
     }
 
     @Override
@@ -342,5 +359,11 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
         }
 
         observations = null;
+
+        // Session-end Findings must be queued before the evidence writer is closed.
+        if(findings != null){
+            findings.close();
+            findings = null;
+        }
     }
 }
