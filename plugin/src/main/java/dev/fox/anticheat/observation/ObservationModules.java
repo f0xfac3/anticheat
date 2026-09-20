@@ -16,6 +16,7 @@ public final class ObservationModules{
     public static List<ObservationModule> create(Session session, ObservationSink sink){
         List<ObservationModule> modules = new ArrayList<>();
         modules.add(new MiningObservations(session, sink));
+        modules.add(new CombatObservations(session, sink));
         return modules;
     }
 }

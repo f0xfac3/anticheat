@@ -1,6 +1,6 @@
 /**
- * wire.cpp contains the decoding of the serialized observations received from Java into the
- * typed C++ observation events defined in event.hpp for processing by the detection engine.
+ * wire.cpp decodes Java observation bytes into the typed C++ events in event.hpp.
+ * Schema 2 adds combat and teleport events. Schema 1 recordings remain readable.
  */
 
 #include "wire.hpp"
@@ -11,35 +11,39 @@
 namespace ac{
 
     namespace{
+
         class Reader{
             const std::uint8_t* data_;
-            std::size_t size_, offset_{};
+            std::size_t size_;
+            std::size_t offset_{};
+
         public:
             Reader(const std::uint8_t* data, std::size_t size) : data_(data), size_(size){
-                if(!data || size > 8192){
+                if(!data || size > 8192)
                     throw std::invalid_argument("Invalid event buffer");
-                }
             }
 
+            // Read an unsigned little-endian integer without stepping outside the buffer.
             std::uint64_t u(unsigned count){
-                if(count > 8 || size_ - offset_ < count){
+                if(count > 8 || size_ - offset_ < count)
                     throw std::invalid_argument("Truncated event");
-                }
 
                 std::uint64_t result{};
 
-                for(unsigned i = 0; i < count; i++){
+                for(unsigned i = 0; i < count; ++i)
                     result |= std::uint64_t(data_[offset_++]) << (i * 8);
-                }
 
                 return result;
             }
 
             std::int32_t i32(){
                 auto value = u(4);
-                std::int64_t signed_value = value <= 0x7fffffffULL
-                    ? static_cast<std::int64_t>(value) : static_cast<std::int64_t>(value) - 0x100000000LL;
-                return static_cast<std::int32_t>(signed_value);
+                std::int64_t result = static_cast<std::int64_t>(value);
+
+                if(value > 0x7fffffffULL)
+                    result -= 0x100000000LL;
+
+                return static_cast<std::int32_t>(result);
             }
 
             double f64(){
@@ -52,40 +56,67 @@ namespace ac{
 
             std::string text(){
                 auto length = static_cast<std::size_t>(u(2));
-                if(length > 1024 || size_ - offset_ < length){
+
+                if(length > 1024 || size_ - offset_ < length)
                     throw std::invalid_argument("Invalid string length");
-                }
+
                 std::string value;
                 value.reserve(length);
-                for(std::size_t i = 0; i < length; i++){
-                    auto c = static_cast<unsigned char>(u(1));
-                    // This v1 schema only carries UUIDs and ASCII game identifiers, not names/chat.
-                    if(c < 32 || c > 126){
+
+                for(std::size_t i = 0; i < length; ++i){
+                    auto character = static_cast<unsigned char>(u(1));
+
+                    if(character < 32 || character > 126)
                         throw std::invalid_argument("Non-ASCII identifier");
-                    }
-                    value += static_cast<char>(c);
+
+                    value += static_cast<char>(character);
                 }
+
                 return value;
             }
 
+            bool flag(){
+                auto value = u(1);
+
+                if(value > 1)
+                    throw std::invalid_argument("Invalid context flag");
+
+                return value != 0;
+            }
+
             BlockPosition position(){
-                return{ i32(), i32(), i32() };
+                return {i32(), i32(), i32()};
             }
 
             MiningContext context(){
-                MiningContext c;
-                c.world_uuid         = text();
-                c.state_key          = text();
-                c.block              = text();
-                c.tool               = text();
-                c.unavailable_reason = text();
-                c.damage_per_tick    = f64();
-                auto available = u(1);
-                if(available > 1){
-                    throw std::invalid_argument("Invalid context flag");
-                }
-                c.available = available != 0;
-                return c;
+                MiningContext value;
+                value.world_uuid = text();
+                value.state_key = text();
+                value.block = text();
+                value.tool = text();
+                value.unavailable_reason = text();
+                value.damage_per_tick = f64();
+                value.available = flag();
+                return value;
+            }
+
+            Vector3 vector3(){
+                return {f64(), f64(), f64()};
+            }
+
+            CombatContext combat(){
+                CombatContext value;
+                value.world_uuid = text();
+                value.target_uuid = text();
+                value.target_kind = text();
+                value.unavailable_reason = text();
+                value.target_id = i32();
+                value.eye = vector3();
+                value.target_box.minimum = vector3();
+                value.target_box.maximum = vector3();
+                value.ping_ms = i32();
+                value.available = flag();
+                return value;
             }
 
             void finish(){
@@ -93,23 +124,32 @@ namespace ac{
                     throw std::invalid_argument("Trailing event bytes");
             }
         };
+
     }
 
     Event decode_event(const std::uint8_t* bytes, std::size_t size){
         Reader r(bytes, size);
-        
-        if(r.u(4) != 0x43415846 || r.u(2) != 1){
+        auto magic = r.u(4);
+        auto version = r.u(2);
+
+        if(magic != 0x43415846 || (version != 1 && version != 2))
             throw std::invalid_argument("Unsupported bridge schema");
-        }
 
         auto type = r.u(2);
+
+        if(version == 1 && type > 6)
+            throw std::invalid_argument("Combat observations require bridge schema 2");
+
         Event event;
-        // populate EventHeader .session, .ordinal, .observed_ns, .epoch_ms, .server_tick
         event.header = {r.u(8), r.u(8), r.u(8), r.u(8), r.u(8)};
-        
+
         switch(type){
             case 1:
-                event.payload = SessionStart{r.text(), static_cast<std::uint32_t>(r.u(4)), static_cast<std::uint32_t>(r.u(4))};
+                event.payload = SessionStart{
+                    r.text(),
+                    static_cast<std::uint32_t>(r.u(4)),
+                    static_cast<std::uint32_t>(r.u(4))
+                };
                 break;
             case 2:
                 event.payload = SessionEnd{};
@@ -127,9 +167,10 @@ namespace ac{
                 dig.sampled_ns = r.u(8);
                 auto action = r.u(1);
                 auto face = r.u(1);
-                if(action > 2 || face > 5){
+
+                if(action > 2 || face > 5)
                     throw std::invalid_argument("Invalid digging enum");
-                }
+
                 dig.action = static_cast<DigAction>(action);
                 dig.face = static_cast<std::uint8_t>(face);
                 dig.position = r.position();
@@ -139,8 +180,39 @@ namespace ac{
             }
             case 6:{
                 MiningContextEvent context;
-                context.position = r.position(); context.context = r.context();
-                event.payload = std::move(context); break;
+                context.position = r.position();
+                context.context = r.context();
+                event.payload = std::move(context);
+                break;
+            }
+            case 7:{
+                AttackEvent attack;
+                attack.packet_sequence = r.u(8);
+                attack.read_batch = r.u(8);
+                attack.sampled_ns = r.u(8);
+                attack.context = r.combat();
+                event.payload = std::move(attack);
+                break;
+            }
+            case 8:{
+                CombatContextEvent snapshot;
+                snapshot.sampled_ns = r.u(8);
+                snapshot.context = r.combat();
+                event.payload = std::move(snapshot);
+                break;
+            }
+            case 9:
+                event.payload = SwingEvent{r.u(8), r.u(8)};
+                break;
+            case 10:{
+                TeleportEvent teleport;
+                teleport.cause = r.text();
+                teleport.from_world = r.text();
+                teleport.to_world = r.text();
+                teleport.from = r.vector3();
+                teleport.to = r.vector3();
+                event.payload = std::move(teleport);
+                break;
             }
             default:
                 throw std::invalid_argument("Unknown bridge event type");

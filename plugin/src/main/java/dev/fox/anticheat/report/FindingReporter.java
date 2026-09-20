@@ -87,8 +87,30 @@ public final class FindingReporter implements Consumer<String>, AutoCloseable{
                 + " | samples=" + clean(samples == null ? "?" : samples, 10);
         }
 
+        if(check.equals("reach.stationary.v1")){
+            return "Reach | " + decimal(finding.evidence.get("minimum_distance")) + " blocks"
+                + " / " + decimal(finding.evidence.get("allowed_distance")) + " allowed"
+                + " | samples=" + clean(finding.evidence.getOrDefault("samples", "?"), 10);
+        }
+
+        if(check.equals("autoclicker.cadence.v1")){
+            return "Autoclicker | " + decimal(finding.evidence.get("attack_cps")) + " attacks/s"
+                + " | regular timing | windows=" + clean(finding.evidence.getOrDefault("samples", "?"), 10);
+        }
+
         // New detectors are readable immediately, even without a custom summary.
         return clean(check, 64) + " | " + clean(finding.field("message"), 120);
+    }
+
+    private static String decimal(String text){
+        try{
+            double value = Double.parseDouble(text);
+
+            if(Double.isFinite(value) && value >= 0 && value <= 1e9)
+                return String.format(Locale.ROOT, "%.2f", value);
+        }catch(RuntimeException ignored){}
+
+        return "?";
     }
 
     private static String milliseconds(String text){

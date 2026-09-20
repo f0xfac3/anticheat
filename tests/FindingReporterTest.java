@@ -277,12 +277,29 @@ public final class FindingReporterTest{
         }
     }
 
+    private static void combat(Path root) throws Exception{
+        Capture capture = new Capture();
+        try(FindingReporter reporter = new FindingReporter(logger(capture), root.resolve("combat").toFile(), uuid->"LabPlayer")){
+            String reach = ALERT.replace("fastbreak.request.v1", "reach.stationary.v1")
+                .replace("\"samples\":\"3\"", "\"minimum_distance\":\"3.369\",\"allowed_distance\":\"3.050\",\"samples\":\"3\"");
+            reporter.accept(reach);
+            check(capture.records.get(0).getMessage().contains("Reach | 3.37 blocks / 3.05 allowed"), "Reach summary uses measured lower bound");
+            String cadence = ALERT.replace("fastbreak.request.v1", "autoclicker.cadence.v1")
+                .replace("\"samples\":\"3\"", "\"attack_cps\":\"13.245\",\"samples\":\"3\"");
+            reporter.accept(cadence);
+            check(capture.records.get(1).getMessage().contains("Autoclicker | 13.25 attacks/s"), "cadence summary describes attack requests");
+            reporter.accept(cadence.replace("\"suspicious\"", "\"trace\""));
+            check(capture.records.size() == 2, "one cadence window is not promoted by reporter");
+        }
+    }
+
     public static void main(String[] arguments) throws Exception{
         Path root = Files.createTempDirectory("fox-report-tests-");
 
         try{
             parser();
             reporter(root);
+            combat(root);
             queue();
 
             if(arguments.length != 0)

@@ -16,12 +16,12 @@ namespace ac{
         // Is this MiningContext usable for evaluating the mining attempt?
         bool usable(const MiningContext& c){
             return c.available &&                    // Java adapter successfully collected the mining context
-                std::isfinite(c.damage_per_tick) &&  // Value is a normal finite number, not positive or negative infinity
+                std::isfinite(c.damage_per_tick) &&  // Finite value, excluding NaN and either infinity
                 c.damage_per_tick > 0 &&             // Player is capable of making mining progress
-                c.damage_per_tick < 1;               // Block takes more than one increment of mining progress (>=1 represents instant breaking behavior)
+                c.damage_per_tick < 1;               // Block takes more than one increment of mining progress
         }
-        
-        // Did this MiningContext remain unchanged between DigAction::start and DigAction::finish?
+
+        // Compare the sampled conditions; this cannot prove nothing changed between samples.
         bool same(const MiningContext& a, const MiningContext& b){
             return usable(a) &&
                    usable(b) &&
@@ -30,7 +30,7 @@ namespace ac{
                    a.damage_per_tick == b.damage_per_tick;
         }
 
-        // Calculate elapsed milliseconds between DigAction::start and DigAction::finish observations?
+        // Calculate elapsed milliseconds between timestamps from the adapter's clock.
         double elapsed_ms(std::uint64_t end, std::uint64_t start){
             return end >= start ? static_cast<double>(end - start) / 1e6 : -1.0;
         }
@@ -64,24 +64,37 @@ namespace ac{
     }
 
     void FastBreakCheck::registerHandlers(CheckManager& manager){
-        manager.on<DigEvent>([this](const DigEvent& event, CheckContext& ctx){
-            on_dig(event, ctx);
-        });
-        manager.on<MiningContextEvent>([this](const MiningContextEvent& event, CheckContext& ctx){
-            on_context(event, ctx);
-        });
-        manager.on<TickEvent>([this](const TickEvent& event, CheckContext& ctx){
-            on_tick(event, ctx);
-        });
+        manager.on<DigEvent>(
+            [this](const DigEvent& event, CheckContext& ctx){
+                on_dig(event, ctx);
+            }
+        );
+        manager.on<MiningContextEvent>(
+            [this](const MiningContextEvent& event, CheckContext& ctx){
+                on_context(event, ctx);
+            }
+        );
+        manager.on<TickEvent>(
+            [this](const TickEvent& event, CheckContext& ctx){
+                on_tick(event, ctx);
+            }
+        );
+        manager.on<TeleportEvent>(
+            [this](const TeleportEvent&, CheckContext&){
+                // Do not compare mining across a teleport. Keep completed suspicious samples.
+                attempt_.reset();
+            }
+        );
     }
 
     // Clear the currently tracked attempt and suspicious sample history
     void FastBreakCheck::reset(std::string_view){
-        attempt_.reset(); samples_ = 0;
+        attempt_.reset();
+        samples_ = 0;
         last_sample_.reset();
     }
 
-    // Clear suspicious FastBreak samples when the configured time window expires
+    // Expire a mining attempt after 60 seconds, or after invalid clock ordering.
     void FastBreakCheck::on_tick(const TickEvent&, CheckContext& ctx){
         if(attempt_ && (ctx.event.observed_ns < attempt_->header.observed_ns
             || elapsed_ms(ctx.event.observed_ns, attempt_->header.observed_ns) > 60000)){
@@ -104,16 +117,14 @@ namespace ac{
 
     // Process client digging observations
     void FastBreakCheck::on_dig(const DigEvent& event, CheckContext& ctx){
-        // Only evaluate minecraft client versions supported by this Spigot 1.8.8 FastBreak detection logic
-        //  Minecraft version: 1.8.8 (protocol 47)
-        //  Spigot server: 1.8.8 (server model 10808)
-        if(ctx.player.identity.client_protocol != 47 /*1.8.x = protocol 47*/ || ctx.player.identity.server_model != 10808){
+        // Only evaluate 1.8.x clients (protocol 47) against the Spigot 1.8.8 model (10808).
+        if(ctx.player.identity.client_protocol != 47 || ctx.player.identity.server_model != 10808){
             return;
         }
-        
+
         if(event.action == DigAction::abort){
             reset("abort");
-            ctx.emit( // record that the abort caused the detector state to reset
+            ctx.emit(
                 "trace",
                 std::string(id()),
                 "abort_reset"
@@ -123,7 +134,7 @@ namespace ac{
 
         double queued = elapsed_ms(event.sampled_ns, ctx.event.observed_ns);
 
-        // Reject late observations becausae the sampled server state won't match the state the packet had when it arrived
+        // Reject late observations because their snapshots may no longer represent packet-time state.
         if(queued < 0 || queued > settings_.maximum_queue_ms){
             reset("delayed_observation");
             return;
@@ -137,7 +148,7 @@ namespace ac{
             // Convert damage-per-tick into the expected mining duration under the current game conditions
             // damage_per_tick = how much block break progress is being made during each tick
             /**
-             * Mining progress in vanilla minecraft goes from 0.0 (unbroken) to 1.0 (broken)
+             * Mining progress in vanilla Minecraft goes from 0.0 (unbroken) to 1.0 (broken)
              * On each tick: progress += damage_per_tick
              * ex. damage_per_tick = 0.20:
              *   . Tick 1 -> 0.20
@@ -145,14 +156,14 @@ namespace ac{
              *   . Tick 3 -> 0.60
              *   . Tick 4 -> 0.80
              *   . Tick 5 -> 1.00 (broken)
-             * 
+             *
              * Therefore, required ticks = ceil(1.0 / damage_per_tick).
-             * @ 20 TPS, each tick = 50ms.
+             * At the nominal 20 TPS, each tick represents 50 ms.
              */
             double expected = 0.0;
             if(usable(event.context)){
                 expected = std::ceil(1.0 / event.context.damage_per_tick) * 50.0;
-                // * 50.0 converts the required tick count to milliseconds, since 1 tick = 50ms.
+                // * 50.0 converts the required tick count to nominal milliseconds.
                 // FastBreak uses milliseconds when comparing expected and observed mining duration.
             }
 
@@ -198,7 +209,7 @@ namespace ac{
 
         // Store the currently tracked mining attempt
         const auto begin = std::move(*attempt_);
-        
+
         // detector no longer tracking an attempt
         attempt_.reset();
 
@@ -239,13 +250,13 @@ namespace ac{
             return;
         }
 
-        // Calculate the expected mine duration from the MiningContext conditions when the DigAction::start observation occurred
+        // Calculate the expected mine duration from the MiningContext conditions at DigAction::start
         double expected = std::ceil(1.0 / begin.dig.context.damage_per_tick) * 50.0;
-        
+
         // Calculate how fast the attempt must finish to be considered suspicious
         double sus_threshold = std::max(0.0, expected * settings_.maximum_ratio - settings_.grace_ms);
-        
-        // If the observed mining duration is faster than the suspicious threshold, suspicious=true.
+
+        // If the observed mining duration is below the suspicious threshold, suspicious=true.
         bool suspicious = observed < sus_threshold;
 
         // Evidence for the Finding
@@ -264,12 +275,13 @@ namespace ac{
             {"server_break_outcome", "NOT_MEASURED"}
         };
 
-        // Track the finished mining attempt and the detector's decision about it
-        // If there are enough suspicious mining durations in a certain timespan, they can be escalated to an actual suspicious finding.
+        // Trace the finished mining attempt and the detector's decision about it.
+        // Repeated suspicious durations can be escalated to a suspicious finding.
         ctx.emit(
             "trace",
             std::string(id()),
-            suspicious ? "dig_early_finish_sample" : "dig_finish_normal_sample", evidence
+            suspicious ? "dig_early_finish_sample" : "dig_finish_normal_sample",
+            evidence
         );
 
         if(!suspicious){

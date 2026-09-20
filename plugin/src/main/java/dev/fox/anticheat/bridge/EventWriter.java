@@ -6,6 +6,8 @@
 package dev.fox.anticheat.bridge;
 
 import dev.fox.anticheat.event.DigEvent;
+import dev.fox.anticheat.event.AttackEvent;
+import dev.fox.anticheat.event.CombatContext;
 import dev.fox.anticheat.event.MiningContext;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -18,8 +20,13 @@ public final class EventWriter{
     public static final int DIG = 5;
     public static final int CONTEXT = 6;
 
+    public static final int ATTACK = 7;
+    public static final int COMBAT_CONTEXT = 8;
+    public static final int SWING = 9;
+    public static final int TELEPORT = 10;
+
     private static final int MAGIC = 0x43415846;
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
 
     private final ByteBuffer buffer = ByteBuffer.allocateDirect(8192)
         .order(ByteOrder.LITTLE_ENDIAN);
@@ -53,7 +60,7 @@ public final class EventWriter{
         return this;
     }
 
-    // Schema v1 stores bounded ASCII identifiers, not arbitrary Unicode text.
+    // Schema v2 stores bounded ASCII identifiers, not arbitrary Unicode text.
     public EventWriter text(String value){
         if(value == null || value.length() > 1024)
             throw new IllegalArgumentException("Invalid identifier size");
@@ -64,7 +71,7 @@ public final class EventWriter{
             char character = value.charAt(i);
 
             if(character < 32 || character > 126)
-                throw new IllegalArgumentException("Bridge v1 identifiers must be ASCII");
+                throw new IllegalArgumentException("Bridge v2 identifiers must be ASCII");
 
             buffer.put((byte) character);
         }
@@ -105,6 +112,65 @@ public final class EventWriter{
         text(context.unavailableReason);
         buffer.putDouble(context.damagePerTick);
         buffer.put((byte) (context.available ? 1 : 0));
+    }
+
+    public EventWriter attack(AttackEvent event, CombatContext context, long sampledNanos){
+        buffer.putLong(event.packet.sequence);
+        buffer.putLong(event.packet.readBatch);
+        buffer.putLong(sampledNanos);
+        combatSnapshot(context);
+        return this;
+    }
+
+    public EventWriter combatContext(CombatContext context, long sampledNanos){
+        buffer.putLong(sampledNanos);
+        combatSnapshot(context);
+        return this;
+    }
+
+    private void combatSnapshot(CombatContext context){
+        text(context.world);
+        text(context.targetUuid);
+        text(context.targetKind);
+        text(context.unavailableReason);
+        buffer.putInt(context.targetId);
+        vector(context.eyeX, context.eyeY, context.eyeZ);
+        vector(context.minX, context.minY, context.minZ);
+        vector(context.maxX, context.maxY, context.maxZ);
+        buffer.putInt(context.pingMillis);
+        buffer.put((byte) (context.available ? 1 : 0));
+    }
+
+    public EventWriter swing(long packetSequence, long readBatch){
+        buffer.putLong(packetSequence);
+        buffer.putLong(readBatch);
+        return this;
+    }
+
+    // The source is a server-recognized teleport, not a client movement claim.
+    public EventWriter teleport(
+        String cause,
+        String fromWorld,
+        String toWorld,
+        double fromX,
+        double fromY,
+        double fromZ,
+        double toX,
+        double toY,
+        double toZ
+    ){
+        text(cause);
+        text(fromWorld);
+        text(toWorld);
+        vector(fromX, fromY, fromZ);
+        vector(toX, toY, toZ);
+        return this;
+    }
+
+    private void vector(double x, double y, double z){
+        buffer.putDouble(x);
+        buffer.putDouble(y);
+        buffer.putDouble(z);
     }
 
     // Prepare the written bytes for a synchronous JNI submission.

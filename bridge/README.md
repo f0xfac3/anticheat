@@ -1,4 +1,4 @@
-# JNI/event boundary (v1)
+# JNI/event boundary (v2)
 
 `NativeBridge.nCreate(config)` creates an engine and returns a checked numeric ID.
 `nSubmit(handle, directByteBuffer, length)` synchronously consumes one normalized
@@ -19,11 +19,11 @@ bytes. Events are capped at 8192 bytes. Unknown schemas/types, trailing bytes,
 truncation, invalid booleans/enums, and non-ASCII identifiers are rejected.
 This restricted text encoding is for UUIDs/game identifiers, not player chat.
 
-## Header (48 bytes)
+## Common header (48 bytes)
 
 ```
 u32 magic = 0x43415846 (bytes "FXAC")
-u16 schema = 1
+u16 schema = 2
 u16 type
 u64 session_id
 u64 normalized_event_ordinal
@@ -39,43 +39,49 @@ is a snapshot, not an assertion that wall-clock intervals equal a number of tick
 ## Bodies
 
 ```
-1 SessionStart:
-    text uuid,
-    u32 client_protocol,
-    u32 server_model
+1 SessionStart: text uuid, u32 client_protocol, u32 server_model
+2 SessionEnd:   empty
+3 Reset:        text reason
+4 Tick:         empty
+5 Dig:          u64 packet_sequence, u64 read_batch, u64 sampled_ns,
+                u8 action (0=start, 1=abort, 2=finish), u8 face (0..5),
+                i32 x, i32 y, i32 z, MiningContext
+6 Context:      i32 x, i32 y, i32 z, MiningContext
+7 Attack:       u64 packet_sequence, u64 read_batch, u64 sampled_ns, CombatContext
+8 CombatContext: u64 sampled_ns, CombatContext
+9 Swing:        u64 packet_sequence, u64 read_batch
+10 Teleport:    text cause, text from_world, text to_world, Vector3 from, Vector3 to
 
-2 SessionEnd:
-    empty
+Vector3:
+    f64 x, f64 y, f64 z
 
-3 Reset:
-    text reason
-
-4 Tick:
-    empty
-
-5 Dig:
-    u64 packet_sequence,
-    u64 read_batch,
-    u64 sampled_ns,
-    u8 action (0=start, 1=abort, 2=finish),
-    u8 face (0..5),
-    i32 x,
-    i32 y,
-    i32 z,
-    MiningContext
-
-6 Context:
-    i32 x,
-    i32 y,
-    i32 z,
-    MiningContext
+CombatContext:
+    text world_uuid, text target_uuid, text target_kind, text unavailable_reason,
+    i32 target_id, Vector3 eye, Vector3 target_minimum, Vector3 target_maximum,
+    i32 ping_ms, u8 available
 
 MiningContext:
     text world_uuid, text state_key, text block, text tool,
     text unavailable_reason, f64 damage_per_tick, u8 available
 ```
 
-The server-model value 10808 is an internal adapter ID.
-Protocol 47 is the configured direct 1.8.x baseline; this adapter does not discover clients hidden behind a translator or distinguish 1.8.x patches sharing a protocol.
+The server-model value 10808 is an internal adapter label, not a protocol number.
+Protocol 47 is the configured direct 1.8.x baseline; this adapter does not discover
+clients hidden behind a translator or distinguish 1.8.x patches sharing a protocol.
 
-When adding telemetry, update the typed event and both schema ends together and add a cross-language smoke test. The public Check interface and generic dispatcher do not change. Batched transfers or an out-of-process transport can be added later; this starter makes one synchronous call per normalized observation.
+When adding telemetry, update the typed event and both schema ends together and
+add a cross-language smoke test. The public Check interface and generic dispatcher
+do not change. Batched transfers or an out-of-process transport can be added later;
+this starter makes one synchronous call per normalized observation.
+
+Schema 2 keeps the old bodies unchanged. The decoder also accepts schema 1 for
+old recorded events (types 1-6 only). Deploy the plugin JAR and native library
+together; an old native library does not understand schema 2.
+
+Attack and Swing are different observations. Neither is a recording of physical
+mouse input. CombatContext contains unexpanded server bounds, not a historical
+client view. Teleport invalidates queued pre-teleport callbacks without inventing
+observation loss; each check decides which state depends on continuous position.
+
+The standalone replayer reads records as `u32 event_length + event_bytes`.
+`tests/combat_cases.py` generates valid synthetic scenarios in this format.

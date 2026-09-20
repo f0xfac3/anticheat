@@ -90,7 +90,7 @@ public final class PacketObserver{
                     return;
 
                 // Capture the generation before copying, so a concurrent reset invalidates this work.
-                long generation = session.loss.get();
+                long generation = session.generation.get();
                 PacketInfo info = new PacketInfo(
                     currentSequence,
                     batch,
@@ -124,7 +124,7 @@ public final class PacketObserver{
 
         if(perPlayer > PLAYER_QUEUE_LIMIT || total > TOTAL_QUEUE_LIMIT){
             release(session);
-            session.loss.incrementAndGet();
+            session.recordLoss();
             return;
         }
 

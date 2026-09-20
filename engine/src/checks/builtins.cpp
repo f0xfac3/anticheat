@@ -1,11 +1,12 @@
 /**
- * builtins.cpp constructs and configures the detection checks
- * 
- * “Built-in checks” simply mean detectors that ship as part of the anticheat, such as FastBreakCheck or FlyCheck.
+ * builtins.cpp constructs and configures the detection checks.
+ * Built-in checks are the detectors shipped with the anticheat.
  */
 
 #include "anticheat/builtins.hpp"
 #include "fastbreak.hpp"
+#include "reach.hpp"
+#include "autoclicker.hpp"
 #include <cmath>
 #include <locale>
 #include <map>
@@ -16,14 +17,14 @@ namespace ac{
 
     namespace{
 
-        std::string trim(std::string s){
-            auto first = s.find_first_not_of(" \t\r\n");
+        std::string trim(std::string text){
+            auto first = text.find_first_not_of(" \t\r\n");
 
             if(first == std::string::npos)
                 return {};
 
-            auto last = s.find_last_not_of(" \t\r\n");
-            return s.substr(first, last - first + 1);
+            auto last = text.find_last_not_of(" \t\r\n");
+            return text.substr(first, last - first + 1);
         }
 
     }
@@ -36,7 +37,7 @@ namespace ac{
         std::map<std::string, std::string> values;
         std::string line;
 
-        // Parse the configuration into unconsumed key/value settings.
+        // Parse settings once. Each detector consumes the keys it owns below.
         while(std::getline(input, line)){
             line = trim(line);
 
@@ -51,19 +52,22 @@ namespace ac{
             auto key = trim(line.substr(0, eq));
             auto value = trim(line.substr(eq + 1));
 
+            if(key.empty())
+                throw std::invalid_argument("Empty setting name");
+
             if(!values.emplace(key, value).second)
                 throw std::invalid_argument("Duplicate setting: " + key);
         }
 
         // Read and consume a boolean setting.
         auto boolean = [&](const std::string& key, bool fallback){
-            auto it = values.find(key);
+            auto found = values.find(key);
 
-            if(it == values.end())
+            if(found == values.end())
                 return fallback;
 
-            auto value = it->second;
-            values.erase(it);
+            auto value = found->second;
+            values.erase(found);
 
             if(value == "true")
                 return true;
@@ -76,14 +80,13 @@ namespace ac{
 
         // Read, validate, and consume a numeric setting.
         auto number = [&](const std::string& key, double fallback){
-            auto it = values.find(key);
+            auto found = values.find(key);
 
-            if(it == values.end())
+            if(found == values.end())
                 return fallback;
 
-            std::istringstream stream(it->second);
+            std::istringstream stream(found->second);
             stream.imbue(std::locale::classic());
-
             double value{};
             stream >> value;
 
@@ -95,8 +98,18 @@ namespace ac{
             if(!stream.eof())
                 throw std::invalid_argument("Trailing number data: " + key);
 
-            values.erase(it);
+            values.erase(found);
             return value;
+        };
+
+        // Reject fractional or out-of-range counts before converting to uint32_t.
+        auto integer = [&](const std::string& key, std::uint32_t fallback, double maximum){
+            double value = number(key, fallback);
+
+            if(value < 1 || value > maximum || std::floor(value) != value)
+                throw std::invalid_argument("Invalid integer: " + key);
+
+            return static_cast<std::uint32_t>(value);
         };
 
         EngineSetup setup{
@@ -105,7 +118,6 @@ namespace ac{
         };
 
         bool fastbreak_enabled = boolean("fastbreak.enabled", true);
-
         FastBreakSettings settings;
         settings.maximum_ratio = number(
             "fastbreak.maximum_ratio",
@@ -127,34 +139,122 @@ namespace ac{
             "fastbreak.sample_window_ms",
             settings.sample_window_ms
         );
-
-        double alert_after = number(
+        settings.alert_after = integer(
             "fastbreak.alert_after",
-            settings.alert_after
+            settings.alert_after,
+            10000
         );
 
-        if(alert_after < 1 ||
-           alert_after > 10000 ||
-           std::floor(alert_after) != alert_after)
-        {
-            throw std::invalid_argument("Invalid alert_after");
-        }
-
-        settings.alert_after = static_cast<std::uint32_t>(alert_after);
-
-        // Validate the complete FastBreak configuration immediately.
+        // Validate settings even when the check is disabled.
         (void)FastBreakCheck(settings);
 
-        // Any remaining key was never recognized or consumed.
-        if(!values.empty())
-            throw std::invalid_argument(
-                "Unknown setting: " + values.begin()->first
-            );
+        bool reach_enabled = boolean("reach.enabled", true);
+        ReachSettings reach;
+        reach.maximum_distance = number(
+            "reach.maximum_distance",
+            reach.maximum_distance
+        );
+        reach.distance_grace = number(
+            "reach.distance_grace",
+            reach.distance_grace
+        );
+        reach.box_padding = number(
+            "reach.box_padding",
+            reach.box_padding
+        );
+        reach.history_ms = number(
+            "reach.history_ms",
+            reach.history_ms
+        );
+        reach.maximum_motion = number(
+            "reach.maximum_motion",
+            reach.maximum_motion
+        );
+        reach.maximum_ping_ms = number(
+            "reach.maximum_ping_ms",
+            reach.maximum_ping_ms
+        );
+        reach.maximum_queue_ms = number(
+            "reach.maximum_queue_ms",
+            reach.maximum_queue_ms
+        );
+        reach.maximum_frame_gap_ms = number(
+            "reach.maximum_frame_gap_ms",
+            reach.maximum_frame_gap_ms
+        );
+        reach.sample_window_ms = number(
+            "reach.sample_window_ms",
+            reach.sample_window_ms
+        );
+        reach.alert_after = integer(
+            "reach.alert_after",
+            reach.alert_after,
+            100
+        );
+        (void)ReachCheck(reach);
 
-        // Register the FastBreak factory only when the check is enabled.
+        bool autoclicker_enabled = boolean("autoclicker.enabled", true);
+        AutoClickerSettings autoclicker;
+        autoclicker.minimum_cps = number(
+            "autoclicker.minimum_cps",
+            autoclicker.minimum_cps
+        );
+        autoclicker.maximum_cv = number(
+            "autoclicker.maximum_cv",
+            autoclicker.maximum_cv
+        );
+        autoclicker.maximum_mad_ms = number(
+            "autoclicker.maximum_mad_ms",
+            autoclicker.maximum_mad_ms
+        );
+        autoclicker.minimum_window_ms = number(
+            "autoclicker.minimum_window_ms",
+            autoclicker.minimum_window_ms
+        );
+        autoclicker.maximum_gap_ms = number(
+            "autoclicker.maximum_gap_ms",
+            autoclicker.maximum_gap_ms
+        );
+        autoclicker.maximum_queue_ms = number(
+            "autoclicker.maximum_queue_ms",
+            autoclicker.maximum_queue_ms
+        );
+        autoclicker.sample_window_ms = number(
+            "autoclicker.sample_window_ms",
+            autoclicker.sample_window_ms
+        );
+        autoclicker.window_intervals = integer(
+            "autoclicker.window_intervals",
+            autoclicker.window_intervals,
+            256
+        );
+        autoclicker.alert_after = integer(
+            "autoclicker.alert_after",
+            autoclicker.alert_after,
+            100
+        );
+        (void)AutoClickerCheck(autoclicker);
+
+        // Remaining keys are misspelled or unsupported, not silently ignored.
+        if(!values.empty())
+            throw std::invalid_argument("Unknown setting: " + values.begin()->first);
+
+        // Each factory creates a separate detector instance for each player session.
         if(fastbreak_enabled){
             setup.factories.push_back([settings]{
                 return std::make_unique<FastBreakCheck>(settings);
+            });
+        }
+
+        if(reach_enabled){
+            setup.factories.push_back([reach]{
+                return std::make_unique<ReachCheck>(reach);
+            });
+        }
+
+        if(autoclicker_enabled){
+            setup.factories.push_back([autoclicker]{
+                return std::make_unique<AutoClickerCheck>(autoclicker);
             });
         }
 

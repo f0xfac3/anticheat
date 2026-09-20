@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(anticheat VERSION 0.2.0 LANGUAGES CXX)
+project(anticheat VERSION 0.3.0 LANGUAGES CXX)
 option(AC_BUILD_JNI "Build the Java/native bridge and its smoke test" ON)
 option(AC_SANITIZE "Address/undefined sanitizers for native-only tests" OFF)
 set(CMAKE_CXX_STANDARD 17)
@@ -24,11 +24,16 @@ add_library(anticheat_engine STATIC
     engine/src/engine.cpp
     engine/src/finding.cpp
     engine/src/checks/fastbreak.cpp
+    engine/src/checks/reach.cpp
+    engine/src/checks/autoclicker.cpp
     engine/src/checks/builtins.cpp)
 target_include_directories(anticheat_engine PUBLIC engine/include)
 add_library(anticheat_wire STATIC bridge/wire.cpp)
 target_include_directories(anticheat_wire PUBLIC bridge)
 target_link_libraries(anticheat_wire PUBLIC anticheat_engine)
+
+add_executable(anticheat_replay engine/src/replay/main.cpp)
+target_link_libraries(anticheat_replay PRIVATE anticheat_wire)
 
 include(CTest)
 if(BUILD_TESTING)
@@ -36,6 +41,10 @@ if(BUILD_TESTING)
     target_include_directories(engine_tests PRIVATE engine/src/checks)
     target_link_libraries(engine_tests PRIVATE anticheat_wire)
     add_test(NAME engine_tests COMMAND engine_tests)
+    add_executable(combat_tests tests/combat_tests.cpp)
+    target_include_directories(combat_tests PRIVATE engine/src/checks)
+    target_link_libraries(combat_tests PRIVATE anticheat_wire)
+    add_test(NAME combat_tests COMMAND combat_tests)
 endif()
 
 if(AC_BUILD_JNI)
@@ -55,11 +64,14 @@ if(AC_BUILD_JNI)
         "${java_root}/bridge/EventWriter.java"
         "${java_root}/event/DigEvent.java"
         "${java_root}/event/MiningContext.java"
+        "${java_root}/event/AttackEvent.java"
+        "${java_root}/event/CombatContext.java"
         "${java_root}/packet/PacketInfo.java"
         "${java_root}/packet/PacketHandlers.java"
         "${java_root}/observation/ObservationModule.java"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/PacketHandlersTest.java"
-        "${CMAKE_CURRENT_SOURCE_DIR}/tests/NativeSmokeTest.java")
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/NativeSmokeTest.java"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/CombatSmokeTest.java")
     set(jni_header "${CMAKE_CURRENT_BINARY_DIR}/generated/dev_fox_anticheat_bridge_NativeBridge.h")
     add_custom_command(OUTPUT "${jni_header}"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/generated" "${CMAKE_CURRENT_BINARY_DIR}/java"
@@ -76,6 +88,9 @@ if(AC_BUILD_JNI)
     if(BUILD_TESTING)
         add_test(NAME packet_handlers COMMAND "${Java_JAVA_EXECUTABLE}"
             -cp "${CMAKE_CURRENT_BINARY_DIR}/java" dev.fox.anticheat.packet.PacketHandlersTest)
+        add_test(NAME combat_jni COMMAND "${Java_JAVA_EXECUTABLE}" -Xcheck:jni
+            -cp "${CMAKE_CURRENT_BINARY_DIR}/java" dev.fox.anticheat.bridge.CombatSmokeTest
+            "$<TARGET_FILE:anticheat_native>")
         add_test(NAME jni_smoke COMMAND "${Java_JAVA_EXECUTABLE}" -Xcheck:jni
             -cp "${CMAKE_CURRENT_BINARY_DIR}/java" dev.fox.anticheat.bridge.NativeSmokeTest
             "$<TARGET_FILE:anticheat_native>")

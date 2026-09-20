@@ -22,6 +22,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -136,7 +137,7 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
                 join(player);
             }
 
-            getLogger().info("C++ detection engine loaded. Java adapter: Spigot 1.8.8. Report-only; no enforcement.");
+            getLogger().info("C++ detection engine loaded. Java adapter: Spigot 1.8.8. Combat schema 2. Report-only; no enforcement.");
         }catch(Exception | LinkageError error){
             getLogger().log(
                 Level.SEVERE,
@@ -179,7 +180,7 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
 
         reconcileLoss(session);
 
-        if(generation != session.loss.get())
+        if(generation != session.generation.get())
             return;
 
         observation.run();
@@ -307,21 +308,45 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
             end(session);
     }
 
-    // Preserve the current conservative reset until teleports have their own typed event.
-    // TODO: Represent authorized teleports explicitly; preserve unrelated detector evidence.
+    // Invalidate old queued observations, but let each check handle the teleport itself.
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onTeleport(PlayerTeleportEvent event){
         Session session = sessions.get(event.getPlayer().getUniqueId());
+        Location from = event.getFrom();
+        Location to = event.getTo();
 
-        if(session == null || !session.active)
+        if(session == null || !session.active || to == null)
             return;
 
-        session.loss.incrementAndGet();
+        session.generation.incrementAndGet();
 
         try{
+            // Real dropped observations still require a full reset.
             reconcileLoss(session);
+
+            for(ObservationModule module : session.modules){
+                module.reset("teleport");
+            }
+
+            observations.begin(
+                EventWriter.TELEPORT,
+                session,
+                now(),
+                System.currentTimeMillis()
+            ).teleport(
+                event.getCause().name(),
+                from.getWorld().getUID().toString(),
+                to.getWorld().getUID().toString(),
+                from.getX(),
+                from.getY(),
+                from.getZ(),
+                to.getX(),
+                to.getY(),
+                to.getZ()
+            );
+            observations.send();
         }catch(RuntimeException | LinkageError error){
-            fail(session, "Teleport reset failed", error);
+            fail(session, "Teleport handling failed", error);
         }
     }
 
