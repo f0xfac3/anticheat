@@ -104,7 +104,7 @@ namespace ac{
                 return {f64(), f64(), f64()};
             }
 
-            CombatContext combat(){
+            CombatContext combat(std::uint64_t version){
                 CombatContext value;
                 value.world_uuid = text();
                 value.target_uuid = text();
@@ -116,6 +116,10 @@ namespace ac{
                 value.target_box.maximum = vector3();
                 value.ping_ms = i32();
                 value.available = flag();
+                if(version>=3){
+                    value.yaw=f64(); value.pitch=f64(); value.rotation_available=flag();
+                    value.attacker_sprinting=flag(); value.target_player=flag();
+                }
                 return value;
             }
 
@@ -132,13 +136,15 @@ namespace ac{
         auto magic = r.u(4);
         auto version = r.u(2);
 
-        if(magic != 0x43415846 || (version != 1 && version != 2))
+        if(magic != 0x43415846 || (version != 1 && version != 2 && version != 3))
             throw std::invalid_argument("Unsupported bridge schema");
 
         auto type = r.u(2);
 
         if(version == 1 && type > 6)
             throw std::invalid_argument("Combat observations require bridge schema 2");
+        if(version < 3 && type > 10)
+            throw std::invalid_argument("Movement observations require bridge schema 3");
 
         Event event;
         event.header = {r.u(8), r.u(8), r.u(8), r.u(8), r.u(8)};
@@ -190,14 +196,14 @@ namespace ac{
                 attack.packet_sequence = r.u(8);
                 attack.read_batch = r.u(8);
                 attack.sampled_ns = r.u(8);
-                attack.context = r.combat();
+                attack.context = r.combat(version);
                 event.payload = std::move(attack);
                 break;
             }
             case 8:{
                 CombatContextEvent snapshot;
                 snapshot.sampled_ns = r.u(8);
-                snapshot.context = r.combat();
+                snapshot.context = r.combat(version);
                 event.payload = std::move(snapshot);
                 break;
             }
@@ -214,6 +220,25 @@ namespace ac{
                 event.payload = std::move(teleport);
                 break;
             }
+            case 11:{
+                MovementEvent m;
+                m.packet_sequence=r.u(8); m.read_batch=r.u(8); m.sampled_ns=r.u(8);
+                m.position=r.vector3(); m.yaw=r.f64(); m.pitch=r.f64();
+                m.has_position=r.flag(); m.has_look=r.flag(); m.on_ground=r.flag();
+                auto& c=m.context;
+                c.world_uuid=r.text(); c.unavailable_reason=r.text();
+                c.available=r.flag(); c.source_supported=r.flag(); c.destination_supported=r.flag();
+                c.clear_path=r.flag(); c.flat_ground=r.flag(); c.using_item=r.flag(); c.sprinting=r.flag();
+                c.movement_speed=r.f64(); c.friction=r.f64(); c.jump_velocity=r.f64();
+                event.payload=std::move(m); break;
+            }
+            case 12:{
+                ImpulseEvent impulse;
+                impulse.token=r.u(8); impulse.velocity=r.vector3(); impulse.additive=r.flag();
+                event.payload=impulse; break;
+            }
+            case 13: event.payload=ImpulseAckEvent{r.u(8)}; break;
+            case 14: event.payload=CorrectionEvent{}; break;
             default:
                 throw std::invalid_argument("Unknown bridge event type");
         }

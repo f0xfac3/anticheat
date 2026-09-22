@@ -1,0 +1,220 @@
+// Reference only: a/y7; business-method excerpts from decoded CFR source.
+// Original decompiler errors and unresolved expressions may remain.
+    public boolean q() {
+        return true;
+    }
+    public void F(WL wL2) {
+        block22: {
+            BM bM2;
+            block23: {
+                block21: {
+                    bM2 = uO.P();
+                    try {
+                        if (this.k == null) {
+                            this.k = Ui.Y.d().w(LS.class);
+                        }
+                    }
+                    catch (vg vg2) {
+                        throw y7.a(vg2);
+                    }
+                    try {
+                        if (this.k.h()) {
+                            return;
+                        }
+                    }
+                    catch (vg vg3) {
+                        throw y7.a(vg3);
+                    }
+                    try {
+                        if (wL2.getThePlayer().B() <= 0.0f) {
+                            return;
+                        }
+                    }
+                    catch (vg vg4) {
+                        throw y7.a(vg4);
+                    }
+                    try {
+                        try {
+                            if (bM2.a() || this.g(bM2)) break block21;
+                        }
+                        catch (vg vg5) {
+                            throw y7.a(vg5);
+                        }
+                        return;
+                    }
+                    catch (vg vg6) {
+                        throw y7.a(vg6);
+                    }
+                }
+                double d10 = 0.6;
+                try {
+                    try {
+                        if (bM2.V() != this.r * d10 || bM2.Z() != this.S * d10) break block22;
+                    }
+                    catch (vg vg7) {
+                        throw y7.a(vg7);
+                    }
+                    if (bM2.W()) break block22;
+                }
+                catch (vg vg8) {
+                    throw y7.a(vg8);
+                }
+                double d11 = (Double)this.t.z();
+                double d12 = bM2.V() / d10;
+                double d13 = bM2.Z() / d10;
+                double d14 = d12 * d11;
+                double d15 = d13 * d11;
+                try {
+                    try {
+                        bM2.F(d14);
+                        bM2.P(d15);
+                        if (!this.A.H().booleanValue()) break block23;
+                        if (!this.y.X(500L)) break block22;
+                    }
+                    catch (vg vg9) {
+                        throw y7.a(vg9);
+                    }
+                    this.w = true;
+                    this.y.q();
+                    break block22;
+                }
+                catch (vg vg10) {
+                    throw y7.a(vg10);
+                }
+            }
+            bM2.o(true);
+        }
+    }
+    public void C(Wx wx2) {
+        block4: {
+            try {
+                try {
+                    if (!this.p || !wx2.isNewStateSprinting()) break block4;
+                }
+                catch (vg vg2) {
+                    throw y7.a(vg2);
+                }
+                wx2.setCanceled(true);
+                this.p = false;
+            }
+            catch (vg vg3) {
+                throw y7.a(vg3);
+            }
+        }
+    }
+    public String C() {
+        return this.t.r();
+    }
+    private boolean g(BM bM2) {
+        float f10 = bM2.B();
+        if (f10 > 0.0f) {
+            boolean bl2;
+            float f12 = bM2.F();
+            float f13 = -sr.J(f12 * (float)Math.PI / 180.0f);
+            float f14 = sr.b(f12 * (float)Math.PI / 180.0f);
+            double d10 = bM2.V();
+            double d11 = bM2.Z();
+            double d12 = d10 * (double)f13 + d11 * (double)f14;
+            try {
+                bl2 = d12 > 0.0;
+            }
+            catch (vg vg2) {
+                throw y7.a(vg2);
+            }
+            return bl2;
+        }
+        return false;
+    }
+    public void m(WQ wQ2) {
+        BM bM2 = uO.P();
+        try {
+            if (this.k == null) {
+                this.k = Ui.Y.d().w(LS.class);
+            }
+        }
+        catch (vg vg2) {
+            throw y7.a(vg2);
+        }
+        try {
+            if (this.k.h()) {
+                return;
+            }
+        }
+        catch (vg vg3) {
+            throw y7.a(vg3);
+        }
+        this.r = bM2.V();
+        this.S = bM2.Z();
+    }
+    private boolean Y(BM bM2) {
+        boolean bl2;
+        block14: {
+            block13: {
+                try {
+                    if (bM2.k()) {
+                        return false;
+                    }
+                }
+                catch (vg vg2) {
+                    throw y7.a(vg2);
+                }
+                try {
+                    try {
+                        try {
+                            try {
+                                try {
+                                    if (this.k.h() || !(bM2.B() > 0.0f)) break block13;
+                                }
+                                catch (vg vg3) {
+                                    throw y7.a(vg3);
+                                }
+                                if (bM2.q()) break block13;
+                            }
+                            catch (vg vg4) {
+                                throw y7.a(vg4);
+                            }
+                            if (bM2.X().d() <= 6) break block13;
+                        }
+                        catch (vg vg5) {
+                            throw y7.a(vg5);
+                        }
+                        if (bM2.W()) break block13;
+                    }
+                    catch (vg vg6) {
+                        throw y7.a(vg6);
+                    }
+                    bl2 = true;
+                    break block14;
+                }
+                catch (vg vg7) {
+                    throw y7.a(vg7);
+                }
+            }
+            bl2 = false;
+        }
+        return bl2;
+    }
+    public void p(rB rB2) {
+        try {
+            if (this.w) {
+                rB2.getThePlayer().o(false);
+                this.p = true;
+                this.w = false;
+            }
+        }
+        catch (vg vg2) {
+            throw y7.a(vg2);
+        }
+    }
+    private static vg a(vg vg2) {
+        return vg2;
+    }
+    public y7() {
+        long l10 = a ^ 0x2A26A37CE21CL;
+        super((String)((Object)"KeepSprint"), (int)j, oK.R, (String)((Object)"Prevents you from losing sprint when attacking"));
+        this.t = new VS(this, (String)((Object)"Retain factor"), 0.95, 0.6, 1.0, (String)((Object)"#.##"), "");
+        this.A = new Ve((Object)this, (String)((Object)"Reset sprint"), false);
+        this.y = new YU();
+        this.o(z4.B, true);
+        this.t(this.t, this.A);
+    }

@@ -7,6 +7,7 @@ package dev.fox.anticheat;
 
 import dev.fox.anticheat.observation.ObservationModule;
 import dev.fox.anticheat.packet.PacketHandlers;
+import dev.fox.anticheat.packet.OutboundHandlers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,6 +18,7 @@ public final class Session{
     public final long id;
     public final Player player; // Access live player state only on the server thread.
     public final PacketHandlers handlers = new PacketHandlers();
+    public final OutboundHandlers outbound = new OutboundHandlers();
     public final List<ObservationModule> modules = new ArrayList<>();
 
     // Network/server handoff bookkeeping; these fields cross thread boundaries.

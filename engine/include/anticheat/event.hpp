@@ -4,6 +4,7 @@
 
 #pragma once
 #include "events/combat.hpp"
+#include "events/movement.hpp"
 #include <cstdint>
 #include <string>
 #include <variant>
@@ -90,7 +91,8 @@ namespace ac{
     using Payload = std::variant<
         SessionStart, SessionEnd, ResetEvent, TickEvent,
         DigEvent, MiningContextEvent,
-        AttackEvent, CombatContextEvent, SwingEvent, TeleportEvent
+        AttackEvent, CombatContextEvent, SwingEvent, TeleportEvent,
+        MovementEvent, ImpulseEvent, ImpulseAckEvent, CorrectionEvent
     >;
 
     // Pairs shared metadata with one typed event payload

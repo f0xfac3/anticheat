@@ -7,6 +7,9 @@
 #include "fastbreak.hpp"
 #include "reach.hpp"
 #include "autoclicker.hpp"
+#include "movement_checks.hpp"
+#include "velocity.hpp"
+#include "hitboxes.hpp"
 #include <cmath>
 #include <locale>
 #include <map>
@@ -234,6 +237,49 @@ namespace ac{
             100
         );
         (void)AutoClickerCheck(autoclicker);
+
+        bool timer_enabled=boolean("timer.enabled",true);
+        TimerSettings timer;
+        timer.credit_ms=number("timer.credit_ms",timer.credit_ms);
+        timer.lead_ms=number("timer.lead_ms",timer.lead_ms);
+        timer.sustain_ms=number("timer.sustain_ms",timer.sustain_ms);
+        timer.warmup_ms=number("timer.warmup_ms",timer.warmup_ms);
+        timer.maximum_queue_ms=number("timer.maximum_queue_ms",timer.maximum_queue_ms);
+        timer.uncertain_gap_ms=number("timer.uncertain_gap_ms",timer.uncertain_gap_ms);
+        (void)TimerCheck(timer);
+        if(timer_enabled) setup.factories.push_back([timer]{return std::make_unique<TimerCheck>(timer);});
+
+        const std::pair<const char*,MovementKind> movements[]{
+            {"speed",MovementKind::speed},{"fly",MovementKind::fly},{"noslow",MovementKind::noslow},
+            {"nofall",MovementKind::nofall},{"keepsprint",MovementKind::keepsprint}};
+        for(const auto& item:movements){
+            std::string key=item.first;
+            // KeepSprint's client-side attack success branch is not acknowledged by this adapter.
+            bool enabled=boolean(key+".enabled",item.second!=MovementKind::keepsprint);
+            MovementSettings model;
+            model.horizontal_epsilon=number(key+".horizontal_epsilon",model.horizontal_epsilon);
+            model.vertical_epsilon=number(key+".vertical_epsilon",model.vertical_epsilon);
+            model.maximum_queue_ms=number(key+".maximum_queue_ms",model.maximum_queue_ms);
+            model.alert_after=integer(key+".alert_after",model.alert_after,100);
+            (void)MovementCheck(item.second,model);
+            if(enabled) setup.factories.push_back([kind=item.second,model]{return std::make_unique<MovementCheck>(kind,model);});
+        }
+        bool velocity_enabled=boolean("velocity.enabled",true);
+        VelocitySettings velocity;
+        velocity.epsilon=number("velocity.epsilon",velocity.epsilon);
+        velocity.maximum_queue_ms=number("velocity.maximum_queue_ms",velocity.maximum_queue_ms);
+        velocity.alert_after=integer("velocity.alert_after",velocity.alert_after,100);
+        (void)VelocityCheck(velocity);
+        if(velocity_enabled) setup.factories.push_back([velocity]{return std::make_unique<VelocityCheck>(velocity);});
+
+        bool hitboxes_enabled=boolean("hitboxes.enabled",true);
+        HitboxSettings hitboxes;
+        hitboxes.padding=number("hitboxes.padding",hitboxes.padding);
+        hitboxes.angle_grace=number("hitboxes.angle_grace",hitboxes.angle_grace);
+        hitboxes.history_ms=number("hitboxes.history_ms",hitboxes.history_ms);
+        hitboxes.alert_after=integer("hitboxes.alert_after",hitboxes.alert_after,100);
+        (void)HitboxCheck(hitboxes);
+        if(hitboxes_enabled) setup.factories.push_back([hitboxes]{return std::make_unique<HitboxCheck>(hitboxes);});
 
         // Remaining keys are misspelled or unsupported, not silently ignored.
         if(!values.empty())

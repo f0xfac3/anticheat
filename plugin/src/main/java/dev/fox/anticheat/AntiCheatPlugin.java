@@ -30,6 +30,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -306,6 +307,12 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
 
         if(session != null)
             end(session);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onRespawn(PlayerRespawnEvent event){
+        Session session=sessions.get(event.getPlayer().getUniqueId());
+        if(session!=null && session.active) session.recordLoss();
     }
 
     // Invalidate old queued observations, but let each check handle the teleport itself.

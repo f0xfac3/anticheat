@@ -22,6 +22,8 @@ public final class CombatContext{
     public final double maxZ;
     public final int pingMillis;
     public final boolean available;
+    public double yaw, pitch;
+    public boolean rotationAvailable, attackerSprinting, targetPlayer;
 
     public CombatContext(
         String world,

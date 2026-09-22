@@ -17,6 +17,7 @@ public final class ObservationModules{
         List<ObservationModule> modules = new ArrayList<>();
         modules.add(new MiningObservations(session, sink));
         modules.add(new CombatObservations(session, sink));
+        modules.add(new MovementObservations(session, sink));
         return modules;
     }
 }

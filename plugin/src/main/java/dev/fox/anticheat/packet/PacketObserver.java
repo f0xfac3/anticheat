@@ -8,12 +8,15 @@ package dev.fox.anticheat.packet;
 import dev.fox.anticheat.Session;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelPromise;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.LongSupplier;
+import java.util.function.Consumer;
+import java.util.logging.Logger;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,24 +30,33 @@ public final class PacketObserver{
     private static final int PLAYER_QUEUE_LIMIT = 128;
     private static final int TOTAL_QUEUE_LIMIT = 1024;
 
-    private final JavaPlugin plugin;
+    private final Logger logger;
     private final Receiver receiver;
     private final LongSupplier clock;
-    private final MinecraftServer server = MinecraftServer.getServer();
+    private final Consumer<Runnable> mainThread;
     private final Map<Long, Channel> channels = new HashMap<>();
     private final AtomicInteger pending = new AtomicInteger();
     private volatile boolean running = true;
 
     public PacketObserver(JavaPlugin plugin, LongSupplier clock, Receiver receiver){
-        this.plugin = plugin;
+        this(plugin.getLogger(),clock,receiver,task->MinecraftServer.getServer().postToMainThread(task));
+    }
+
+    // Package-private injection allows exercising the real handler with EmbeddedChannel.
+    PacketObserver(Logger logger, LongSupplier clock, Receiver receiver, Consumer<Runnable> mainThread){
+        this.logger = logger;
         this.clock = clock;
         this.receiver = receiver;
+        this.mainThread = mainThread;
     }
+
+    ChannelDuplexHandler connectionHandler(Session session){return new ConnectionObserver(session);}
 
     // Install this session's observer before normal NMS packet processing.
     // Call on the server thread; pipeline changes run on the channel's event loop.
     public void attach(Session session){
         session.handlers.seal();
+        session.outbound.seal();
 
         Channel channel = ((CraftPlayer) session.player).getHandle()
             .playerConnection.networkManager.channel;
@@ -61,10 +73,10 @@ public final class PacketObserver{
                 channel.pipeline().addBefore(
                     "packet_handler",
                     NAME,
-                    new ConnectionObserver(session)
+                    connectionHandler(session)
                 );
 
-                plugin.getLogger().info("Packet observer attached: session=" + session.id);
+                logger.info("Packet observer attached: session=" + session.id);
             }catch(RuntimeException | LinkageError error){
                 fail(session, error);
             }
@@ -72,13 +84,37 @@ public final class PacketObserver{
     }
 
     // Each connection has its own packet order and Netty read-cycle counter.
-    private final class ConnectionObserver extends ChannelInboundHandlerAdapter{
+    private final class ConnectionObserver extends ChannelDuplexHandler{
         private final Session session;
         private long sequence;
         private long batch;
 
         private ConnectionObserver(Session session){
             this.session = session;
+        }
+
+        @Override
+        public void write(ChannelHandlerContext ctx, Object message, ChannelPromise promise) throws Exception{
+            Object followup=null;
+            try{
+                if(running && session.active){
+                    long generation=session.generation.get();
+                    PacketInfo info=new PacketInfo(++sequence,batch,clock.getAsLong(),System.currentTimeMillis());
+                    OutboundHandlers.Capture capture=session.outbound.capture(message,info);
+                    if(capture!=null){
+                        if(capture.observation!=null) submit(session,capture.observation,generation);
+                        followup=capture.afterWrite;
+                    }
+                }
+            }catch(RuntimeException | LinkageError error){ fail(session,error); }
+            // ctx.write resumes downstream: the original is forwarded exactly once.
+            ctx.write(message,promise);
+            if(followup!=null){
+                if(promise!=ctx.voidPromise()) promise.addListener(future->{ if(!future.isSuccess()) session.recordLoss(); });
+                ctx.write(followup).addListener(future->{ if(!future.isSuccess()) session.recordLoss(); });
+                // Also flush a barrier when the original caller used write without flush.
+                ctx.flush();
+            }
         }
 
         @Override
@@ -131,7 +167,7 @@ public final class PacketObserver{
         try{
             // Spigot 1.8.8 uses this queue for gameplay packet processing.
             // Queue our snapshot first, then let channelRead forward the original packet.
-            server.postToMainThread(()->{
+            mainThread.accept(()->{
                 try{
                     if(running && session.active)
                         receiver.accept(session, observation, generation);
@@ -156,7 +192,7 @@ public final class PacketObserver{
     private void fail(Session session, Throwable error){
         session.failure = error.toString();
         session.active = false;
-        plugin.getLogger().severe("Observer disabled for session=" + session.id + ": " + error);
+        logger.severe("Observer disabled for session=" + session.id + ": " + error);
     }
 
     public void detach(long id){

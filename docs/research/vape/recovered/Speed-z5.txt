@@ -1,0 +1,177 @@
+// Reference only: a/z5; business-method excerpts from decoded CFR source.
+// Original decompiler errors and unresolved expressions may remain.
+    private static vg a(vg vg2) {
+        return vg2;
+    }
+    public z5(zb zb2, String string) {
+        super(zb2, string);
+    }
+    public void i(Wy wy2) {
+        block52: {
+            BM bM2;
+            block53: {
+                block46: {
+                    block44: {
+                        block43: {
+                            bM2 = uO.P();
+                            try {
+                                if (bM2.n()) {
+                                    return;
+                                }
+                            }
+                            catch (vg vg2) {
+                                throw z5.a(vg2);
+                            }
+                            try {
+                                try {
+                                    if (bM2.B() != 0.0f || bM2.y() != 0.0f) break block43;
+                                }
+                                catch (vg vg3) {
+                                    throw z5.a(vg3);
+                                }
+                                this.a.G = this.a.o();
+                            }
+                            catch (vg vg4) {
+                                throw z5.a(vg4);
+                            }
+                        }
+                        try {
+                            block45: {
+                                try {
+                                    try {
+                                        try {
+                                            if (this.a.r != 1 || !bM2.Y()) break block44;
+                                        }
+                                        catch (vg vg5) {
+                                            throw z5.a(vg5);
+                                        }
+                                        if (bM2.B() != 0.0f) break block45;
+                                    }
+                                    catch (vg vg6) {
+                                        throw z5.a(vg6);
+                                    }
+                                    if (bM2.y() == 0.0f) break block44;
+                                }
+                                catch (vg vg7) {
+                                    throw z5.a(vg7);
+                                }
+                            }
+                            this.a.G = 0.25 + this.a.o() - 0.01;
+                        }
+                        catch (vg vg8) {
+                            throw z5.a(vg8);
+                        }
+                    }
+                    try {
+                        block47: {
+                            try {
+                                try {
+                                    if (this.a.r != 2) break block46;
+                                    if (bM2.B() != 0.0f) break block47;
+                                }
+                                catch (vg vg9) {
+                                    throw z5.a(vg9);
+                                }
+                                if (bM2.y() == 0.0f) break block46;
+                            }
+                            catch (vg vg10) {
+                                throw z5.a(vg10);
+                            }
+                        }
+                        if (!bM2.a()) break block46;
+                    }
+                    catch (vg vg11) {
+                        throw z5.a(vg11);
+                    }
+                    double d10 = 0.42f;
+                    if (bM2.o(vH.F)) {
+                        d10 += (double)((float)(bM2.a(vH.F).p() + 1) * 0.1f);
+                    }
+                    wy2.setY(d10);
+                    bM2.w(d10);
+                    this.a.G *= 2.149;
+                    break block53;
+                }
+                if (this.a.r == 3) {
+                    double d11 = 0.66 * (this.a.b - this.a.o());
+                    this.a.G = this.a.b - d11;
+                } else {
+                    block48: {
+                        int n10;
+                        block51: {
+                            block50: {
+                                block49: {
+                                    NF nF2 = null;
+                                    nF2 = oF.MC_1_7_10.e() ? bM2.s().t().e(0.0, bM2.c(), 0.0) : bM2.s().e(0.0, bM2.c(), 0.0);
+                                    List list = uO.o().z(bM2, nF2);
+                                    try {
+                                        try {
+                                            try {
+                                                try {
+                                                    if (list.size() <= 0 && !bM2.Y()) break block48;
+                                                }
+                                                catch (vg vg12) {
+                                                    throw z5.a(vg12);
+                                                }
+                                                if (this.a.r <= 0) break block48;
+                                            }
+                                            catch (vg vg13) {
+                                                throw z5.a(vg13);
+                                            }
+                                            if (!(1.35 * this.a.o() - 0.01 > this.a.G)) break block49;
+                                        }
+                                        catch (vg vg14) {
+                                            throw z5.a(vg14);
+                                        }
+                                        this.a.r = 0;
+                                        break block48;
+                                    }
+                                    catch (vg vg15) {
+                                        throw z5.a(vg15);
+                                    }
+                                }
+                                try {
+                                    try {
+                                        yq yq2 = this.a;
+                                        if (bM2.B() == 0.0f && bM2.y() == 0.0f) break block50;
+                                    }
+                                    catch (vg vg16) {
+                                        throw z5.a(vg16);
+                                    }
+                                    n10 = 1;
+                                    break block51;
+                                }
+                                catch (vg vg17) {
+                                    throw z5.a(vg17);
+                                }
+                            }
+                            n10 = 0;
+                        }
+                        yq2.r = n10;
+                    }
+                    this.a.G = this.a.b - this.a.b / 159.0;
+                }
+            }
+            try {
+                if (this.a.r > 0) {
+                    this.a.G = Math.max(this.a.G, this.a.o());
+                    this.a.F(wy2, this.a.G, bM2);
+                }
+            }
+            catch (vg vg18) {
+                throw z5.a(vg18);
+            }
+            try {
+                try {
+                    if (bM2.B() == 0.0f && bM2.y() == 0.0f) break block52;
+                }
+                catch (vg vg19) {
+                    throw z5.a(vg19);
+                }
+                ++this.a.r;
+            }
+            catch (vg vg20) {
+                throw z5.a(vg20);
+            }
+        }
+    }

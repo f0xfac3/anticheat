@@ -103,7 +103,7 @@ public final class CombatSmokeTest{
             check(truncated, "every attack-payload truncation rejected safely");
 
             valid.put(valid.limit() - 1, (byte) 2);
-            check(rejects(engine, valid), "invalid combat availability flag rejected");
+            check(rejects(engine, valid), "invalid combat target-player flag rejected");
             valid.put(valid.limit() - 1, (byte) 1);
             valid.put(4, (byte) 1);
             check(rejects(engine, valid), "v1 cannot silently interpret v2 combat fields");

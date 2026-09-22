@@ -1,0 +1,256 @@
+// Reference only: a/Vs; business-method excerpts from decoded CFR source.
+// Original decompiler errors and unresolved expressions may remain.
+    public DecimalFormat h() {
+        return this.C;
+    }
+    public void Z(double d10) {
+        super.x(new double[]{sr.g(d10, this.r()), this.R()});
+        this.d();
+    }
+    public double I() {
+        return this.l;
+    }
+    private DecimalFormat D() {
+        DecimalFormat decimalFormat;
+        long l10 = d ^ 0x2030AE6F3EC6L;
+        try {
+            decimalFormat = new DecimalFormat(this.p);
+        }
+        catch (Exception exception) {
+            Ui.h(exception);
+            decimalFormat = new DecimalFormat((String)((Object)"#.##"));
+        }
+        decimalFormat.setMinimumIntegerDigits(1);
+        return decimalFormat;
+    }
+    public double p() {
+        double d10 = this.e();
+        double d11 = this.R();
+        return d10 + (d11 - d10) * this.A.nextDouble();
+    }
+    public static Vs U(Object object, String string, String string2, String string3, double d10, double d11, double d12, double d13) {
+        return new Vs(object, string, new double[]{d11, d12}, d10, d13, string2, string3);
+    }
+    public static Vs R(Object object, String string, String string2, String string3, double d10, double d11, double d12, double d13, double d14) {
+        Vs vs2 = new Vs(object, string, new double[]{d11, d12}, d10, d13, string2, string3);
+        vs2.o = d14;
+        return vs2;
+    }
+    public void Y(double d10) {
+        this.o = d10;
+    }
+    public double r() {
+        return this.o;
+    }
+    public Vs M(int n10) {
+        this.j.setMaximumFractionDigits(n10);
+        return this;
+    }
+    public double R() {
+        return ((double[])this.z())[1];
+    }
+    public double y() {
+        return this.U;
+    }
+    public void P(double d10) {
+        if (d10 < this.e()) {
+            d10 = this.e();
+        } else if (d10 > this.U) {
+            d10 = this.U;
+        } else if (d10 < this.l) {
+            d10 = this.l;
+        }
+        super.x(new double[]{this.e(), sr.g(d10, this.r())});
+        this.d();
+    }
+    public boolean p(JsonObject jsonObject) {
+        long l10 = d ^ 0x71A8AFD98B6FL;
+        if (jsonObject.get((String)((Object)"id")).getAsString().equalsIgnoreCase(this.f())) {
+            double d10;
+            double[] dArray;
+            double d11;
+            double[] dArray2;
+            Vs vs2;
+            Double d12;
+            Double d13;
+            block9: {
+                d13 = kN.L(jsonObject, (String)((Object)"minimum"));
+                d12 = kN.L(jsonObject, (String)((Object)"maximum"));
+                try {
+                    try {
+                        if (d13 != null || d12 != null) break block9;
+                    }
+                    catch (vg vg2) {
+                        throw Vs.a(vg2);
+                    }
+                    return false;
+                }
+                catch (vg vg3) {
+                    throw Vs.a(vg3);
+                }
+            }
+            try {
+                vs2 = this;
+                double[] dArray3 = new double[2];
+                double[] dArray4 = dArray3;
+                dArray2 = dArray3;
+                int n10 = 0;
+                d11 = d13 != null ? d13 : ((double[])this.f)[0];
+            }
+            catch (vg vg4) {
+                throw Vs.a(vg4);
+            }
+            try {
+                dArray4[n10] = d11;
+                double[] dArray5 = dArray2;
+                dArray = dArray2;
+                int n11 = 1;
+                d10 = d12 != null ? d12 : ((double[])this.f)[1];
+            }
+            catch (vg vg5) {
+                throw Vs.a(vg5);
+            }
+            dArray5[n11] = d10;
+            vs2.A(dArray);
+            return true;
+        }
+        return false;
+    }
+    public void a(double d10) {
+        super.x(new double[]{this.e(), sr.g(d10, this.r())});
+        this.d();
+    }
+    public void A(double[] dArray) {
+        block13: {
+            block12: {
+                block11: {
+                    block10: {
+                        try {
+                            super.x(dArray);
+                            if (!(dArray[0] > this.Y)) break block10;
+                            dArray[0] = this.Y;
+                            break block11;
+                        }
+                        catch (vg vg2) {
+                            throw Vs.a(vg2);
+                        }
+                    }
+                    try {
+                        if (dArray[0] < -this.Y) {
+                            dArray[0] = -this.Y;
+                        }
+                    }
+                    catch (vg vg3) {
+                        throw Vs.a(vg3);
+                    }
+                }
+                try {
+                    if (!(dArray[1] > this.Y)) break block12;
+                    dArray[1] = this.Y;
+                    break block13;
+                }
+                catch (vg vg4) {
+                    throw Vs.a(vg4);
+                }
+            }
+            try {
+                if (dArray[1] < -this.Y) {
+                    dArray[1] = -this.Y;
+                }
+            }
+            catch (vg vg5) {
+                throw Vs.a(vg5);
+            }
+        }
+        this.Z(dArray[0]);
+        this.a(dArray[1]);
+        this.d();
+    }
+    public int J() {
+        return (int)this.R();
+    }
+    private static vg a(vg vg2) {
+        return vg2;
+    }
+    public String W() {
+        return this.C.format(this.e());
+    }
+    public String z() {
+        return this.k;
+    }
+    public JsonObject z(boolean bl2) {
+        long l10 = d ^ 0x1963CC65572CL;
+        JsonObject jsonObject = this.E();
+        try {
+            if (this.e() != ((double[])this.D())[0]) {
+                jsonObject.addProperty((String)((Object)"minimum"), (Number)this.e());
+            }
+        }
+        catch (vg vg2) {
+            throw Vs.a(vg2);
+        }
+        try {
+            if (this.R() != ((double[])this.D())[1]) {
+                jsonObject.addProperty((String)((Object)"maximum"), (Number)this.R());
+            }
+        }
+        catch (vg vg3) {
+            throw Vs.a(vg3);
+        }
+        return jsonObject;
+    }
+    public String r() {
+        String string = this.j.format(this.e());
+        String string2 = this.j.format(this.R());
+        return string + "-" + string2 + this.k.trim();
+    }
+    public double e() {
+        return ((double[])this.z())[0];
+    }
+    public void x(double d10) {
+        this.Y = d10;
+    }
+    public Vs k() {
+        return new Vs(null, this.j(), (double[])this.D(), this.I(), this.y(), this.p, this.k);
+    }
+    public void R(String string) {
+    }
+    public static Vs b(Object object, String string, String string2, String string3, double d10, double d11, double d12, double d13, double d14, String string4) {
+        Vs vs2 = new Vs(object, string, new double[]{d11, d12}, d10, d13, string2, string3);
+        vs2.o = d14;
+        return (Vs)vs2.a(string4);
+    }
+    public static Vs j(Object object, String string, String string2, String string3, String string4, double d10, double d11, double d12, double d13, double d14) {
+        Vs vs2 = new Vs(object, string, new double[]{d11, d12}, d10, d13, string3, string4);
+        vs2.o = d14;
+        return vs2;
+    }
+    public void w(double d10) {
+        if (d10 > this.R()) {
+            d10 = this.R();
+        } else if (d10 > this.U) {
+            d10 = this.U;
+        } else if (d10 < this.l) {
+            d10 = this.l;
+        }
+        super.x(new double[]{sr.g(d10, this.r()), this.R()});
+        this.d();
+    }
+    public String V() {
+        return this.C.format(this.R());
+    }
+    public int k() {
+        return (int)this.e();
+    }
+    public Vs(Object object, String string, double[] dArray, double d10, double d11, String string2, String string3) {
+        super(object, string, dArray);
+        this.l = d10;
+        this.U = d11;
+        this.p = CN.G(string2);
+        if (!string3.isEmpty()) {
+            string3 = " " + string3;
+        }
+        this.k = string3;
+        this.C = this.D();
+        this.j = this.D();
+    }

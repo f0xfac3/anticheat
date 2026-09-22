@@ -1,0 +1,113 @@
+{
+  "capture_jar_sha256": "0bba297387dc4d1dfad51553771af31ad8b7ff3019419db9329502596279854e",
+  "transformation": "Existing business-method excerpts; remove blank lines and normalize LF only. Not compilable or independently parity-verified.",
+  "files": [
+    {
+      "file": "recovered/Timer-yG.txt",
+      "source_excerpt_sha256": "d090ea78fa42006470077222b11b69fe410663c98406f6921a874f0cf81b8f1c",
+      "sha256": "c9c131c5f344d48558c674c730cbe37f65d27e92d7e4e1cd1be00574804978e1",
+      "class_entry": "a/yG.class",
+      "class_sha256": "862b9c123bde880c51068a7513a780b2b18e12910ccff6e4189c3566b2449ae0"
+    },
+    {
+      "file": "recovered/Timer-Nb.txt",
+      "source_excerpt_sha256": "1861a6e103f9ed80f732319fc82983ba724717a8de66d6a5adf67b951d5e1a1e",
+      "sha256": "faf0514c8805fae3f7b8a68f6ff78795c4ac1e13d516a0397b7aaeea604dd5e4",
+      "class_entry": "a/Nb.class",
+      "class_sha256": "9376bfa78b5ac7f61377ecd07e4b960d32fd8f9028d17819ac2d1ecff828a7db"
+    },
+    {
+      "file": "recovered/Reach-y6.txt",
+      "source_excerpt_sha256": "49b701acdffe3ce994db835ce2d27873d35f15c77d0cd93e87b9fed6da898c88",
+      "sha256": "5bf05ba0ead2590c07021d722c83058006b2d99697a1023366d2a0abf9ec4817",
+      "class_entry": "a/y6.class",
+      "class_sha256": "6391367d704b68ddda036bfac8ab32387805c0f20220ba37f797bece8f273a51"
+    },
+    {
+      "file": "recovered/Reach-OR.txt",
+      "source_excerpt_sha256": "7017f31b8e91e065f1785e77c329ea7a5f1b3c5e40edc4fced951fe299ce2683",
+      "sha256": "b5b7de7b3212af067e92ce88d3bbb01839c45580dde954e72cc6824de13291c2",
+      "class_entry": "a/OR.class",
+      "class_sha256": "09543f9ffc6836e15c8df4dd94e96d2479ef3dadbf4bf5f889a079139f7660cf"
+    },
+    {
+      "file": "recovered/Reach-Vs.txt",
+      "source_excerpt_sha256": "4c79d19372f3a58929244126d795cc6ff6dda539eadda8313be825a7d2289fa3",
+      "sha256": "1317c976ef61db5df4338e68f18e10e9969ad73e8bcf80594fd0a995920b6645",
+      "class_entry": "a/Vs.class",
+      "class_sha256": "feefbd3773ba7ed978662bb16e654140bd958c523d88eb2c36eead538f96126e"
+    },
+    {
+      "file": "recovered/HitBoxes-yY.txt",
+      "source_excerpt_sha256": "bd8eb4e425f7be96d155646a1672f88e6c1ab9b1c657ae836fc5c767a3c0471a",
+      "sha256": "e478eefc26c48938f2bbfb71bbbbbf92a9541eed7e4870d9e7a1458e95bf23e3",
+      "class_entry": "a/yY.class",
+      "class_sha256": "e9b15e402d71d3e7ccf4f6a339dd31c639d7d287d3eeb5965ce405155251ccba"
+    },
+    {
+      "file": "recovered/Velocity-yZ.txt",
+      "source_excerpt_sha256": "c426a2f4f7e96c7456f5d58d7cc2fcf9aa2c3f50d0f64e34ab4b4b8e9e8fe35c",
+      "sha256": "6f61bda40cbc4009cb8ce25f7f9d214a222ba0fda5dd33a858d6cc8099c030d7",
+      "class_entry": "a/yZ.class",
+      "class_sha256": "697b583d1f8bed9399e41632540fd4719c878e7a523eacc20ec4d12f9f8d42b2"
+    },
+    {
+      "file": "recovered/KeepSprint-y7.txt",
+      "source_excerpt_sha256": "e589b3d6453e940764db68aaf5a56a8d3a973f327fd83fbfea52c13f6fe68579",
+      "sha256": "7bba1a7dc20caf850c1fb81e34c5cf20b099587044242e2023ded7a27db48443",
+      "class_entry": "a/y7.class",
+      "class_sha256": "4e10ef9c6c247c7774d868dd6b628d9810976ad3a3c0d4e467fb783a2dfe7697"
+    },
+    {
+      "file": "recovered/NoSlowdown-yl.txt",
+      "source_excerpt_sha256": "2ee7542e741410c8496e522d6b3efc8f22efe429372d54c49ea4e300cab5a5ed",
+      "sha256": "132c21c084b6156640d43e689500570b600d6722c2677927f7db379a3df972ef",
+      "class_entry": "a/yl.class",
+      "class_sha256": "fe275377fc4ea49de19ecd11e94fb22aeafc281f6db77dc42cbb1a82d6c75d6a"
+    },
+    {
+      "file": "recovered/NoFall-ys.txt",
+      "source_excerpt_sha256": "a9fb12db55c349ac2b570df0f3aa4caca466ee55d7c3526f1ad6813e969b4f89",
+      "sha256": "e14a3f57f37bb0f9fbb18efafa7ab1853f2d87f1093ce6086c2f111aa924eff8",
+      "class_entry": "a/ys.class",
+      "class_sha256": "c82dce1b03f4ef1158c8e079d6cdd9b40b7520f483f771906d63d30823d375c9"
+    },
+    {
+      "file": "recovered/Speed-yq.txt",
+      "source_excerpt_sha256": "3d07f0561e4f4d19df78896a766a76e662b04a184b6f560c1371ebb51ed9a7a1",
+      "sha256": "396860198185ab6d4b1835492062d75e55afde21a0f3a33bdb386b78286b6dc2",
+      "class_entry": "a/yq.class",
+      "class_sha256": "4150cb47ead154b2f23d60c0eb4ae20941e65e6adad301caccd294c9a10410af"
+    },
+    {
+      "file": "recovered/Speed-z5.txt",
+      "source_excerpt_sha256": "9a39db131420921c0c793c151a034f1747fe68e89037eef303ba6a5b1bd15252",
+      "sha256": "cf758a10da575eed1401e956256db369b0ac1edef4677a65eccea0617465ee3b",
+      "class_entry": "a/z5.class",
+      "class_sha256": "1fd6877f16a68aad46982b54fa92cdee1c291bcad5d8b8f7cd47e3f022b3d7d0"
+    },
+    {
+      "file": "recovered/Fly-yp.txt",
+      "source_excerpt_sha256": "7b2536f4d81d7e40d23cdbf2e2d3aec10d958fa67a500ad944cec60812dd06e2",
+      "sha256": "e156bfeea5c45343c46dd5e20783255944a6d25b04c56a62f2f1d6e66153dd5c",
+      "class_entry": "a/yp.class",
+      "class_sha256": "f84f26fc854f7a4a5f329768461b94348f89a8aa90393397843bcdc8eecf3aee"
+    },
+    {
+      "file": "baseline.json",
+      "sha256": "474d44af002e447ae06b1aa558844fc5aa1a562e0aa76283bdd02c135f4f6ee9"
+    },
+    {
+      "file": "field-evidence.json",
+      "sha256": "11fcd1d5036033b783e7b8f28a46fe61e0ec310440b796f2ea71a77e6beec8a7"
+    },
+    {
+      "file": "capture-summary.json",
+      "sha256": "98f1b300a75a341214a4cba78046a24dc817fa08bb92321503369dad72607f64"
+    },
+    {
+      "file": "decryption-validation.json",
+      "sha256": "bdcfbf070e0e259f434eff6eb603d28d7c7565f882d615e20363fd28892599fd"
+    }
+  ]
+}

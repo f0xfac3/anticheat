@@ -1,0 +1,583 @@
+// Reference only: a/yZ; business-method excerpts from decoded CFR source.
+// Original decompiler errors and unresolved expressions may remain.
+    public void u(rB rB2) {
+        block11: {
+            block13: {
+                double d10;
+                BM bM2;
+                block14: {
+                    block12: {
+                        try {
+                            if (this.Z()) {
+                                this.y = null;
+                                this.a = 0;
+                                return;
+                            }
+                        }
+                        catch (vg vg2) {
+                            throw yZ.a(vg2);
+                        }
+                        try {
+                            try {
+                                if (this.y == null) break block11;
+                                if (this.a <= 0) break block12;
+                                break block13;
+                            }
+                            catch (vg vg3) {
+                                throw yZ.a(vg3);
+                            }
+                        }
+                        catch (vg vg4) {
+                            throw yZ.a(vg4);
+                        }
+                    }
+                    bM2 = uO.P();
+                    double[] dArray = this.r();
+                    d10 = dArray[0] / 100.0;
+                    double d11 = dArray[1] / 100.0;
+                    double d12 = bM2.c();
+                    try {
+                        try {
+                            if (this.y.t == 0.0 || !(d12 > 0.0)) break block14;
+                        }
+                        catch (vg vg5) {
+                            throw yZ.a(vg5);
+                        }
+                        bM2.w(this.O(bM2.c(), d11));
+                    }
+                    catch (vg vg6) {
+                        throw yZ.a(vg6);
+                    }
+                }
+                bM2.F(this.O(bM2.V(), d10));
+                bM2.P(this.O(bM2.Z(), d10));
+                this.y = null;
+            }
+            --this.a;
+        }
+    }
+    private boolean L() {
+        boolean bl2;
+        int n10 = sr.s(new Random(), 0, 100);
+        try {
+            bl2 = (double)n10 >= 100.0 - (Double)this.p.z();
+        }
+        catch (vg vg2) {
+            throw yZ.a(vg2);
+        }
+        return bl2;
+    }
+    private void lambda$onPacketReceived$0(W3 w32, P5 p52) {
+        this.o(p52, w32);
+    }
+    private QQ j(QQ qQ2, double d10, double d11, double d12) {
+        Object object = Ui.Y.S().Lj.e(qQ2.Z(), d10, d11, d12);
+        return new QQ(object);
+    }
+    public yZ() {
+        long l10 = d ^ 0x7EAC68826748L;
+        super((String)((Object)"Velocity"), (int)r, oK.f, (String)((Object)"Reduces knockback taken"));
+        this.Z = Ve.j(this, (String)((Object)"Only when targeting"), false, (String)((Object)"Only reduce knockback while being face to face with opponent"));
+        this.Y = Ve.j(this, (String)((Object)"Water check"), false, (String)((Object)"Won't reduce knockback if in water"));
+        this.p = VS.M(this, (String)((Object)"Chance"), "#", "%", 0.0, 40.0, 100.0, (String)((Object)"Chance of reducing knockback"));
+        this.O = Ve.j(this, (String)((Object)"Kite mode"), false, (String)((Object)"Increases knockback while not facing opponent"));
+        this.A = Ve.j(this, (String)((Object)"Always Kite"), false, (String)((Object)"Increase knockback regardless if not facing opponent"));
+        this.j = VS.w(this, (String)((Object)"Horizontal"), "#", "%", 0.0, 90.0, 100.0);
+        this.k = VS.w(this, (String)((Object)"Vertical"), "#", "%", 0.0, 100.0, 100.0);
+        this.x = VS.h(this, (String)((Object)"Ticks"), "#", "", 0.0, 1.0, 10.0, 1.0, (String)((Object)"How many ticks to wait before activating\nDoes not delay Kite"));
+        this.b = VS.w(this, (String)((Object)"Kite horizontal"), "#", "%", 100.0, 120.0, 300.0);
+        this.C = VS.w(this, (String)((Object)"Kite vertical"), "#", "%", 100.0, 120.0, 300.0);
+        this.a = 0;
+        this.y = null;
+        this.o(z4.B, true);
+        this.O.E(this.b, this.C, this.A);
+        this.t(this.p, this.j, this.k, this.x, this.O, this.b, this.C, this.A, this.Z, this.Y);
+        this.p.z(0);
+        this.k.z(0);
+        this.j.z(0);
+    }
+    private double O(double d10, double d11) {
+        boolean bl2;
+        String string;
+        String string2 = Double.toString(Math.abs(d10));
+        try {
+            string = string2.contains(",") ? "," : ".";
+        }
+        catch (vg vg2) {
+            throw yZ.a(vg2);
+        }
+        String string3 = string;
+        int n10 = string2.indexOf(string3);
+        int n11 = string2.length() - n10 - 1;
+        Du du2 = new Du(n11);
+        try {
+            bl2 = d11 < 0.0;
+        }
+        catch (vg vg3) {
+            throw yZ.a(vg3);
+        }
+        boolean bl3 = bl2;
+        double d12 = Math.abs(d11);
+        double d13 = d10 * d12;
+        if (bl3) {
+            d13 = -d13;
+        }
+        return du2.N(d13);
+    }
+    private void o(P5 p52, W3 w32) {
+        block74: {
+            double d10;
+            double d11;
+            double d12;
+            double d13;
+            double d14;
+            double[] dArray;
+            double d15;
+            double d16;
+            double d17;
+            boolean bl2;
+            boolean bl3;
+            boolean bl4;
+            BM bM2;
+            P5 p53;
+            block70: {
+                if (p52.J(EN.I8)) {
+                    block64: {
+                        block63: {
+                            p53 = new Q1(p52);
+                            bM2 = uO.P();
+                            bl4 = Tj.N(bM2);
+                            bl3 = Tj.o((BZ)bM2);
+                            try {
+                                if (!this.O.H().booleanValue() || !this.A.H().booleanValue()) break block63;
+                            }
+                            catch (vg vg2) {
+                                throw yZ.a(vg2);
+                            }
+                            bl3 = false;
+                        }
+                        try {
+                            try {
+                                try {
+                                    try {
+                                        if (!bl4 || bl3) break block64;
+                                    }
+                                    catch (vg vg3) {
+                                        throw yZ.a(vg3);
+                                    }
+                                    if (this.O.H().booleanValue()) break block64;
+                                }
+                                catch (vg vg4) {
+                                    throw yZ.a(vg4);
+                                }
+                                if (!this.Z.H().booleanValue()) break block64;
+                            }
+                            catch (vg vg5) {
+                                throw yZ.a(vg5);
+                            }
+                            return;
+                        }
+                        catch (vg vg6) {
+                            throw yZ.a(vg6);
+                        }
+                    }
+                    bl2 = this.L();
+                    if (bl2) {
+                        block66: {
+                            boolean bl5;
+                            block69: {
+                                block68: {
+                                    block65: {
+                                        d17 = ((Q1)p53).w();
+                                        d16 = ((Q1)p53).I();
+                                        d15 = ((Q1)p53).l();
+                                        try {
+                                            try {
+                                                if (!bl4 || bl3) break block65;
+                                            }
+                                            catch (vg vg7) {
+                                                throw yZ.a(vg7);
+                                            }
+                                            if (!this.O.H().booleanValue()) break block65;
+                                        }
+                                        catch (vg vg8) {
+                                            throw yZ.a(vg8);
+                                        }
+                                        double d18 = (Double)this.b.z() / 100.0;
+                                        double d19 = (Double)this.C.z() / 100.0;
+                                        double d20 = this.O(d17, d18);
+                                        double d21 = this.O(d16, d19);
+                                        double d22 = this.O(d15, d18);
+                                        ((Q1)p53).L((float)d20);
+                                        ((Q1)p53).W((float)d21);
+                                        ((Q1)p53).G((float)d22);
+                                        return;
+                                    }
+                                    try {
+                                        block67: {
+                                            try {
+                                                try {
+                                                    try {
+                                                        if (!((Double)this.x.z() > 0.0)) break block66;
+                                                        if ((double)Math.abs(((Q1)p53).w()) >= 0.005) break block67;
+                                                    }
+                                                    catch (vg vg9) {
+                                                        throw yZ.a(vg9);
+                                                    }
+                                                    if ((double)Math.abs(((Q1)p53).I()) >= 0.005) break block67;
+                                                }
+                                                catch (vg vg10) {
+                                                    throw yZ.a(vg10);
+                                                }
+                                                if (!((double)Math.abs(((Q1)p53).l()) >= 0.005)) break block68;
+                                            }
+                                            catch (vg vg11) {
+                                                throw yZ.a(vg11);
+                                            }
+                                        }
+                                        bl5 = true;
+                                        break block69;
+                                    }
+                                    catch (vg vg12) {
+                                        throw yZ.a(vg12);
+                                    }
+                                }
+                                bl5 = false;
+                            }
+                            boolean bl6 = bl5;
+                            try {
+                                if (bl6) {
+                                    this.a = ((Double)this.x.z()).intValue();
+                                    this.y = new C9(((Q1)p53).w(), ((Q1)p53).I(), ((Q1)p53).l());
+                                }
+                            }
+                            catch (vg vg13) {
+                                throw yZ.a(vg13);
+                            }
+                            return;
+                        }
+                        dArray = this.r();
+                        d14 = dArray[0] / 100.0;
+                        d13 = dArray[1] / 100.0;
+                        d12 = this.O(d17, d14);
+                        d11 = this.O(d16, d13);
+                        d10 = this.O(d15, d14);
+                        try {
+                            try {
+                                ((Q1)p53).L((float)d12);
+                                ((Q1)p53).W((float)d11);
+                                ((Q1)p53).G((float)d10);
+                                if (d14 != 0.0 || d13 != 0.0) break block70;
+                            }
+                            catch (vg vg14) {
+                                throw yZ.a(vg14);
+                            }
+                            ((Q1)p53).L(0.0f);
+                            ((Q1)p53).W(0.0f);
+                            ((Q1)p53).G(0.0f);
+                        }
+                        catch (vg vg15) {
+                            throw yZ.a(vg15);
+                        }
+                    }
+                }
+            }
+            if (p52.J(EN.nB)) {
+                p53 = new QQ(p52);
+                bM2 = uO.P();
+                try {
+                    if (bM2.k()) {
+                        return;
+                    }
+                }
+                catch (vg vg16) {
+                    throw yZ.a(vg16);
+                }
+                if (((QQ)p53).Z() == bM2.o()) {
+                    block72: {
+                        block71: {
+                            bl4 = Tj.N(bM2);
+                            bl3 = Tj.o((BZ)bM2);
+                            try {
+                                if (!this.O.H().booleanValue() || !this.A.H().booleanValue()) break block71;
+                            }
+                            catch (vg vg17) {
+                                throw yZ.a(vg17);
+                            }
+                            bl3 = false;
+                        }
+                        try {
+                            try {
+                                try {
+                                    try {
+                                        if (bl4 || bl3) break block72;
+                                    }
+                                    catch (vg vg18) {
+                                        throw yZ.a(vg18);
+                                    }
+                                    if (this.O.H().booleanValue()) break block72;
+                                }
+                                catch (vg vg19) {
+                                    throw yZ.a(vg19);
+                                }
+                                if (!this.Z.H().booleanValue()) break block72;
+                            }
+                            catch (vg vg20) {
+                                throw yZ.a(vg20);
+                            }
+                            return;
+                        }
+                        catch (vg vg21) {
+                            throw yZ.a(vg21);
+                        }
+                    }
+                    bl2 = this.L();
+                    if (bl2) {
+                        block75: {
+                            block73: {
+                                d17 = ((QQ)p53).Y();
+                                d16 = ((QQ)p53).N();
+                                d15 = ((QQ)p53).V();
+                                if (oF.MC_1_21_10.p()) {
+                                    d17 /= 8000.0;
+                                    d16 /= 8000.0;
+                                    d15 /= 8000.0;
+                                }
+                                try {
+                                    try {
+                                        if (!bl4 || bl3) break block73;
+                                    }
+                                    catch (vg vg22) {
+                                        throw yZ.a(vg22);
+                                    }
+                                    if (!this.O.H().booleanValue()) break block73;
+                                }
+                                catch (vg vg23) {
+                                    throw yZ.a(vg23);
+                                }
+                                double d23 = (Double)this.b.z() / 100.0;
+                                double d24 = (Double)this.C.z() / 100.0;
+                                double d25 = d17 * d23;
+                                double d26 = d16 * d24;
+                                double d27 = d15 * d23;
+                                if (oF.MC_26_1.p()) {
+                                    p53 = this.j((QQ)p53, d25, d26, d27);
+                                    this.X(w32, (QQ)p53);
+                                } else {
+                                    ((QQ)p53).Z(d25);
+                                    ((QQ)p53).j(d26);
+                                    ((QQ)p53).W(d27);
+                                }
+                                return;
+                            }
+                            try {
+                                if ((Double)this.x.z() > 0.0) {
+                                    this.a = ((Double)this.x.z()).intValue();
+                                    this.y = new C9((double)((QQ)p53).Y() / 8000.0, (double)((QQ)p53).N() / 8000.0, (double)((QQ)p53).V() / 8000.0);
+                                    return;
+                                }
+                            }
+                            catch (vg vg24) {
+                                throw yZ.a(vg24);
+                            }
+                            dArray = this.r();
+                            d14 = dArray[0] / 100.0;
+                            d13 = dArray[1] / 100.0;
+                            d12 = d17 * d14;
+                            d11 = d16 * d13;
+                            d10 = d15 * d14;
+                            if (oF.MC_26_1.p()) {
+                                p53 = this.j((QQ)p53, d12, d11, d10);
+                                this.X(w32, (QQ)p53);
+                            } else {
+                                ((QQ)p53).Z(d12);
+                                ((QQ)p53).j(d11);
+                                ((QQ)p53).W(d10);
+                            }
+                            try {
+                                try {
+                                    if (d14 != 0.0 || d13 != 0.0) break block74;
+                                }
+                                catch (vg vg25) {
+                                    throw yZ.a(vg25);
+                                }
+                                if (!oF.MC_26_1.p()) break block75;
+                            }
+                            catch (vg vg26) {
+                                throw yZ.a(vg26);
+                            }
+                            p53 = this.j((QQ)p53, 0.0, 0.0, 0.0);
+                            this.X(w32, (QQ)p53);
+                            break block74;
+                        }
+                        ((QQ)p53).Z(0.0);
+                        ((QQ)p53).j(0.0);
+                        ((QQ)p53).W(0.0);
+                    }
+                }
+            }
+        }
+    }
+    private static Exception a(Exception exception) {
+        return exception;
+    }
+    private double[] r() {
+        double d10;
+        double d11 = (Double)this.j.z();
+        double d12 = (Double)this.k.z();
+        Random random = new Random();
+        double d13 = random.nextDouble();
+        if (d11 > 0.0) {
+            d10 = d11 + (d11 + 5.0 - d11) * d13;
+            if (d10 >= 100.0) {
+                d10 = 100.0;
+            }
+            d11 = d10;
+        }
+        if (d12 > 0.0) {
+            d10 = d12 + (d12 + 5.0 - d12) * d13;
+            if (d10 >= 90.0) {
+                d10 = 100.0;
+            }
+            d12 = d10;
+        }
+        return new double[]{d11, d12};
+    }
+    public void N(JsonObject jsonObject) {
+        block21: {
+            long l10 = d ^ 0x7520BC618D2L;
+            JsonObject jsonObject2 = Ui.Y.V().F().Z();
+            try {
+                if (jsonObject2 == null || !jsonObject2.has((String)((Object)"Velocity"))) break block21;
+            }
+            catch (vg vg2) {
+                throw yZ.a(vg2);
+            }
+            JsonArray jsonArray = jsonObject.getAsJsonArray((String)((Object)"values"));
+            if (jsonArray != null) {
+                for (JsonElement jsonElement : jsonArray) {
+                    block24: {
+                        String string;
+                        block22: {
+                            block23: {
+                                JsonObject jsonObject3 = jsonElement.getAsJsonObject();
+                                String string2 = kN.r(jsonObject3, (String)((Object)"id"));
+                                try {
+                                    if (string2 == null || !string2.equals("Mode")) continue;
+                                }
+                                catch (vg vg3) {
+                                    throw yZ.a(vg3);
+                                }
+                                string = kN.r(jsonObject3, (String)((Object)"value"));
+                                try {
+                                    try {
+                                        try {
+                                            if (string == null || !string.contains((CharSequence)((Object)"Jump"))) break block22;
+                                        }
+                                        catch (vg vg4) {
+                                            throw yZ.a(vg4);
+                                        }
+                                        jsonObject2.remove((String)((Object)"Velocity"));
+                                        if (!this.u()) break block23;
+                                    }
+                                    catch (vg vg5) {
+                                        throw yZ.a(vg5);
+                                    }
+                                    this.U(false);
+                                }
+                                catch (vg vg6) {
+                                    throw yZ.a(vg6);
+                                }
+                            }
+                            Ui.Y.M().U((String)((Object)"Velocity disabled"), (String)((Object)"Velocity turned off since JumpReset mode is now a standalone module."), ME.WARNING, 10000L);
+                        }
+                        try {
+                            try {
+                                try {
+                                    if (string == null || !string.contains((CharSequence)((Object)"Lag"))) continue;
+                                }
+                                catch (vg vg7) {
+                                    throw yZ.a(vg7);
+                                }
+                                jsonObject2.remove((String)((Object)"Velocity"));
+                                if (!this.u()) break block24;
+                            }
+                            catch (vg vg8) {
+                                throw yZ.a(vg8);
+                            }
+                            this.U(false);
+                        }
+                        catch (vg vg9) {
+                            throw yZ.a(vg9);
+                        }
+                    }
+                    Lu lu2 = Ui.Y.d().w(Lu.class);
+                    try {
+                        if (lu2 != null) {
+                            lu2.U(true);
+                        }
+                    }
+                    catch (vg vg10) {
+                        throw yZ.a(vg10);
+                    }
+                    Ui.Y.M().U((String)((Object)"Velocity disabled"), (String)((Object)"Velocity Lag mode is now KnockbackDelay under Network.\nKnockbackDelay has been enabled."), ME.WARNING, 10000L);
+                }
+            }
+        }
+        super.N(jsonObject);
+    }
+    public String C() {
+        long l10 = d ^ 0xFE7A0B6C1E0L;
+        return this.j.r() + (String)((Object)"h ") + this.k.r() + "v";
+    }
+    private P5 X(W3 w32, QQ qQ2) {
+        P5 p52 = new P5(qQ2.K());
+        w32.setPacket(p52);
+        return p52;
+    }
+    public void S(W3 w32) {
+        try {
+            if (this.Z()) {
+                return;
+            }
+        }
+        catch (Exception exception) {
+            throw yZ.a(exception);
+        }
+        try {
+            if (w32.getPacketInstance() == null) {
+                return;
+            }
+            P5 p52 = w32.getPacket();
+            P5.U(p52, arg_0 -> this.lambda$onPacketReceived$0(w32, arg_0));
+        }
+        catch (Exception exception) {
+            Ui.h(exception);
+        }
+    }
+    private boolean Z() {
+        block7: {
+            BM bM2 = uO.P();
+            try {
+                if (bM2.k()) {
+                    return true;
+                }
+            }
+            catch (vg vg2) {
+                throw yZ.a(vg2);
+            }
+            try {
+                try {
+                    if (!this.Y.H().booleanValue() || !bM2.n()) break block7;
+                }
+                catch (vg vg3) {
+                    throw yZ.a(vg3);
+                }
+                return true;
+            }
+            catch (vg vg4) {
+                throw yZ.a(vg4);
+            }
+        }
+        return false;
+    }

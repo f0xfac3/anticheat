@@ -1,0 +1,7 @@
+{
+  "recovered_class_count": 3290,
+  "source_jar_sha256": "0bba297387dc4d1dfad51553771af31ad8b7ff3019419db9329502596279854e",
+  "substituted_calls": 7956,
+  "resolved_member_calls": 2042,
+  "observation": "Timer disabled, configured value 1.07, timerSpeed 1.0; no verified transition"
+}

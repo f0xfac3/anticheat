@@ -30,6 +30,8 @@ namespace ac{
         BoundingBox target_box;
         std::int32_t ping_ms{}; // Server's latency estimate, not exact packet delay.
         bool available{};
+        double yaw{}, pitch{};
+        bool rotation_available{}, attacker_sprinting{}, target_player{};
     };
 
     // Client ATTACK request plus the state sampled before normal attack handling.

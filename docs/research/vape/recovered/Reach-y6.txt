@@ -1,0 +1,846 @@
+// Reference only: a/y6; business-method excerpts from decoded CFR source.
+// Original decompiler errors and unresolved expressions may remain.
+    private boolean B() {
+        boolean bl2;
+        block8: {
+            block9: {
+                boolean bl3;
+                block6: {
+                    block7: {
+                        long l10 = j ^ 0x7423027585BBL;
+                        bl3 = P5.u();
+                        try {
+                            try {
+                                bl2 = this.G.O();
+                                if (!bl3) break block6;
+                                if (!bl2) break block7;
+                            }
+                            catch (vg vg2) {
+                                throw y6.a(vg2);
+                            }
+                            return this.l;
+                        }
+                        catch (vg vg3) {
+                            throw y6.a(vg3);
+                        }
+                    }
+                    double d10 = (Double)this.w.z() - (double)this.x.nextInt(100);
+                    bl2 = d10 == 0.0 ? 0 : (d10 > 0.0 ? 1 : -1);
+                }
+                try {
+                    if (!bl3) break block8;
+                    if (bl2 <= false) break block9;
+                }
+                catch (vg vg4) {
+                    throw y6.a(vg4);
+                }
+                bl2 = true;
+                break block8;
+            }
+            bl2 = false;
+        }
+        return bl2;
+    }
+    private static void e() {
+        Object[] objectArray = bb;
+        bb[0] = "gil5";
+        objectArray[1] = Boolean.TYPE;
+        y6.cb[1] = "java/lang/Boolean";
+        objectArray[2] = Void.TYPE;
+        y6.cb[2] = "java/lang/Void";
+        objectArray[3] = ">\u0001|\u000b\u000es5\u000emDo}>\u0005i\u001e";
+        objectArray[4] = "Vt.@`_Bce-\\1\nnzH'[P~gB\u001c";
+        objectArray[5] = "\u0016=\"\tev\u0002*idX\u0018J3|\u0001eg\u001f&uT\u0019";
+        Object[] objectArray2 = objectArray;
+        objectArray[6] = "8\u0005%f4~,\u0012n\u000b\u0002\u0010d\u000b{n4o1\u001er;H";
+    }
+    private static Exception a(Exception exception) {
+        return exception;
+    }
+    public void T(CO cO2) {
+        try {
+            if (!this.d.H().booleanValue()) {
+                return;
+            }
+        }
+        catch (vg vg2) {
+            throw y6.a(vg2);
+        }
+        this.u();
+        this.V(false);
+    }
+    private void G(boolean bl2) {
+        pX pX2 = uO.o();
+        try {
+            if (pX2.k()) {
+                return;
+            }
+        }
+        catch (vg vg2) {
+            throw y6.a(vg2);
+        }
+        for (Map.Entry<Integer, TT> entry : this.A.entrySet()) {
+            TT tT2 = entry.getValue();
+            BZ bZ2 = new BZ(((pV)pX2).x(tT2.u));
+            try {
+                if (!bZ2.Z() || !bZ2.J(EN.zN)) continue;
+            }
+            catch (vg vg3) {
+                throw y6.a(vg3);
+            }
+            Bt bt2 = new Bt(((pV)pX2).x(tT2.u));
+            try {
+                if (bl2) {
+                    tT2.g = tT2.w;
+                    tT2.G = tT2.a;
+                    bt2.m(tT2.v);
+                    bt2.i(tT2.U);
+                    bt2.J(tT2.t);
+                    bt2.l(tT2.I);
+                    bt2.O(tT2.J);
+                    bt2.K(tT2.r);
+                }
+            }
+            catch (vg vg4) {
+                throw y6.a(vg4);
+            }
+            bt2.P(bt2.i(), bt2.q(), bt2.k());
+        }
+    }
+    public void J(Cg cg2) {
+        try {
+            if (!this.d.H().booleanValue()) {
+                return;
+            }
+        }
+        catch (vg vg2) {
+            throw y6.a(vg2);
+        }
+        try {
+            this.u();
+            this.G(false);
+            if (oF.MC_1_8_9.s()) {
+                this.i();
+            }
+        }
+        catch (vg vg3) {
+            throw y6.a(vg3);
+        }
+    }
+    private void H() {
+        block55: {
+            block56: {
+                block57: {
+                    block58: {
+                        block54: {
+                            block52: {
+                                block53: {
+                                    block51: {
+                                        block50: {
+                                            block49: {
+                                                block48: {
+                                                    block45: {
+                                                        block47: {
+                                                            block46: {
+                                                                block44: {
+                                                                    var1_1 = y6.j ^ 86181993606279L;
+                                                                    var4_2 = null;
+                                                                    var3_3 = P5.D();
+                                                                    var5_4 = gY.V(this.P.R(), 0.0f, true);
+                                                                    try {
+                                                                        v0 = var5_4;
+                                                                        if (var3_3) break block44;
+                                                                        if (v0 == null) break block45;
+                                                                    }
+                                                                    catch (vg v1) {
+                                                                        throw y6.a(v1);
+                                                                    }
+                                                                    v0 = var5_4;
+                                                                }
+                                                                try {
+                                                                    try {
+                                                                        try {
+                                                                            v2 = v0.Z();
+                                                                            if (var3_3) break block46;
+                                                                            if (!v2) break block45;
+                                                                        }
+                                                                        catch (vg v3) {
+                                                                            throw y6.a(v3);
+                                                                        }
+                                                                        v4 = var5_4.g();
+                                                                        if (var3_3) break block47;
+                                                                    }
+                                                                    catch (vg v5) {
+                                                                        throw y6.a(v5);
+                                                                    }
+                                                                    v2 = v4.Z();
+                                                                }
+                                                                catch (vg v6) {
+                                                                    throw y6.a(v6);
+                                                                }
+                                                            }
+                                                            try {
+                                                                if (!v2) break block45;
+                                                                v4 = var5_4.g();
+                                                            }
+                                                            catch (vg v7) {
+                                                                throw y6.a(v7);
+                                                            }
+                                                        }
+                                                        var4_2 = v4;
+                                                    }
+                                                    try {
+                                                        try {
+                                                            v8 = this;
+                                                            if (var3_3) break block48;
+                                                            if (v8.y <= 0) break block49;
+                                                        }
+                                                        catch (vg v9) {
+                                                            throw y6.a(v9);
+                                                        }
+                                                        v8 = this;
+                                                    }
+                                                    catch (vg v10) {
+                                                        throw y6.a(v10);
+                                                    }
+                                                }
+                                                --v8.y;
+                                            }
+                                            try {
+                                                v11 = var4_2;
+                                                if (var3_3) break block50;
+                                                if (v11 != null) {
+                                                }
+                                                ** GOTO lbl99
+                                            }
+                                            catch (vg v12) {
+                                                throw y6.a(v12);
+                                            }
+                                            v11 = var4_2;
+                                        }
+                                        try {
+                                            try {
+                                                try {
+                                                    if (var3_3) break block51;
+                                                    if (!v11.k()) {
+                                                    }
+                                                    ** GOTO lbl99
+                                                }
+                                                catch (vg v13) {
+                                                    throw y6.a(v13);
+                                                }
+                                                v14 = this;
+                                                if (var3_3) break block52;
+                                            }
+                                            catch (vg v15) {
+                                                throw y6.a(v15);
+                                            }
+                                            v11 = v14.e;
+                                        }
+                                        catch (vg v16) {
+                                            throw y6.a(v16);
+                                        }
+                                    }
+                                    try {
+                                        try {
+                                            try {
+                                                if (v11 == null) break block53;
+                                                v17 /* !! */  = var4_2.equals(this.e);
+                                                if (var3_3) break block54;
+                                            }
+                                            catch (vg v18) {
+                                                throw y6.a(v18);
+                                            }
+                                            if (v17 /* !! */ ) break block53;
+                                        }
+                                        catch (vg v19) {
+                                            throw y6.a(v19);
+                                        }
+lbl99:
+                                        // 3 sources
+                                        this.e = null;
+                                        return;
+                                    }
+                                    catch (vg v20) {
+                                        throw y6.a(v20);
+                                    }
+                                }
+                                v14 = this;
+                            }
+                            try {
+                                if (var3_3) break block55;
+                                v17 /* !! */  = y6.d("O", (Object)v14, (long)-958969110423045342L, (long)var1_1);
+                            }
+                            catch (vg v21) {
+                                throw y6.a(v21);
+                            }
+                        }
+                        try {
+                            try {
+                                try {
+                                    try {
+                                        if (!v17 /* !! */ ) break block56;
+                                        v14 = this;
+                                        if (var3_3) break block55;
+                                    }
+                                    catch (vg v22) {
+                                        throw y6.a(v22);
+                                    }
+                                    if (v14.y != 0) break block56;
+                                }
+                                catch (vg v23) {
+                                    throw y6.a(v23);
+                                }
+                                v24 = this;
+                                cfr_temp_0 = (Double)this.w.z() - (double)this.x.nextInt(100);
+                                v25 = cfr_temp_0 == 0.0 ? 0 : (cfr_temp_0 > 0.0 ? 1 : -1);
+                                if (var3_3) break block57;
+                            }
+                            catch (vg v26) {
+                                throw y6.a(v26);
+                            }
+                            if (v25 <= 0) break block58;
+                        }
+                        catch (vg v27) {
+                            throw y6.a(v27);
+                        }
+                        v25 = (double)true;
+                        break block57;
+                    }
+                    v25 = (double)false;
+                }
+                try {
+                    try {
+                        v24.l = v25;
+                        v14 = this;
+                        if (var3_3) break block55;
+                        if (!v14.l) break block56;
+                    }
+                    catch (vg v28) {
+                        throw y6.a(v28);
+                    }
+                    this.y = (int)10;
+                }
+                catch (vg v29) {
+                    throw y6.a(v29);
+                }
+            }
+            v14 = this;
+        }
+        v14.e = var4_2;
+    }
+    private void i() {
+        float f10;
+        try {
+            f10 = this.p.H() != false ? -90.0f : 90.0f;
+        }
+        catch (Exception exception) {
+            throw y6.a(exception);
+        }
+        float f12 = f10;
+        double d10 = this.P.e() - 3.0;
+        iC iC2 = uO.c();
+        try {
+            if (iC2.k()) {
+                return;
+            }
+        }
+        catch (Exception exception) {
+            throw y6.a(exception);
+        }
+        try {
+            List<BD>[][] listArray;
+            List<BD>[][] listArray2 = listArray = iC2.L();
+            int n10 = listArray2.length;
+            for (int i10 = 0; i10 < n10; ++i10) {
+                List<BD>[] listArray3;
+                for (List<BD> list : listArray3 = listArray2[i10]) {
+                    for (BD bD2 : list) {
+                        block25: {
+                            try {
+                                if (bD2.k()) {
+                                    continue;
+                                }
+                            }
+                            catch (Exception exception) {
+                                throw y6.a(exception);
+                            }
+                            if (bD2.J(EN.NX)) break block25;
+                            try {
+                                if (!bD2.J(EN.IS)) {
+                                    continue;
+                                }
+                                break block25;
+                                catch (Exception exception) {
+                                    throw y6.a(exception);
+                                }
+                            }
+                            catch (Exception exception) {
+                                throw y6.a(exception);
+                            }
+                        }
+                        BM bM2 = uO.P();
+                        try {
+                            if (bM2.k()) {
+                                continue;
+                            }
+                        }
+                        catch (Exception exception) {
+                            throw y6.a(exception);
+                        }
+                        if (!((double)bM2.m(bD2) < this.P.R() + 2.0)) continue;
+                        try {
+                            block26: {
+                                if (!(bD2.q() < bM2.q() + 2.5)) continue;
+                                break block26;
+                                catch (Exception exception) {
+                                    throw y6.a(exception);
+                                }
+                            }
+                            if (Tj.W((BZ)bM2, bD2)) continue;
+                        }
+                        catch (Exception exception) {
+                            throw y6.a(exception);
+                        }
+                        float f13 = this.Z(bM2.i(), bM2.k(), bD2.i(), bD2.k());
+                        double d11 = Math.cos(Math.toRadians(f13 + f12)) * d10;
+                        double d12 = Math.sin(Math.toRadians(f13 + f12)) * d10;
+                        bD2.m(bD2.i() - d11);
+                        bD2.i(bD2.k() - d12);
+                        bD2.J(bD2.e() - d11);
+                        bD2.l(bD2.o() - d12);
+                    }
+                }
+            }
+        }
+        catch (Exception exception) {
+            // empty catch block
+        }
+    }
+    public void E(rG rG2) {
+        try {
+            if (!this.d.H().booleanValue()) {
+                return;
+            }
+        }
+        catch (vg vg2) {
+            throw y6.a(vg2);
+        }
+        this.V(true);
+    }
+    public Ve G() {
+        return this.d;
+    }
+    public void I(WL wL2) {
+        block5: {
+            block4: {
+                long l10 = j ^ 0x4FE3C4547BE3L;
+                boolean bl2 = P5.D();
+                try {
+                    y6 y62;
+                    try {
+                        y62 = this;
+                        if (bl2) break block4;
+                        if (!y62.G.O()) break block5;
+                    }
+                    catch (vg vg2) {
+                        throw y6.a(vg2);
+                    }
+                    y62 = this;
+                }
+                catch (vg vg3) {
+                    throw y6.a(vg3);
+                }
+            }
+            y62.l = false;
+        }
+    }
+    public String C() {
+        return this.P.r();
+    }
+    public void P() {
+        this.A.clear();
+    }
+    public void B(CO cO2) {
+        block4: {
+            long l10 = j ^ 0x41A773AC0D34L;
+            try {
+                try {
+                    if (!this.G.O()) break block4;
+                    y6.d("O", (Object)this, (long)-7853608536341209663L, (long)l10);
+                    if (!this.C) break block4;
+                }
+                catch (vg vg2) {
+                    throw y6.a(vg2);
+                }
+                this.r = System.currentTimeMillis();
+                this.C = false;
+            }
+            catch (vg vg3) {
+                throw y6.a(vg3);
+            }
+        }
+    }
+    public double w() {
+        block4: {
+            long l10 = j ^ 0x603642C3A434L;
+            try {
+                try {
+                    if (y6.d("O", (Object)this, (long)4179939667828257681L, (long)l10) != false && y6.d("O", (Object)this, (long)4180173475910851226L, (long)l10) != false) break block4;
+                }
+                catch (vg vg2) {
+                    throw y6.a(vg2);
+                }
+                return 3.0;
+            }
+            catch (vg vg3) {
+                throw y6.a(vg3);
+            }
+        }
+        return this.P.p();
+    }
+    private float Z(double d10, double d11, double d12, double d13) {
+        float f10;
+        block5: {
+            double d14;
+            double d15;
+            block4: {
+                d15 = d12 - d10;
+                d14 = d13 - d11;
+                f10 = (float)Math.toDegrees(-Math.atan(d15 / d14));
+                try {
+                    if (!(d14 < 0.0) || !(d15 < 0.0)) break block4;
+                }
+                catch (vg vg2) {
+                    throw y6.a(vg2);
+                }
+                f10 = (float)(90.0 + Math.toDegrees(Math.atan(d14 / d15)));
+                break block5;
+            }
+            try {
+                if (!(d14 < 0.0) || !(d15 > 0.0)) break block5;
+            }
+            catch (vg vg3) {
+                throw y6.a(vg3);
+            }
+            f10 = (float)(-90.0 + Math.toDegrees(Math.atan(d14 / d15)));
+        }
+        return f10;
+    }
+    public y6() {
+        long l10 = j ^ 0x13369108763EL;
+        super((String)((Object)"Reach"), (int)-16711936, oK.k, (String)((Object)"Extends attack reach"));
+        this.P = Vs.b(this, (String)((Object)"Range"), (String)((Object)"#.##"), "", 3.0, 3.0, 3.1, 4.0, 0.01, (String)((Object)"The range in which your reach will be increased to."));
+        this.w = VS.M(this, (String)((Object)"Chance"), "#", "%", 0.0, 50.0, 100.0, (String)((Object)"The chance of reach taking affect when hitting an opponent"));
+        this.G = new V1((String)((Object)"Advanced"));
+        this.Y = new V1((String)((Object)"Normal"));
+        this.a = VC.v(this, (String)((Object)"Chance mode"), this.G, this.G, this.Y);
+        this.d = Ve.j(this, (String)((Object)"Misplace"), false, (String)((Object)"Pulls players towards you rather than giving you extra reach distance. Uses the minimum slider value."));
+        this.p = Ve.j(this, (String)((Object)"Disadvantage"), false, (String)((Object)"Moves misplaced players in opposite direction. Useful for framing other players"));
+        this.b = Ve.j(this, (String)((Object)"Vertical check"), false, (String)((Object)"Prevents hitting players which are y0.2 above or below you\nfor more legitimate use"));
+        this.t = Ve.j(this, (String)((Object)"Only while sprinting"), false, (String)((Object)"Only give extra reach while sprinting"));
+        this.S = Ve.j(this, (String)((Object)"Disable in water"), false, (String)((Object)"Won't give any extra reach while standing in water"));
+        this.A = new HashMap<Integer, TT>();
+        this.x = new Random();
+        this.l = false;
+        this.y = 0;
+        this.d.E(this.p);
+        this.o(z4.B, true);
+        this.P.x(100.0);
+        this.t(this.P, this.w, this.a, this.d, this.p, this.b, this.t, this.S);
+    }
+    private boolean I() {
+        boolean bl2;
+        block38: {
+            block39: {
+                boolean bl3;
+                block34: {
+                    boolean bl4;
+                    block35: {
+                        boolean bl5;
+                        block36: {
+                            block37: {
+                                boolean bl6;
+                                block30: {
+                                    block33: {
+                                        block31: {
+                                            block32: {
+                                                long l10 = j ^ 0x4F1D1489F665L;
+                                                bl3 = P5.D();
+                                                try {
+                                                    try {
+                                                        try {
+                                                            try {
+                                                                try {
+                                                                    try {
+                                                                        bl6 = this.u();
+                                                                        if (bl3) break block30;
+                                                                        if (!bl6) break block31;
+                                                                    }
+                                                                    catch (vg vg2) {
+                                                                        throw y6.a(vg2);
+                                                                    }
+                                                                    bl6 = this.d.H();
+                                                                    if (bl3) break block30;
+                                                                }
+                                                                catch (vg vg3) {
+                                                                    throw y6.a(vg3);
+                                                                }
+                                                                if (bl6) break block31;
+                                                            }
+                                                            catch (vg vg4) {
+                                                                throw y6.a(vg4);
+                                                            }
+                                                            bl6 = this.S.H();
+                                                            if (bl3) break block32;
+                                                        }
+                                                        catch (vg vg5) {
+                                                            throw y6.a(vg5);
+                                                        }
+                                                        if (!bl6) break block33;
+                                                    }
+                                                    catch (vg vg6) {
+                                                        throw y6.a(vg6);
+                                                    }
+                                                    bl6 = uO.P().n();
+                                                }
+                                                catch (vg vg7) {
+                                                    throw y6.a(vg7);
+                                                }
+                                            }
+                                            try {
+                                                try {
+                                                    try {
+                                                        if (bl3) break block30;
+                                                        if (bl6) break block31;
+                                                    }
+                                                    catch (vg vg8) {
+                                                        throw y6.a(vg8);
+                                                    }
+                                                    bl6 = uO.P().U();
+                                                    if (bl3) break block30;
+                                                }
+                                                catch (vg vg9) {
+                                                    throw y6.a(vg9);
+                                                }
+                                                if (!bl6) break block33;
+                                            }
+                                            catch (vg vg10) {
+                                                throw y6.a(vg10);
+                                            }
+                                        }
+                                        bl6 = true;
+                                        break block30;
+                                    }
+                                    bl6 = false;
+                                }
+                                bl4 = bl6;
+                                try {
+                                    try {
+                                        try {
+                                            try {
+                                                try {
+                                                    bl2 = bl4;
+                                                    if (bl3) break block34;
+                                                    if (bl2) break block35;
+                                                }
+                                                catch (vg vg11) {
+                                                    throw y6.a(vg11);
+                                                }
+                                                bl2 = this.t.H();
+                                                if (bl3) break block34;
+                                            }
+                                            catch (vg vg12) {
+                                                throw y6.a(vg12);
+                                            }
+                                            if (!bl2) break block35;
+                                        }
+                                        catch (vg vg13) {
+                                            throw y6.a(vg13);
+                                        }
+                                        bl5 = uO.P().u();
+                                        if (bl3) break block36;
+                                    }
+                                    catch (vg vg14) {
+                                        throw y6.a(vg14);
+                                    }
+                                    if (bl5) break block37;
+                                }
+                                catch (vg vg15) {
+                                    throw y6.a(vg15);
+                                }
+                                bl5 = true;
+                                break block36;
+                            }
+                            bl5 = false;
+                        }
+                        bl4 = bl5;
+                    }
+                    bl2 = bl4;
+                }
+                try {
+                    if (bl3) break block38;
+                    if (bl2) break block39;
+                }
+                catch (vg vg16) {
+                    throw y6.a(vg16);
+                }
+                bl2 = true;
+                break block38;
+            }
+            bl2 = false;
+        }
+        return bl2;
+    }
+    private void u() {
+        float f10;
+        pX pX2 = uO.o();
+        BM bM2 = uO.P();
+        try {
+            if (pX2.k()) {
+                return;
+            }
+        }
+        catch (vg vg2) {
+            throw y6.a(vg2);
+        }
+        try {
+            f10 = this.p.H() != false ? -90.0f : 90.0f;
+        }
+        catch (vg vg3) {
+            throw y6.a(vg3);
+        }
+        float f12 = f10;
+        for (Object e10 : pX2.j()) {
+            double d10;
+            BZ bZ2 = new BZ(e10);
+            if (!bZ2.J(EN.zN)) continue;
+            try {
+                if (bZ2.J(EN.Nb)) {
+                    continue;
+                }
+            }
+            catch (vg vg4) {
+                throw y6.a(vg4);
+            }
+            Bt bt2 = new Bt(e10);
+            double d11 = this.P.e() - 3.0;
+            double d12 = Math.hypot(bM2.i() - bZ2.i(), bM2.k() - bZ2.k());
+            float f13 = this.Z(bM2.i(), bM2.k(), bZ2.i(), bZ2.k());
+            double d13 = d12 - d11;
+            if (d13 < 0.5 && (d11 += (d10 = d13 - 0.5)) < 0.0) {
+                d11 = 0.0;
+            }
+            d10 = Math.cos(Math.toRadians(f13 + f12)) * d11;
+            double d14 = Math.sin(Math.toRadians(f13 + f12)) * d11;
+            int n10 = bZ2.o();
+            double d15 = bZ2.i();
+            double d16 = bZ2.k();
+            TT tT2 = null;
+            boolean bl2 = false;
+            if (this.A.containsKey(n10)) {
+                tT2 = this.A.get(n10);
+                bl2 = true;
+            } else {
+                tT2 = new TT();
+                tT2.u = n10;
+            }
+            try {
+                this.A.put(n10, tT2);
+                tT2.v = d15;
+                tT2.U = d16;
+                tT2.t = bZ2.e();
+                tT2.I = bZ2.o();
+                tT2.J = bt2.d();
+                tT2.r = bt2.P();
+                tT2.y = bt2.n();
+                tT2.p = bt2.R();
+                tT2.w = tT2.v - d10;
+                tT2.a = tT2.U - d14;
+                tT2.s = tT2.t - d10;
+                tT2.i = tT2.I - d14;
+                tT2.P = tT2.J - d10;
+                tT2.x = tT2.r - d14;
+                if (!bl2) continue;
+                tT2.s = tT2.g;
+                tT2.i = tT2.G;
+            }
+            catch (vg vg5) {
+                throw y6.a(vg5);
+            }
+        }
+    }
+    private void V(boolean bl2) {
+        pX pX2 = uO.o();
+        try {
+            if (pX2.k()) {
+                return;
+            }
+        }
+        catch (vg vg2) {
+            throw y6.a(vg2);
+        }
+        for (Object e10 : pX2.j()) {
+            BZ bZ2 = new BZ(e10);
+            if (!bZ2.J(EN.zN)) continue;
+            try {
+                if (bZ2.J(EN.Nb)) {
+                    continue;
+                }
+            }
+            catch (vg vg3) {
+                throw y6.a(vg3);
+            }
+            Bt bt2 = new Bt(e10);
+            int n10 = bZ2.o();
+            double d10 = bZ2.i();
+            double d11 = bZ2.k();
+            TT tT2 = null;
+            if (this.A.containsKey(n10)) {
+                tT2 = this.A.get(n10);
+            } else {
+                tT2 = new TT();
+                tT2.u = n10;
+            }
+            try {
+                this.A.put(n10, tT2);
+                tT2.v = d10;
+                tT2.U = d11;
+                tT2.t = bZ2.e();
+                tT2.I = bZ2.o();
+                tT2.J = bt2.d();
+                tT2.r = bt2.P();
+                tT2.y = bt2.n();
+                tT2.p = bt2.R();
+                if (bl2) {
+                    bt2.m(tT2.w);
+                    bt2.i(tT2.a);
+                    bt2.J(tT2.s);
+                    bt2.l(tT2.i);
+                    bt2.O(tT2.P);
+                    bt2.K(tT2.x);
+                    bt2.P(bZ2.i(), bZ2.q(), bZ2.k());
+                    continue;
+                }
+            }
+            catch (vg vg4) {
+                throw y6.a(vg4);
+            }
+            bt2.m(tT2.w);
+            bt2.i(tT2.a);
+            bt2.P(bZ2.i(), bZ2.q(), bZ2.k());
+            bt2.m(tT2.v);
+            bt2.i(tT2.U);
+        }
+    }
+    public void e(rq rq2) {
+        try {
+            if (!this.d.H().booleanValue()) {
+                return;
+            }
+        }
+        catch (vg vg2) {
+            throw y6.a(vg2);
+        }
+        this.G(true);
+    }
