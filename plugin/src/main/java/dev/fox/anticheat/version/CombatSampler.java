@@ -57,7 +57,7 @@ public final class CombatSampler{
         Location eyes = player.getEyeLocation();
         AxisAlignedBB box = target.getBoundingBox();
 
-        return new CombatContext(
+        CombatContext context = new CombatContext(
             world,
             uuid,
             bukkitTarget.getType().name(),
@@ -75,5 +75,8 @@ public final class CombatSampler{
             handle.ping,
             true
         );
+        context.yaw=eyes.getYaw(); context.pitch=eyes.getPitch(); context.rotationAvailable=true;
+        context.attackerSprinting=player.isSprinting(); context.targetPlayer=bukkitTarget instanceof Player;
+        return context;
     }
 }

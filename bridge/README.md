@@ -1,4 +1,4 @@
-# JNI/event boundary (v2)
+# JNI/event boundary (v3)
 
 `NativeBridge.nCreate(config)` creates an engine and returns a checked numeric ID.
 `nSubmit(handle, directByteBuffer, length)` synchronously consumes one normalized
@@ -23,7 +23,7 @@ This restricted text encoding is for UUIDs/game identifiers, not player chat.
 
 ```
 u32 magic = 0x43415846 (bytes "FXAC")
-u16 schema = 2
+u16 schema = 3
 u16 type
 u64 session_id
 u64 normalized_event_ordinal
@@ -51,6 +51,12 @@ is a snapshot, not an assertion that wall-clock intervals equal a number of tick
 8 CombatContext: u64 sampled_ns, CombatContext
 9 Swing:        u64 packet_sequence, u64 read_batch
 10 Teleport:    text cause, text from_world, text to_world, Vector3 from, Vector3 to
+11 Movement:    u64 packet_sequence, u64 read_batch, u64 sampled_ns,
+                Vector3 position, f64 yaw, f64 pitch,
+                u8 has_position, u8 has_look, u8 packet_on_ground, MovementContext
+12 Impulse:     u64 token, Vector3 velocity, u8 additive
+13 ImpulseAck:  u64 token
+14 Correction:  empty (also invalidates world-snapshot assumptions after block/chunk updates)
 
 Vector3:
     f64 x, f64 y, f64 z
@@ -58,7 +64,14 @@ Vector3:
 CombatContext:
     text world_uuid, text target_uuid, text target_kind, text unavailable_reason,
     i32 target_id, Vector3 eye, Vector3 target_minimum, Vector3 target_maximum,
-    i32 ping_ms, u8 available
+    i32 ping_ms, u8 available,
+    f64 yaw, f64 pitch, u8 rotation_available, u8 attacker_sprinting, u8 target_player
+
+MovementContext:
+    text world_uuid, text unavailable_reason,
+    u8 available, u8 source_supported, u8 destination_supported, u8 clear_path,
+    u8 flat_ground, u8 using_item, u8 sprinting,
+    f64 movement_speed, f64 friction, f64 jump_velocity
 
 MiningContext:
     text world_uuid, text state_key, text block, text tool,
@@ -74,9 +87,16 @@ add a cross-language smoke test. The public Check interface and generic dispatch
 do not change. Batched transfers or an out-of-process transport can be added later;
 this starter makes one synchronous call per normalized observation.
 
-Schema 2 keeps the old bodies unchanged. The decoder also accepts schema 1 for
-old recorded events (types 1-6 only). Deploy the plugin JAR and native library
-together; an old native library does not understand schema 2.
+The decoder accepts schema 1 (types 1-6), schema 2 (types 1-10), and schema 3.
+Schema-2 CombatContext ends after `available`; its missing rotation/sprint/target
+flags default to false. Schema 3 appends that 19-byte suffix and adds types 11-14.
+Deploy the plugin JAR and native library together; older native libraries reject v3.
+
+Support/clearance flags come from server collision queries. They are separate from
+the packet ground bit. Missing movement positions are not inferred by the C++
+physics checks. Impulses contain copied on-wire values, not a Bukkit intention.
+An acknowledgement is an owned transaction-processing marker with the trust and
+timing limits described in `docs/VAPE_DETECTIONS.md`.
 
 Attack and Swing are different observations. Neither is a recording of physical
 mouse input. CombatContext contains unexpanded server bounds, not a historical

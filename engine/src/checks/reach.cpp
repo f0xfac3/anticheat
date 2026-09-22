@@ -254,6 +254,7 @@ namespace ac{
         bool suspicious = distance > threshold;
 
         Evidence evidence{
+            {"source", "a/y6 + a/OR + a/Vs: extended entity selection range"},
             {"target", event.context.target_uuid},
             {"target_id", std::to_string(event.context.target_id)},
             {"target_kind", event.context.target_kind},

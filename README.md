@@ -2,6 +2,30 @@
 
 Detection engine is written in C++, Java 8-compatible Spigot 1.8.8 is the adapter, in-process JNI bridge.
 
+## Vape-derived research checks
+
+Timer, Reach, HitBoxes, Velocity, NoSlowdown, NoFall, Speed and Fly are integrated
+with packet collection, per-session C++ checks and evidence reporting. KeepSprint
+is available as an opt-in conditional experiment. The existing FastBreak and
+AutoClicker checks remain available. All findings are report-only.
+
+Start with [the source-to-detection reasoning](docs/VAPE_DETECTIONS.md), including
+recovered code/hash references, equations, exclusions, unsupported modules and the
+off/on/off validation procedure. [Validation](docs/VALIDATION.md) distinguishes
+synthetic test coverage from outstanding original-client gameplay trials. These
+checks do not identify a particular client or establish production reliability.
+
+New telemetry uses [bridge schema 3](bridge/README.md), with old recording support.
+Velocity collection emits an ordered transaction marker after relevant outgoing
+impulses; coordinate its IDs with other packet-probing plugins before live trials.
+
+## Gameplay dataset lab
+
+[Collection setup and two-tester protocol](tools/dataset/COLLECTION_GUIDE.md) covers
+raw recording, independent label review, export, and an offline research baseline.
+The recorder is disabled by default. `tools/dataset/Install-Lab.ps1` backs up a
+stopped existing lab and enables collection in a separate flat world.
+
 ## Architecture
 
 ```
@@ -108,7 +132,7 @@ Individual detection mechanisms within the engine that evaluate behavior and rep
 
 `Check` and `CheckManager` are in `engine/include/anticheat/check.hpp`. Checks register handlers for any number of typed observations. Multiple checks may consume the same observation. Each connected session gets fresh check instances. `Finding` is generic; mining evidence is not required by its interface.
 
-FastBreak registration/settings are in `engine/src/checks/builtins.cpp`, the composition root, not in `Engine` or `CheckManager`. Disabling FastBreak does not disable telemetry or the engine. The multistream test check demonstrates this structure; movement/combat collection is not implemented yet.
+Check registration/settings are in `engine/src/checks/builtins.cpp`, the composition root. Disabling a check does not disable telemetry or the engine. Mining, combat and movement collectors register typed observations without modifying the generic check interface.
 
 ## Windows build
 
@@ -202,8 +226,8 @@ exceptions are contained at entry points. A native access violation can STILL
 terminate the JVM; this is not crash isolation.
 
 Do not run expensive model training, disk IO, or unbounded analysis on this live
-synchronous path. This version has no dataset importer, ML model, dashboard,
-movement/combat collection, or punishment system yet.
+synchronous path. The offline dataset tools do not install a live ML model or punishment
+system. Combat and movement model scope is documented in `docs/VAPE_DETECTIONS.md`.
 
 - https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/design.html
 - https://docs.oracle.com/en/java/javase/21/docs/specs/man/javac.html

@@ -1,0 +1,233 @@
+// Reference only: a/ys; business-method excerpts from decoded CFR source.
+// Original decompiler errors and unresolved expressions may remain.
+    public void H(W9 w92) {
+        block39: {
+            BM bM2;
+            block40: {
+                block36: {
+                    boolean bl2;
+                    block38: {
+                        block37: {
+                            block35: {
+                                bM2 = uO.P();
+                                try {
+                                    block34: {
+                                        try {
+                                            try {
+                                                try {
+                                                    try {
+                                                        try {
+                                                            if (bM2.k() || bM2.w().k()) break block34;
+                                                        }
+                                                        catch (vg vg2) {
+                                                            throw ys.a(vg2);
+                                                        }
+                                                        if (bM2.e()) break block34;
+                                                    }
+                                                    catch (vg vg3) {
+                                                        throw ys.a(vg3);
+                                                    }
+                                                    if (bM2.C().D()) break block34;
+                                                }
+                                                catch (vg vg4) {
+                                                    throw ys.a(vg4);
+                                                }
+                                                if (bM2.C().L()) break block34;
+                                            }
+                                            catch (vg vg5) {
+                                                throw ys.a(vg5);
+                                            }
+                                            if (!Ui.Y.d().y(yp.class)) break block35;
+                                        }
+                                        catch (vg vg6) {
+                                            throw ys.a(vg6);
+                                        }
+                                    }
+                                    return;
+                                }
+                                catch (vg vg7) {
+                                    throw ys.a(vg7);
+                                }
+                            }
+                            try {
+                                try {
+                                    try {
+                                        if (this.q.z() != this.t) break block36;
+                                        if (!((double)bM2.Q() > 2.224)) break block37;
+                                    }
+                                    catch (vg vg8) {
+                                        throw ys.a(vg8);
+                                    }
+                                    if (!(bM2.c() < 0.0)) break block37;
+                                }
+                                catch (vg vg9) {
+                                    throw ys.a(vg9);
+                                }
+                                bl2 = true;
+                                break block38;
+                            }
+                            catch (vg vg10) {
+                                throw ys.a(vg10);
+                            }
+                        }
+                        bl2 = false;
+                    }
+                    boolean bl3 = bl2;
+                    try {
+                        try {
+                            if (!bl3) break block36;
+                            Wk.setOnGround(true);
+                            bM2.H(1);
+                            if (!uO.Q().d().o()) break block36;
+                        }
+                        catch (vg vg11) {
+                            throw ys.a(vg11);
+                        }
+                        OH.y(uO.Q().d(), false);
+                    }
+                    catch (vg vg12) {
+                        throw ys.a(vg12);
+                    }
+                }
+                try {
+                    try {
+                        if (this.q.z() != this.k) break block39;
+                        if (!(this.G > bM2.Q())) break block40;
+                    }
+                    catch (vg vg13) {
+                        throw ys.a(vg13);
+                    }
+                    this.G = 0.0f;
+                }
+                catch (vg vg14) {
+                    throw ys.a(vg14);
+                }
+            }
+            try {
+                try {
+                    try {
+                        try {
+                            if (!((double)bM2.Q() > 2.124) || !(bM2.c() < 0.0)) break block39;
+                        }
+                        catch (vg vg15) {
+                            throw ys.a(vg15);
+                        }
+                        if (!(bM2.Q() >= 3.0f)) break block39;
+                    }
+                    catch (vg vg16) {
+                        throw ys.a(vg16);
+                    }
+                    if (!(bM2.Q() - this.G > 3.0f)) break block39;
+                }
+                catch (vg vg17) {
+                    throw ys.a(vg17);
+                }
+                this.G = bM2.Q();
+                bM2.P().l(Pt.e(true));
+                bM2.P().l(Pt.e(false));
+            }
+            catch (vg vg18) {
+                throw ys.a(vg18);
+            }
+        }
+    }
+    public void g(WH wH2) {
+        block23: {
+            boolean bl2;
+            BM bM2;
+            block25: {
+                block24: {
+                    block22: {
+                        bM2 = uO.P();
+                        try {
+                            block21: {
+                                try {
+                                    try {
+                                        try {
+                                            try {
+                                                try {
+                                                    if (bM2.k() || bM2.w().k()) break block21;
+                                                }
+                                                catch (vg vg2) {
+                                                    throw ys.a(vg2);
+                                                }
+                                                if (bM2.e()) break block21;
+                                            }
+                                            catch (vg vg3) {
+                                                throw ys.a(vg3);
+                                            }
+                                            if (bM2.C().D()) break block21;
+                                        }
+                                        catch (vg vg4) {
+                                            throw ys.a(vg4);
+                                        }
+                                        if (bM2.C().L()) break block21;
+                                    }
+                                    catch (vg vg5) {
+                                        throw ys.a(vg5);
+                                    }
+                                    if (!Ui.Y.d().y(yp.class)) break block22;
+                                }
+                                catch (vg vg6) {
+                                    throw ys.a(vg6);
+                                }
+                            }
+                            return;
+                        }
+                        catch (vg vg7) {
+                            throw ys.a(vg7);
+                        }
+                    }
+                    try {
+                        try {
+                            try {
+                                if (this.q.z() != this.t) break block23;
+                                if (!((double)bM2.Q() > 2.224)) break block24;
+                            }
+                            catch (vg vg8) {
+                                throw ys.a(vg8);
+                            }
+                            if (!(bM2.c() < 0.0)) break block24;
+                        }
+                        catch (vg vg9) {
+                            throw ys.a(vg9);
+                        }
+                        bl2 = true;
+                        break block25;
+                    }
+                    catch (vg vg10) {
+                        throw ys.a(vg10);
+                    }
+                }
+                bl2 = false;
+            }
+            boolean bl3 = bl2;
+            try {
+                if (bl3) {
+                    bM2.T(false);
+                }
+            }
+            catch (vg vg11) {
+                throw ys.a(vg11);
+            }
+        }
+    }
+    public ys() {
+        long l10 = a ^ 0x9CFF9828BFFL;
+        super((String)((Object)"NoFall"), (int)j, oK.R, (String)((Object)"Prevents taking fall damage.\nThis may not bypass AntiCheats."));
+        this.t = new V1((String)((Object)"Normal"));
+        this.k = new V1((String)((Object)"AntiCheat"));
+        this.q = VC.u(this, (String)((Object)"Mode"), (String)((Object)"NoFall method to prevent you from taking fall damage.\nNormal - Works on vanilla/some anti-cheats (Does not Bypass AntiCheat)\nAntiCheat - Works and bypasses on various anti-cheats"), this.t, this.t, this.k);
+        this.o(z4.B, true);
+        this.o(z4.c, true);
+        this.t(this.q);
+    }
+    public String y() {
+        return this.q.r();
+    }
+    private static vg a(vg vg2) {
+        return vg2;
+    }
+    public boolean q() {
+        return true;
+    }

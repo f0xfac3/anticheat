@@ -1,0 +1,135 @@
+// Reference only: a/yq; business-method excerpts from decoded CFR source.
+// Original decompiler errors and unresolved expressions may remain.
+    public void F(W2 w22, double d10, BM bM2) {
+        float f10;
+        double d11;
+        double d12;
+        block15: {
+            block16: {
+                float f12;
+                float f13;
+                block17: {
+                    float f14;
+                    float f15;
+                    block19: {
+                        block18: {
+                            block14: {
+                                d12 = bM2.t().R();
+                                d11 = bM2.t().t();
+                                f10 = bM2.F();
+                                try {
+                                    try {
+                                        if (d12 != 0.0 || d11 != 0.0) break block14;
+                                    }
+                                    catch (vg vg2) {
+                                        throw yq.a(vg2);
+                                    }
+                                    w22.setX(0.0);
+                                    w22.setZ(0.0);
+                                    break block15;
+                                }
+                                catch (vg vg3) {
+                                    throw yq.a(vg3);
+                                }
+                            }
+                            try {
+                                try {
+                                    try {
+                                        try {
+                                            if (d12 == 0.0) break block15;
+                                            if (d11 == 0.0) break block16;
+                                        }
+                                        catch (vg vg4) {
+                                            throw yq.a(vg4);
+                                        }
+                                        if (!(d11 > 0.0)) break block17;
+                                    }
+                                    catch (vg vg5) {
+                                        throw yq.a(vg5);
+                                    }
+                                    f15 = f10;
+                                    if (!(d12 > 0.0)) break block18;
+                                }
+                                catch (vg vg6) {
+                                    throw yq.a(vg6);
+                                }
+                                f14 = -45.0f;
+                                break block19;
+                            }
+                            catch (vg vg7) {
+                                throw yq.a(vg7);
+                            }
+                        }
+                        f14 = 45.0f;
+                    }
+                    f10 = f15 + f14;
+                    d11 = 0.0;
+                    break block16;
+                }
+                try {
+                    f13 = f10;
+                    f12 = d12 > 0.0 ? 45.0f : -45.0f;
+                }
+                catch (vg vg8) {
+                    throw yq.a(vg8);
+                }
+                f10 = f13 + f12;
+                d11 = 0.0;
+            }
+            d12 = d12 > 0.0 ? 1.0 : -1.0;
+        }
+        double d13 = Math.cos(Math.toRadians(f10 + 90.0f));
+        double d14 = Math.sin(Math.toRadians(f10 + 90.0f));
+        w22.setX(d12 * d10 * d13 + d11 * d10 * d14);
+        w22.setZ(d12 * d10 * d14 - d11 * d10 * d13);
+    }
+    public void S() {
+        long l10 = a ^ 0x48427483216CL;
+        Ui.Y.S().F(this);
+        this.G = this.o();
+        this.b = 0.0;
+        this.r = (int)2;
+    }
+    public void D(W9 w92) {
+        BM bM2 = uO.P();
+        double d10 = bM2.i() - bM2.x();
+        double d11 = bM2.k() - bM2.I();
+        this.b = Math.sqrt(d10 * d10 + d11 * d11);
+    }
+    public double o() {
+        double d10;
+        block2: {
+            d10 = 0.28730000691562896;
+            BM bM2 = uO.P();
+            try {
+                if (!bM2.o(vH.X) || bM2.a(vH.X).A() <= 10) break block2;
+            }
+            catch (vg vg2) {
+                throw yq.a(vg2);
+            }
+            int n10 = bM2.a(vH.X).p();
+            d10 *= 1.0 + 0.15 * (double)(n10 + 1);
+        }
+        return d10;
+    }
+    private static vg a(vg vg2) {
+        return vg2;
+    }
+    public void z(int n10) {
+        this.r = n10;
+    }
+    public String y() {
+        return this.v.r();
+    }
+    public yq() {
+        long l10 = a ^ 0x5B4D16BCDEC7L;
+        super((String)((Object)"Speed"), (int)49630, oK.R, (String)((Object)"Increases your movement with various methods."));
+        this.k = new zJ(this, (String)((Object)"AntiCheat B")).I();
+        this.p = new z5(this, (String)((Object)"Bhop")).I();
+        this.v = VC.u(this, (String)((Object)"Mode"), (String)((Object)"Speed mode to use.\nAntiCheat B works on various servers\nBhop - Bypasses Old NCP"), this.p, this.k, this.p);
+        this.T(false);
+        this.t(this.v);
+    }
+    public boolean q() {
+        return true;
+    }

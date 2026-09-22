@@ -1,0 +1,26 @@
+// Reference only: a/Nb; business-method excerpts from decoded CFR source.
+// Original decompiler errors and unresolved expressions may remain.
+    public void S(float f10) {
+        if (oF.MC_1_12_2.p()) {
+            float f12 = 50.0f;
+            GH.p(Nb.y.S().nN, this.a, f12 / f10);
+            return;
+        }
+        GH.b(Nb.y.S().nN, this.a, f10);
+    }
+    public Nb(Object object) {
+        super(object);
+    }
+    public float W() {
+        if (oF.MC_1_12_2.p()) {
+            float f10 = 50.0f;
+            return f10 / Nb.y.S().nN.g(this.a);
+        }
+        return GH.r(Nb.y.S().nN, this.a);
+    }
+    public float h() {
+        return GH.n(Nb.y.S().nN, this.a);
+    }
+    public float A() {
+        return GH.d(Nb.y.S().nN, this.a);
+    }

@@ -1,0 +1,508 @@
+// Reference only: a/OR; business-method excerpts from decoded CFR source.
+// Original decompiler errors and unresolved expressions may remain.
+    public static Na K(BZ bZ2, Nn nn2, Nn nn3, NF nF2, double d10, double d11, @Nullable Predicate<BZ> predicate) {
+        pX pX2 = uO.o();
+        double d12 = d10;
+        BZ bZ3 = new BZ(null);
+        Nn nn4 = new Nn(null);
+        List list = pX2.j(bZ2, nF2);
+        Iterator iterator = list.iterator();
+        while (iterator.hasNext()) {
+            double d13;
+            Nn nn5;
+            BZ bZ4;
+            block20: {
+                bZ4 = new BZ(iterator.next());
+                if (bZ4.h()) continue;
+                try {
+                    if (!bZ4.C()) {
+                        continue;
+                    }
+                }
+                catch (vg vg2) {
+                    throw OR.a(vg2);
+                }
+                try {
+                    try {
+                        if (predicate != null && !predicate.test(bZ4)) {
+                            continue;
+                        }
+                    }
+                    catch (vg vg3) {
+                        throw OR.a(vg3);
+                    }
+                }
+                catch (vg vg4) {
+                    throw OR.a(vg4);
+                }
+                NF nF3 = bZ4.s().c((double)bZ4.D() + d11);
+                Optional optional = nF3.k(nn2, nn3);
+                if (nF3.g(nn2)) {
+                    bZ3 = new BZ(bZ4);
+                    nn4 = new Nn(optional.orElse(nn2));
+                    d12 = 0.0;
+                    continue;
+                }
+                if (!optional.isPresent()) continue;
+                nn5 = new Nn(optional.get());
+                d13 = nn2.T(nn5);
+                try {
+                    try {
+                        try {
+                            if (!(d13 < d12) && d12 != 0.0) continue;
+                        }
+                        catch (vg vg5) {
+                            throw OR.a(vg5);
+                        }
+                        if (!bZ4.A().equals(bZ2.A())) break block20;
+                    }
+                    catch (vg vg6) {
+                        throw OR.a(vg6);
+                    }
+                    if (d12 != 0.0) continue;
+                }
+                catch (vg vg7) {
+                    throw OR.a(vg7);
+                }
+                bZ3 = new BZ(bZ4);
+                nn4 = new Nn(nn5);
+                continue;
+            }
+            bZ3 = new BZ(bZ4);
+            nn4 = new Nn(nn5);
+            d12 = d13;
+        }
+        try {
+            if (bZ3.k()) {
+                return new Na(null);
+            }
+        }
+        catch (vg vg8) {
+            throw OR.a(vg8);
+        }
+        return Na.E(bZ3, nn4);
+    }
+    private static void F(double d10, float f10) {
+        block36: {
+            BZ bZ2;
+            ux ux2;
+            Nn nn2;
+            block43: {
+                double d11;
+                double d12;
+                block42: {
+                    float f12 = 1.0f;
+                    BJ bJ2 = uO.v();
+                    pX pX2 = uO.o();
+                    ie ie2 = uO.Y();
+                    try {
+                        if (!bJ2.Z() || !pX2.Z()) break block36;
+                    }
+                    catch (vg vg2) {
+                        throw OR.a(vg2);
+                    }
+                    BZ bZ3 = new BZ(null);
+                    uO.F(bZ3);
+                    double d13 = ie2.N();
+                    Np np2 = bJ2.W(d13, f12);
+                    uO.f(np2);
+                    d12 = d10;
+                    Nn nn3 = bJ2.S(f12);
+                    boolean bl2 = false;
+                    d12 = d10;
+                    d13 = d10;
+                    if (d13 > 3.0) {
+                        bl2 = true;
+                    }
+                    if (uO.L().Z()) {
+                        d12 = bJ2.W((double)ie2.N() + (d10 - 3.0), f12).B().r(nn3);
+                    }
+                    if (d12 > 6.0) {
+                        d12 = 6.0;
+                    }
+                    Nn nn4 = bJ2.Y(f12);
+                    Nn nn5 = nn3.l(nn4.e() * d13, nn4.y() * d13, nn4.N() * d13);
+                    uO.a().b(bZ3);
+                    nn2 = null;
+                    float f13 = 1.0f;
+                    List list = pX2.j(bJ2, bJ2.s().H(nn4.e() * d13, nn4.y() * d13, nn4.N() * d13).R(f13, f13, f13));
+                    d11 = d12;
+                    for (int i10 = 0; i10 < list.size(); ++i10) {
+                        double d14;
+                        Np np3;
+                        block41: {
+                            block37: {
+                                Nn nn6;
+                                block40: {
+                                    block39: {
+                                        ux2 = new BZ(list.get(i10));
+                                        if (!((BZ)ux2).H()) continue;
+                                        float f14 = ((BZ)ux2).D() + f10;
+                                        NF nF2 = ((BZ)ux2).s().R(f14, f14, f14);
+                                        np3 = nF2.d(nn3, nn5);
+                                        try {
+                                            try {
+                                                block38: {
+                                                    try {
+                                                        try {
+                                                            if (!nF2.u(nn3)) break block37;
+                                                            if (0.0 < d11) break block38;
+                                                        }
+                                                        catch (vg vg3) {
+                                                            throw OR.a(vg3);
+                                                        }
+                                                        if (d11 != 0.0) continue;
+                                                    }
+                                                    catch (vg vg4) {
+                                                        throw OR.a(vg4);
+                                                    }
+                                                }
+                                                uO.a().b((BZ)ux2);
+                                                if (!np3.k()) break block39;
+                                            }
+                                            catch (vg vg5) {
+                                                throw OR.a(vg5);
+                                            }
+                                            nn6 = new Nn(nn3);
+                                            break block40;
+                                        }
+                                        catch (vg vg6) {
+                                            throw OR.a(vg6);
+                                        }
+                                    }
+                                    nn6 = np3.B();
+                                }
+                                nn2 = nn6;
+                                d11 = 0.0;
+                                continue;
+                            }
+                            if (!np3.Z()) continue;
+                            d14 = nn3.r(np3.B());
+                            try {
+                                try {
+                                    try {
+                                        try {
+                                            if (!(d14 < d11) && d11 != 0.0) continue;
+                                        }
+                                        catch (vg vg7) {
+                                            throw OR.a(vg7);
+                                        }
+                                        if (!ux2.equals(bJ2.M())) break block41;
+                                    }
+                                    catch (vg vg8) {
+                                        throw OR.a(vg8);
+                                    }
+                                    if (((BZ)ux2).O()) break block41;
+                                }
+                                catch (vg vg9) {
+                                    throw OR.a(vg9);
+                                }
+                                if (d11 != 0.0) continue;
+                            }
+                            catch (vg vg10) {
+                                throw OR.a(vg10);
+                            }
+                            uO.a().b((BZ)ux2);
+                            nn2 = np3.B();
+                            continue;
+                        }
+                        uO.a().b((BZ)ux2);
+                        nn2 = np3.B();
+                        d11 = d14;
+                    }
+                    bZ2 = uO.a().d();
+                    try {
+                        try {
+                            try {
+                                if (!oF.MC_1_7_10.Y() || !bZ2.Z()) break block42;
+                            }
+                            catch (vg vg11) {
+                                throw OR.a(vg11);
+                            }
+                            if (!bl2) break block42;
+                        }
+                        catch (vg vg12) {
+                            throw OR.a(vg12);
+                        }
+                        if (!(nn3.r(nn2) > d10)) break block42;
+                    }
+                    catch (vg vg13) {
+                        throw OR.a(vg13);
+                    }
+                    uO.a().b(bZ3);
+                    ux2 = Np.V(NS.e(), nn2, new NL(null), N5.D(nn2));
+                    uO.f((Np)ux2);
+                    bZ2 = uO.a().d();
+                }
+                try {
+                    try {
+                        if (!bZ2.Z()) break block36;
+                        if (d11 < d12) break block43;
+                    }
+                    catch (vg vg14) {
+                        throw OR.a(vg14);
+                    }
+                    if (!uO.L().k()) break block36;
+                }
+                catch (vg vg15) {
+                    throw OR.a(vg15);
+                }
+            }
+            ux2 = Np.B(bZ2, nn2);
+            try {
+                try {
+                    uO.f((Np)ux2);
+                    if (!bZ2.J(EN.Jb) && !bZ2.J(EN.j)) break block36;
+                }
+                catch (vg vg16) {
+                    throw OR.a(vg16);
+                }
+                uO.F(bZ2);
+            }
+            catch (vg vg17) {
+                throw OR.a(vg17);
+            }
+        }
+    }
+    private static vg a(vg vg2) {
+        return vg2;
+    }
+    private static void H(float f10, float f12) {
+        block18: {
+            float f13 = 1.0f;
+            BJ bJ2 = uO.v();
+            ie ie2 = uO.Y();
+            if (bJ2.Z()) {
+                BZ bZ2 = new BZ(null);
+                uO.F(bZ2);
+                double d10 = ie2.N();
+                uO.f(bJ2.W(d10, f13));
+                Nn nn2 = bJ2.V(f13);
+                double d11 = d10;
+                boolean bl2 = false;
+                if (d10 > 3.0) {
+                    bl2 = true;
+                }
+                d11 = f10;
+                d10 = f10;
+                d11 *= d11;
+                if (uO.L().Z()) {
+                    double d12;
+                    d10 = d12 = (double)ie2.N() + ((double)f10 - 3.0);
+                    d11 = bJ2.W(d12, 1.0f).B().T(nn2);
+                    if (oF.MC_1_21_4.p()) {
+                        d11 *= d11;
+                    }
+                }
+                Nn nn3 = bJ2.Y(1.0f);
+                Nn nn4 = nn2.l(nn3.e() * d10, nn3.y() * d10, nn3.N() * d10);
+                double d13 = 1.0;
+                NF nF2 = bJ2.s().s(nn3.R(d10)).Z(d13, d13, d13);
+                Na na2 = OR.K(bJ2, nn2, nn4, nF2, d11, f12, null);
+                if (na2.Z()) {
+                    double d14;
+                    BZ bZ3;
+                    block17: {
+                        bZ3 = na2.W();
+                        Nn nn5 = na2.B();
+                        d14 = nn2.Z(nn5);
+                        try {
+                            try {
+                                if (!bl2 || !(d14 > (double)(f10 * f10))) break block17;
+                            }
+                            catch (vg vg2) {
+                                throw OR.a(vg2);
+                            }
+                            uO.f(N7.H(nn5, NQ.j(nn3.e(), nn3.y(), nn3.N()), N5.D(nn5)));
+                            break block18;
+                        }
+                        catch (vg vg3) {
+                            throw OR.a(vg3);
+                        }
+                    }
+                    try {
+                        block19: {
+                            try {
+                                try {
+                                    try {
+                                        if (!(d14 < d11) && !uO.L().k()) break block18;
+                                    }
+                                    catch (vg vg4) {
+                                        throw OR.a(vg4);
+                                    }
+                                    uO.f(na2);
+                                    if (bZ3.J(EN.Jb)) break block19;
+                                }
+                                catch (vg vg5) {
+                                    throw OR.a(vg5);
+                                }
+                                if (!bZ3.J(EN.j)) break block18;
+                            }
+                            catch (vg vg6) {
+                                throw OR.a(vg6);
+                            }
+                        }
+                        uO.F(bZ3);
+                    }
+                    catch (vg vg7) {
+                        throw OR.a(vg7);
+                    }
+                }
+            }
+        }
+    }
+    public static void C(float f10, float f12) {
+        try {
+            if (ST.l.U()) {
+                return;
+            }
+        }
+        catch (vg vg2) {
+            throw OR.a(vg2);
+        }
+        try {
+            if (oF.MC_1_21_4.p()) {
+                OR.W(f10, f12);
+                return;
+            }
+        }
+        catch (vg vg3) {
+            throw OR.a(vg3);
+        }
+        try {
+            if (oF.MC_1_16_5.p()) {
+                OR.H(f10, f12);
+                return;
+            }
+        }
+        catch (vg vg4) {
+            throw OR.a(vg4);
+        }
+        OR.F(f10, f12);
+    }
+    public static void E(boolean bl2) {
+        block13: {
+            float f10;
+            block12: {
+                try {
+                    if (I == null) {
+                        I = Ui.Y.d().w(y6.class);
+                        B = Ui.Y.d().w(yY.class);
+                    }
+                }
+                catch (vg vg2) {
+                    throw OR.a(vg2);
+                }
+                try {
+                    if (uO.P().k()) {
+                        return;
+                    }
+                }
+                catch (vg vg3) {
+                    throw OR.a(vg3);
+                }
+                try {
+                    try {
+                        if (I.u() && !I.G().H().booleanValue()) break block12;
+                    }
+                    catch (vg vg4) {
+                        throw OR.a(vg4);
+                    }
+                    if (!B.u()) break block13;
+                }
+                catch (vg vg5) {
+                    throw OR.a(vg5);
+                }
+            }
+            float f12 = (float)I.w();
+            try {
+                f10 = bl2 ? 0.0f : B.j();
+            }
+            catch (vg vg6) {
+                throw OR.a(vg6);
+            }
+            float f13 = f10;
+            OR.C(f12, f13);
+        }
+    }
+    private static void W(float f10, float f12) {
+        block17: {
+            float f13 = 1.0f;
+            BJ bJ2 = uO.v();
+            ie ie2 = uO.Y();
+            if (bJ2.Z()) {
+                BZ bZ2 = new BZ(null);
+                uO.F(bZ2);
+                double d10 = ie2.N();
+                uO.f(bJ2.W(d10, f13));
+                Nn nn2 = bJ2.V(f13);
+                double d11 = d10;
+                boolean bl2 = false;
+                if (d10 > 3.0) {
+                    bl2 = true;
+                }
+                d11 = f10;
+                d10 = f10;
+                d11 *= d11;
+                if (uO.L().Z()) {
+                    double d12 = (double)ie2.N() + ((double)f10 - 3.0);
+                    d11 = bJ2.W(d12, 1.0f).B().T(nn2);
+                    d11 *= d11;
+                }
+                Nn nn3 = bJ2.Y(1.0f);
+                Nn nn4 = nn2.l(nn3.e() * d10, nn3.y() * d10, nn3.N() * d10);
+                double d13 = 1.0;
+                NF nF2 = bJ2.s().s(nn3.R(d10)).Z(d13, d13, d13);
+                Na na2 = OR.K(bJ2, nn2, nn4, nF2, d11, f12, null);
+                if (na2.Z()) {
+                    double d14;
+                    BZ bZ3;
+                    block16: {
+                        bZ3 = na2.W();
+                        Nn nn5 = na2.B();
+                        d14 = nn2.Z(nn5);
+                        try {
+                            try {
+                                if (!bl2 || !(d14 > (double)(f10 * f10))) break block16;
+                            }
+                            catch (vg vg2) {
+                                throw OR.a(vg2);
+                            }
+                            uO.f(N7.H(nn5, NQ.j(nn3.e(), nn3.y(), nn3.N()), N5.D(nn5)));
+                            break block17;
+                        }
+                        catch (vg vg3) {
+                            throw OR.a(vg3);
+                        }
+                    }
+                    try {
+                        block18: {
+                            try {
+                                try {
+                                    try {
+                                        if (!(d14 < d11) && !uO.L().k()) break block17;
+                                    }
+                                    catch (vg vg4) {
+                                        throw OR.a(vg4);
+                                    }
+                                    uO.f(na2);
+                                    if (bZ3.J(EN.Jb)) break block18;
+                                }
+                                catch (vg vg5) {
+                                    throw OR.a(vg5);
+                                }
+                                if (!bZ3.J(EN.j)) break block17;
+                            }
+                            catch (vg vg6) {
+                                throw OR.a(vg6);
+                            }
+                        }
+                        uO.F(bZ3);
+                    }
+                    catch (vg vg7) {
+                        throw OR.a(vg7);
+                    }
+                }
+            }
+        }
+    }

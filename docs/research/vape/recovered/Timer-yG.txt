@@ -1,0 +1,29 @@
+// Reference only: a/yG; business-method excerpts from decoded CFR source.
+// Original decompiler errors and unresolved expressions may remain.
+    private static vg a(vg vg2) {
+        return vg2;
+    }
+    public yG() {
+        long l10 = b ^ 0x467E5A778B91L;
+        super((String)((Object)"Timer"), (int)k, oK.R, (String)((Object)"Modifies game timer"));
+        this.a = VS.j(this, (String)((Object)"Speed"), (String)((Object)"#.##"), "", 0.1, 1.07, 2.0, 0.01);
+        this.o(z4.B, true);
+        this.o(z4.c, true);
+        this.T(false);
+        this.t(this.a);
+    }
+    public void f(rB rB2) {
+        boolean bl2;
+        try {
+            yG yG2 = this;
+            bl2 = !this.r;
+        }
+        catch (vg vg2) {
+            throw yG.a(vg2);
+        }
+        yG2.r = bl2;
+        uO.o().S(((Double)this.a.z()).floatValue());
+    }
+    public void P() {
+        uO.o().S(1.0f);
+    }

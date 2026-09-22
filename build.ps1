@@ -42,24 +42,35 @@ try{
     Invoke-Checked "cmake" @("--build", "build/native", "--parallel")
     Invoke-Checked "ctest" @("--test-dir", "build/native", "--output-on-failure")
 
-    $classes = Join-Path $PSScriptRoot "build\plugin-classes"
+    $classes = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "build\plugin-classes"))
     $libs = Join-Path $PSScriptRoot "build\libs"
+    $buildRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "build"))
+    if(-not $classes.StartsWith($buildRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)){
+        throw "Refusing to clean a directory outside build"
+    }
+    foreach($directory in @($buildRoot, $classes)){
+        if((Test-Path -LiteralPath $directory) -and ((Get-Item -LiteralPath $directory).Attributes -band [IO.FileAttributes]::ReparsePoint)){
+            throw "Refusing to clean through a directory link: $directory"
+        }
+    }
     if(Test-Path -LiteralPath $classes){ Remove-Item -LiteralPath $classes -Recurse -Force }
     New-Item -ItemType Directory -Path $classes, $libs -Force | Out-Null
     $argFile = Join-Path $PSScriptRoot "build\java-sources.txt"
     $sources = @(Get-ChildItem "plugin\src\main\java" -Filter "*.java" -Recurse |
         Sort-Object FullName | ForEach-Object { '"' + $_.FullName.Replace('\', '/') + '"' })
     [System.IO.File]::WriteAllLines($argFile, [string[]]$sources, ([System.Text.UTF8Encoding]::new($false)))
-    Invoke-Checked $javac @("--release", "8", "-encoding", "UTF-8", "-cp", $ServerJar,
+    Invoke-Checked $javac @("--release", "8", "-proc:none", "-encoding", "UTF-8", "-cp", $ServerJar,
         "-d", $classes, "@$argFile")
     # Exercise the Java session -> native engine path without starting Spigot.
     $testClasses = Join-Path $PSScriptRoot "build\adapter-test-classes"
     New-Item -ItemType Directory -Path $testClasses -Force | Out-Null
     Invoke-Checked $javac @(
-        "--release", "8", "-encoding", "UTF-8",
-        "-cp", "$classes;$ServerJar",
+        "--release", "8", "-proc:none", "-encoding", "UTF-8",
+        "-cp", $ServerJar,
         "-d", $testClasses,
+        "@$argFile",
         "tests/SessionSmokeTest.java",
+        "tests/MovementPacketTest.java",
         "tests/FindingReporterTest.java"
     )
     Invoke-Checked (Join-Path $Jdk "bin\java.exe") @(
@@ -70,6 +81,11 @@ try{
     )
 
     # Check console filtering, JSON decoding, and bounded evidence-file output.
+    Invoke-Checked (Join-Path $Jdk "bin\java.exe") @(
+        "-cp", "$testClasses;$ServerJar",
+        "dev.fox.anticheat.packet.MovementPacketTest"
+    )
+
     Invoke-Checked (Join-Path $Jdk "bin\java.exe") @(
         "-cp", "$testClasses;$classes;$ServerJar",
         "dev.fox.anticheat.report.FindingReporterTest"

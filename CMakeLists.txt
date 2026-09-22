@@ -26,6 +26,9 @@ add_library(anticheat_engine STATIC
     engine/src/checks/fastbreak.cpp
     engine/src/checks/reach.cpp
     engine/src/checks/autoclicker.cpp
+    engine/src/checks/movement_checks.cpp
+    engine/src/checks/velocity.cpp
+    engine/src/checks/hitboxes.cpp
     engine/src/checks/builtins.cpp)
 target_include_directories(anticheat_engine PUBLIC engine/include)
 add_library(anticheat_wire STATIC bridge/wire.cpp)
@@ -45,6 +48,9 @@ if(BUILD_TESTING)
     target_include_directories(combat_tests PRIVATE engine/src/checks)
     target_link_libraries(combat_tests PRIVATE anticheat_wire)
     add_test(NAME combat_tests COMMAND combat_tests)
+    add_executable(movement_tests tests/movement_tests.cpp)
+    target_link_libraries(movement_tests PRIVATE anticheat_wire)
+    add_test(NAME movement_tests COMMAND movement_tests)
 endif()
 
 if(AC_BUILD_JNI)
@@ -66,12 +72,19 @@ if(AC_BUILD_JNI)
         "${java_root}/event/MiningContext.java"
         "${java_root}/event/AttackEvent.java"
         "${java_root}/event/CombatContext.java"
+        "${java_root}/event/MovementEvent.java"
+        "${java_root}/event/MovementContext.java"
+        "${java_root}/event/ImpulseEvent.java"
+        "${java_root}/packet/OutboundHandlers.java"
+        "${java_root}/packet/ImpulseBarriers.java"
         "${java_root}/packet/PacketInfo.java"
         "${java_root}/packet/PacketHandlers.java"
         "${java_root}/observation/ObservationModule.java"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/PacketHandlersTest.java"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/NativeSmokeTest.java"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/CombatSmokeTest.java")
+    list(APPEND java_sources "${CMAKE_CURRENT_SOURCE_DIR}/tests/MovementSmokeTest.java")
+    list(APPEND java_sources "${java_root}/capture/CaptureRecorder.java" "${CMAKE_CURRENT_SOURCE_DIR}/tests/CaptureRecorderTest.java")
     set(jni_header "${CMAKE_CURRENT_BINARY_DIR}/generated/dev_fox_anticheat_bridge_NativeBridge.h")
     add_custom_command(OUTPUT "${jni_header}"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/generated" "${CMAKE_CURRENT_BINARY_DIR}/java"
@@ -94,5 +107,10 @@ if(AC_BUILD_JNI)
         add_test(NAME jni_smoke COMMAND "${Java_JAVA_EXECUTABLE}" -Xcheck:jni
             -cp "${CMAKE_CURRENT_BINARY_DIR}/java" dev.fox.anticheat.bridge.NativeSmokeTest
             "$<TARGET_FILE:anticheat_native>")
+        add_test(NAME movement_jni COMMAND "${Java_JAVA_EXECUTABLE}" -Xcheck:jni
+            -cp "${CMAKE_CURRENT_BINARY_DIR}/java" dev.fox.anticheat.bridge.MovementSmokeTest
+            "$<TARGET_FILE:anticheat_native>")
+        add_test(NAME capture_journal COMMAND "${Java_JAVA_EXECUTABLE}"
+            -cp "${CMAKE_CURRENT_BINARY_DIR}/java" dev.fox.anticheat.capture.CaptureRecorderTest)
     endif()
 endif()

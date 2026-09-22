@@ -1,0 +1,4 @@
+Anticheat collection source plus Windows Java/JNI build.
+See tools/dataset/COLLECTION_GUIDE.md and docs/DATASET_VALIDATION.md.
+No Minecraft server jar, world, gameplay recordings, secrets, or trained model included.
+Build outputs are ignored by Git; build from source for another platform.

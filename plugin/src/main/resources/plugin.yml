@@ -2,3 +2,12 @@ name: FoxAntiCheat
 version: 0.3.0
 main: dev.fox.anticheat.AntiCheatPlugin
 description: Java observation adapter with a C++ detection engine.
+commands:
+  acdata:
+    description: Start, stop and inspect explicitly labeled lab gameplay recordings.
+    usage: /acdata status
+    permission: foxanticheat.capture
+permissions:
+  foxanticheat.capture:
+    description: Control local research recordings and declare trial labels.
+    default: op

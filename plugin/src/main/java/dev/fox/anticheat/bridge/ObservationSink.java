@@ -5,6 +5,7 @@
 package dev.fox.anticheat.bridge;
 
 import dev.fox.anticheat.Session;
+import java.nio.ByteBuffer;
 import java.util.function.Consumer;
 import java.util.function.LongSupplier;
 
@@ -15,6 +16,9 @@ public final class ObservationSink{
     private final LongSupplier clock;
     private final LongSupplier tick;
     private final Consumer<String> report;
+    private Consumer<ByteBuffer> capture = buffer -> {};
+
+    public void setCapture(Consumer<ByteBuffer> capture){checkThread();this.capture=capture;}
 
     public ObservationSink(
         NativeBridge engine,
@@ -54,7 +58,9 @@ public final class ObservationSink{
     // Submit before reusing the writer; native processing completes synchronously.
     public void send(){
         checkThread();
-        String[] records = engine.submit(writer.finish());
+        ByteBuffer event=writer.finish();
+        capture.accept(event.asReadOnlyBuffer());
+        String[] records = engine.submit(event);
 
         if(records == null)
             return;

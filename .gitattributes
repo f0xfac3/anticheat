@@ -1,0 +1,2 @@
+# Research hashes refer to exact bytes, including the retained JSON line endings.
+/docs/research/vape/** -text whitespace=cr-at-eol

@@ -1,0 +1,181 @@
+// Reference only: a/yY; business-method excerpts from decoded CFR source.
+// Original decompiler errors and unresolved expressions may remain.
+    public void Z(W1 w12) {
+        block31: {
+            double d10;
+            double d11;
+            double d12;
+            NF nF2;
+            NF nF3;
+            double d13;
+            BZ bZ2;
+            Nn nn2;
+            block34: {
+                double d14;
+                double d15;
+                block33: {
+                    PO pO2;
+                    try {
+                        if (oF.MC_1_8_9.h()) {
+                            return;
+                        }
+                    }
+                    catch (vg vg2) {
+                        throw yY.a(vg2);
+                    }
+                    if (!PO.Y(w12.getPacket()) || !(pO2 = new PO(w12.getPacket())).L()) break block31;
+                    nn2 = pO2.r();
+                    bZ2 = pO2.D(uO.o());
+                    d13 = (Double)this.r.z();
+                    double d16 = bZ2.D();
+                    nF3 = bZ2.C().R(d16, d16, d16);
+                    nF2 = bZ2.C().R(d16 + d13, d16 + d13, d16 + d13);
+                    double d17 = nF3.F() - nF3.u();
+                    double d18 = d17 / 2.0;
+                    double d19 = nF2.F() - nF2.u();
+                    double d20 = d19 / 2.0;
+                    if (Math.abs(nn2.e()) > d18) {
+                        double d21;
+                        Nn nn3;
+                        block24: {
+                            double d22;
+                            Nn nn4;
+                            block26: {
+                                block25: {
+                                    d15 = Math.min(1.0, Math.abs(nn2.e()) / d20);
+                                    d14 = d18 * d15;
+                                    try {
+                                        try {
+                                            if (d15 != 1.0) break block24;
+                                            nn4 = nn2;
+                                            if (!(nn2.e() > 0.0)) break block25;
+                                        }
+                                        catch (vg vg3) {
+                                            throw yY.a(vg3);
+                                        }
+                                        d22 = d18;
+                                        break block26;
+                                    }
+                                    catch (vg vg4) {
+                                        throw yY.a(vg4);
+                                    }
+                                }
+                                d22 = -d18;
+                            }
+                            nn4.w(d22);
+                            break block33;
+                        }
+                        try {
+                            nn3 = nn2;
+                            d21 = nn2.e() > 0.0 ? d14 : -d14;
+                        }
+                        catch (vg vg5) {
+                            throw yY.a(vg5);
+                        }
+                        nn3.w(d21);
+                    }
+                }
+                d15 = nF3.Q() - nF3.c();
+                d14 = d15 / 2.0;
+                double d23 = nF2.Q() - nF2.c();
+                double d24 = d23 / 2.0;
+                if (Math.abs(nn2.N()) > d14) {
+                    double d25;
+                    Nn nn5;
+                    block27: {
+                        double d26;
+                        Nn nn6;
+                        block29: {
+                            block28: {
+                                d12 = Math.min(1.0, Math.abs(nn2.N()) / d24);
+                                d11 = d14 * d12;
+                                try {
+                                    try {
+                                        if (d12 != 1.0) break block27;
+                                        nn6 = nn2;
+                                        if (!(nn2.N() > 0.0)) break block28;
+                                    }
+                                    catch (vg vg6) {
+                                        throw yY.a(vg6);
+                                    }
+                                    d26 = d14;
+                                    break block29;
+                                }
+                                catch (vg vg7) {
+                                    throw yY.a(vg7);
+                                }
+                            }
+                            d26 = -d14;
+                        }
+                        nn6.f(d26);
+                        break block34;
+                    }
+                    try {
+                        nn5 = nn2;
+                        d25 = nn2.N() > 0.0 ? d11 : -d11;
+                    }
+                    catch (vg vg8) {
+                        throw yY.a(vg8);
+                    }
+                    nn5.f(d25);
+                }
+            }
+            d11 = d12 = nF3.I() - bZ2.q();
+            double d27 = nF3.y() - bZ2.q();
+            double d28 = d10 = nF2.I() - bZ2.q();
+            if (nn2.y() > d11) {
+                double d29;
+                block30: {
+                    double d30 = Math.min(1.0, Math.abs(nn2.y()) / d28);
+                    d29 = d11 * d30;
+                    try {
+                        if (d30 != 1.0) break block30;
+                        nn2.H(d11);
+                        break block31;
+                    }
+                    catch (vg vg9) {
+                        throw yY.a(vg9);
+                    }
+                }
+                nn2.H(d29);
+            } else if (nn2.y() < d27) {
+                double d31;
+                block32: {
+                    double d32 = d27 - d13;
+                    d31 = nn2.y() / d32;
+                    try {
+                        if (!(d31 >= 1.0)) break block32;
+                        nn2.H(d27);
+                        break block31;
+                    }
+                    catch (vg vg10) {
+                        throw yY.a(vg10);
+                    }
+                }
+                double d33 = d27 * d31;
+                nn2.H(d33);
+            }
+        }
+    }
+    public yY() {
+        long l10 = a ^ 0x597B4199B2EL;
+        super((String)((Object)"HitBoxes"), (int)j, oK.R, (String)((Object)"Expands entities hitboxes"));
+        this.r = VS.j(this, (String)((Object)"Expand amount"), (String)((Object)"#.##"), "", 0.0, 0.35, 1.0, 0.01);
+        this.o(z4.B, true);
+        this.o(z4.c, true);
+        this.t(this.r);
+    }
+    private static vg a(vg vg2) {
+        return vg2;
+    }
+    public float j() {
+        try {
+            if (!this.u()) {
+                return 0.0f;
+            }
+        }
+        catch (vg vg2) {
+            throw yY.a(vg2);
+        }
+        return ((Double)this.r.z()).floatValue();
+    }

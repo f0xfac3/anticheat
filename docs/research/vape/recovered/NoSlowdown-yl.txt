@@ -1,0 +1,211 @@
+// Reference only: a/yl; business-method excerpts from decoded CFR source.
+// Original decompiler errors and unresolved expressions may remain.
+    private static vg a(vg vg2) {
+        return vg2;
+    }
+    public boolean q() {
+        return true;
+    }
+    public void y(W3 w32) {
+        block8: {
+            P5 p52 = w32.getPacket();
+            try {
+                if (p52.J(EN.I8)) {
+                    this.x = true;
+                }
+            }
+            catch (vg vg2) {
+                throw yl.a(vg2);
+            }
+            if (p52.J(EN.nB)) {
+                QQ qQ2 = new QQ(p52);
+                BM bM2 = uO.P();
+                try {
+                    try {
+                        if (!bM2.Z() || qQ2.Z() != bM2.o()) break block8;
+                    }
+                    catch (vg vg3) {
+                        throw yl.a(vg3);
+                    }
+                    this.x = true;
+                }
+                catch (vg vg4) {
+                    throw yl.a(vg4);
+                }
+            }
+        }
+    }
+    public void z(W9 w92) {
+        block41: {
+            float f10;
+            double d10;
+            double d11;
+            BM bM2;
+            block49: {
+                double d12;
+                double d13;
+                block51: {
+                    block50: {
+                        block47: {
+                            block48: {
+                                block45: {
+                                    block46: {
+                                        block44: {
+                                            block39: {
+                                                block40: {
+                                                    bM2 = uO.P();
+                                                    try {
+                                                        try {
+                                                            if (!this.x) break block39;
+                                                            if (!bM2.a()) break block40;
+                                                        }
+                                                        catch (vg vg2) {
+                                                            throw yl.a(vg2);
+                                                        }
+                                                        this.x = false;
+                                                    }
+                                                    catch (vg vg3) {
+                                                        throw yl.a(vg3);
+                                                    }
+                                                }
+                                                return;
+                                            }
+                                            try {
+                                                if (bM2.n()) {
+                                                    return;
+                                                }
+                                            }
+                                            catch (vg vg4) {
+                                                throw yl.a(vg4);
+                                            }
+                                            d11 = bM2.t().R();
+                                            d10 = bM2.t().t();
+                                            f10 = bM2.F();
+                                            try {
+                                                try {
+                                                    block43: {
+                                                        try {
+                                                            try {
+                                                                block42: {
+                                                                    try {
+                                                                        try {
+                                                                            if (!bM2.w()) break block41;
+                                                                            if (!this.l.H().booleanValue()) break block42;
+                                                                        }
+                                                                        catch (vg vg5) {
+                                                                            throw yl.a(vg5);
+                                                                        }
+                                                                        if (!this.j.Z(bM2.F())) break block41;
+                                                                    }
+                                                                    catch (vg vg6) {
+                                                                        throw yl.a(vg6);
+                                                                    }
+                                                                }
+                                                                if (Math.abs(d10) == (double)0.2f) break block43;
+                                                            }
+                                                            catch (vg vg7) {
+                                                                throw yl.a(vg7);
+                                                            }
+                                                            if (Math.abs(d11) != (double)0.2f) break block41;
+                                                        }
+                                                        catch (vg vg8) {
+                                                            throw yl.a(vg8);
+                                                        }
+                                                    }
+                                                    if (!Ui.Y.d().y(VQ.class)) break block44;
+                                                }
+                                                catch (vg vg9) {
+                                                    throw yl.a(vg9);
+                                                }
+                                                bM2.o(true);
+                                            }
+                                            catch (vg vg10) {
+                                                throw yl.a(vg10);
+                                            }
+                                        }
+                                        try {
+                                            try {
+                                                if (Math.abs(d10) != (double)0.2f) break block45;
+                                                if (!(d10 > 0.0)) break block46;
+                                            }
+                                            catch (vg vg11) {
+                                                throw yl.a(vg11);
+                                            }
+                                            bM2.t().e(1.0f);
+                                            break block45;
+                                        }
+                                        catch (vg vg12) {
+                                            throw yl.a(vg12);
+                                        }
+                                    }
+                                    try {
+                                        if (d10 < 0.0) {
+                                            bM2.t().e(-1.0f);
+                                        }
+                                    }
+                                    catch (vg vg13) {
+                                        throw yl.a(vg13);
+                                    }
+                                }
+                                try {
+                                    try {
+                                        if (Math.abs(d11) != (double)0.2f) break block47;
+                                        if (!(d11 > 0.0)) break block48;
+                                    }
+                                    catch (vg vg14) {
+                                        throw yl.a(vg14);
+                                    }
+                                    bM2.t().j(1.0f);
+                                    break block47;
+                                }
+                                catch (vg vg15) {
+                                    throw yl.a(vg15);
+                                }
+                            }
+                            try {
+                                if (d11 < 0.0) {
+                                    bM2.t().j(-1.0f);
+                                }
+                            }
+                            catch (vg vg16) {
+                                throw yl.a(vg16);
+                            }
+                        }
+                        try {
+                            try {
+                                try {
+                                    if (Math.abs(bM2.t().t()) == 1.0f || !(d11 > 0.0)) break block49;
+                                }
+                                catch (vg vg17) {
+                                    throw yl.a(vg17);
+                                }
+                                d13 = d11;
+                                if (!bM2.u()) break block50;
+                            }
+                            catch (vg vg18) {
+                                throw yl.a(vg18);
+                            }
+                            d12 = 1.3f;
+                            break block51;
+                        }
+                        catch (vg vg19) {
+                            throw yl.a(vg19);
+                        }
+                    }
+                    d12 = 1.0;
+                }
+                d11 = d13 * d12;
+            }
+            d10 = d11 != 0.0 ? (d10 *= 0.5) : (d10 *= 0.85);
+            bM2.F(d11 * Math.cos(Math.toRadians(f10 + 90.0f)) + d10 * Math.sin(Math.toRadians(f10 + 90.0f)));
+            bM2.P(d11 * Math.sin(Math.toRadians(f10 + 90.0f)) - d10 * Math.cos(Math.toRadians(f10 + 90.0f)));
+        }
+    }
+    public yl() {
+        long l10 = a ^ 0x6BB101B7CB62L;
+        super((String)((Object)"NoSlowdown"), (int)k, oK.R, (String)((Object)"Prevents slowing down when\nblocking or using items."));
+        this.l = Ve.j(this, (String)((Object)"Limit Items"), false, (String)((Object)"Limits to whitelisted items only."));
+        this.j = Vo.H(this, (String)((Object)"noslowdown-whitelist"), (String)((Object)"Whitelisted"), Vo.K, new Jw((String)((Object)"swords")));
+        this.l.E(this.j);
+        this.t(this.l, this.j);
+    }

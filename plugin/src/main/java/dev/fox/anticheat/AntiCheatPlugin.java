@@ -12,6 +12,7 @@ import dev.fox.anticheat.observation.ObservationModule;
 import dev.fox.anticheat.observation.ObservationModules;
 import dev.fox.anticheat.packet.PacketObserver;
 import dev.fox.anticheat.report.FindingReporter;
+import dev.fox.anticheat.capture.CaptureController;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -30,6 +31,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -46,6 +48,7 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
     private FindingReporter findings;
     private ObservationSink observations;
     private PacketObserver packets;
+    private CaptureController capture;
     private BukkitTask ticker;
     private boolean running;
 
@@ -118,6 +121,13 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
         try{
             checkServer();
             openEngine();
+            try{
+                capture=new CaptureController(this,sessions::get,this::now);
+                observations.setCapture(capture::accept);
+                getCommand("acdata").setExecutor(capture);
+            }catch(Exception captureError){
+                getLogger().log(Level.SEVERE,"Raw capture unavailable; detection remains active",captureError);
+            }
             packets = new PacketObserver(
                 this,
                 this::now,
@@ -137,7 +147,7 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
                 join(player);
             }
 
-            getLogger().info("C++ detection engine loaded. Java adapter: Spigot 1.8.8. Combat schema 2. Report-only; no enforcement.");
+            getLogger().info("C++ detection engine loaded. Java adapter: Spigot 1.8.8. Observation schema 3. Report-only; no enforcement.");
         }catch(Exception | LinkageError error){
             getLogger().log(
                 Level.SEVERE,
@@ -308,6 +318,12 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
             end(session);
     }
 
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onRespawn(PlayerRespawnEvent event){
+        Session session=sessions.get(event.getPlayer().getUniqueId());
+        if(session!=null && session.active) session.recordLoss();
+    }
+
     // Invalidate old queued observations, but let each check handle the teleport itself.
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onTeleport(PlayerTeleportEvent event){
@@ -368,6 +384,7 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
         }
 
         sessions.clear();
+        if(capture!=null){capture.close();capture=null;}
 
         if(engine != null){
             try{

@@ -1,0 +1,52 @@
+[
+  {
+    "mapper": "a/GH",
+    "field": "T",
+    "class": "a/kD",
+    "address": "0x966e7be8",
+    "metadata": {
+      "m": "F",
+      "E": false,
+      "f": "timerSpeed",
+      "Z": "timerSpeed",
+      "q": "net/minecraft/util/Timer",
+      "n": 719,
+      "p": false,
+      "s": "0x966e7cc0:java/lang/reflect/Field",
+      "o": "F",
+      "W": true,
+      "c": "0x826f0578:java/lang/Class",
+      "z": "0x966e7a50:a/GH",
+      "t": false,
+      "R": "0x8002cda8:java/lang/Class",
+      "A": "0x8002cda8:java/lang/Class"
+    },
+    "reflected_name": "field_74278_d",
+    "reflected_slot": 4
+  },
+  {
+    "mapper": "a/Zw",
+    "field": "j",
+    "class": "a/kD",
+    "address": "0x966a29a0",
+    "metadata": {
+      "m": "Lnet/minecraft/util/Timer;",
+      "E": false,
+      "f": "timer",
+      "Z": "timer",
+      "q": "net/minecraft/client/Minecraft",
+      "n": 495,
+      "p": false,
+      "s": "0x966a2ae0:java/lang/reflect/Field",
+      "o": "Lnet/minecraft/util/Timer;",
+      "W": true,
+      "c": "0x826f2488:java/lang/Class",
+      "z": "0x966624d0:a/Zw",
+      "t": false,
+      "R": "0x826f0578:java/lang/Class",
+      "A": "0x826f0578:java/lang/Class"
+    },
+    "reflected_name": "field_71428_T",
+    "reflected_slot": 19
+  }
+]

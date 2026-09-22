@@ -9,6 +9,9 @@ import dev.fox.anticheat.event.DigEvent;
 import dev.fox.anticheat.event.AttackEvent;
 import dev.fox.anticheat.event.CombatContext;
 import dev.fox.anticheat.event.MiningContext;
+import dev.fox.anticheat.event.MovementEvent;
+import dev.fox.anticheat.event.MovementContext;
+import dev.fox.anticheat.event.ImpulseEvent;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -24,9 +27,13 @@ public final class EventWriter{
     public static final int COMBAT_CONTEXT = 8;
     public static final int SWING = 9;
     public static final int TELEPORT = 10;
+    public static final int MOVEMENT = 11;
+    public static final int IMPULSE = 12;
+    public static final int IMPULSE_ACK = 13;
+    public static final int CORRECTION = 14;
 
     private static final int MAGIC = 0x43415846;
-    private static final int VERSION = 2;
+    private static final int VERSION = 3;
 
     private final ByteBuffer buffer = ByteBuffer.allocateDirect(8192)
         .order(ByteOrder.LITTLE_ENDIAN);
@@ -139,6 +146,8 @@ public final class EventWriter{
         vector(context.maxX, context.maxY, context.maxZ);
         buffer.putInt(context.pingMillis);
         buffer.put((byte) (context.available ? 1 : 0));
+        buffer.putDouble(context.yaw).putDouble(context.pitch);
+        flag(context.rotationAvailable); flag(context.attackerSprinting); flag(context.targetPlayer);
     }
 
     public EventWriter swing(long packetSequence, long readBatch){
@@ -172,6 +181,26 @@ public final class EventWriter{
         buffer.putDouble(y);
         buffer.putDouble(z);
     }
+
+    public EventWriter movement(MovementEvent event, MovementContext c, long sampledNanos){
+        buffer.putLong(event.packet.sequence).putLong(event.packet.readBatch).putLong(sampledNanos);
+        vector(event.x,event.y,event.z);
+        buffer.putDouble(event.yaw).putDouble(event.pitch);
+        flag(event.position); flag(event.look); flag(event.ground);
+        text(c.world); text(c.reason);
+        flag(c.available); flag(c.sourceSupported); flag(c.destinationSupported); flag(c.clearPath);
+        flag(c.flatGround); flag(c.usingItem); flag(c.sprinting);
+        buffer.putDouble(c.movementSpeed).putDouble(c.friction).putDouble(c.jumpVelocity);
+        return this;
+    }
+
+    public EventWriter impulse(ImpulseEvent event){
+        buffer.putLong(event.token); vector(event.x,event.y,event.z); flag(event.additive);
+        return this;
+    }
+
+    public EventWriter impulseAck(long token){ buffer.putLong(token); return this; }
+    private void flag(boolean value){ buffer.put((byte)(value?1:0)); }
 
     // Prepare the written bytes for a synchronous JNI submission.
     public ByteBuffer finish(){
