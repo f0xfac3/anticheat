@@ -4,7 +4,8 @@
 
 The engine now has executable checks for **Timer, Reach, HitBoxes, Velocity,
 NoSlowdown, NoFall, Speed, Fly, and an opt-in KeepSprint experiment**. They emit
-research findings. They do not cancel movement, cancel damage, kick, or ban.
+research findings. The separate [Timer baseline policy](TIMER.md) now connects
+audited recordings to a conditional ban path. Other checks remain report-only.
 
 There are three different claims to test:
 
@@ -16,7 +17,8 @@ There are three different claims to test:
    sessions establish actual coverage and false-positive behavior.
 
 This change supplies source evidence and reproducible synthetic tests for the first
-two layers. **Layer 3 remains outstanding.** Neither a decompiler listing nor a
+two layers. [Timer's local recorded example](TIMER.md) adds limited live evidence;
+broader human/network validation remains outstanding. Neither a decompiler listing nor a
 passing synthetic test proves that every setting/mode is caught, that a player uses
 Vape, or that the check is safe to punish on. Another client or a server-side plugin
 can produce the same observable contradiction.

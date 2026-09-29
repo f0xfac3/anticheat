@@ -12,6 +12,8 @@ import dev.fox.anticheat.observation.ObservationModule;
 import dev.fox.anticheat.observation.ObservationModules;
 import dev.fox.anticheat.packet.PacketObserver;
 import dev.fox.anticheat.report.FindingReporter;
+import dev.fox.anticheat.report.TimerStore;
+import dev.fox.anticheat.capture.CaptureController;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -19,6 +21,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Properties;
+import java.io.InputStream;
+import org.bukkit.BanList;
 import java.util.logging.Level;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 import org.bukkit.Bukkit;
@@ -47,6 +52,9 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
     private FindingReporter findings;
     private ObservationSink observations;
     private PacketObserver packets;
+    private CaptureController capture;
+    private TimerStore timerStore;
+    private String enforcementWorld;
     private BukkitTask ticker;
     private boolean running;
 
@@ -89,7 +97,21 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
             Files.readAllBytes(config.toPath()),
             StandardCharsets.UTF_8
         );
-        engine = new NativeBridge(configuration);
+        File policy=new File(getDataFolder(),"enforcement.properties");
+        if(!policy.isFile())saveResource("enforcement.properties",false);
+        Properties settings=new Properties();
+        try(InputStream in=Files.newInputStream(policy.toPath())){settings.load(in);}
+        String mode=settings.getProperty("mode","report");
+        if(!mode.equals("ban") && !mode.equals("report"))throw new IllegalArgumentException("Enforcement mode must be report or ban");
+        enforcementWorld=settings.getProperty("world","ac_auto_samples");
+        if(enforcementWorld.trim().isEmpty())throw new IllegalArgumentException("Set an explicit enforcement world");
+        try{
+            timerStore=new TimerStore(new File(getDataFolder(),"anticheat.sqlite"),getLogger(),mode.equals("ban"),
+                task->getServer().getScheduler().runTask(this,task),this::banTimer);
+        }catch(Exception error){
+            getLogger().log(Level.SEVERE,"Timer database unavailable; model enforcement disabled",error);
+        }
+        engine = new NativeBridge(configuration+(timerStore==null?"":timerStore.nativeConfiguration()));
         findings = new FindingReporter(
             getLogger(),
             getDataFolder(),
@@ -100,8 +122,23 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
             engine,
             this::now,
             this::tick,
-            findings
+            record->{findings.accept(record);if(timerStore!=null)timerStore.accept(record);}
         );
+    }
+
+    // A native candidate is persisted before this callback runs on the server thread.
+    private String banTimer(TimerStore.Assessment assessment){
+        if(!running)return "skipped_stopped";
+        Session session=sessions.get(UUID.fromString(assessment.player));
+        if(session==null || !session.active || !Long.toString(session.id).equals(assessment.session) || !session.player.isOnline())
+            return "skipped_session_changed";
+        if(!session.player.getWorld().getName().equals(enforcementWorld))return "skipped_outside_scope";
+        if(capture!=null && capture.isCollectionSession(session.player.getUniqueId()))return "skipped_collection";
+        String reason="Timer: sustained excess client time. Evidence "+assessment.id;
+        Bukkit.getBanList(BanList.Type.NAME).addBan(session.player.getName(),reason,null,"FoxAntiCheat");
+        session.player.kickPlayer(reason);
+        getLogger().warning("BAN | "+session.player.getName()+" | Timer | evidence="+assessment.id);
+        return "banned";
     }
 
     // Resolve names only on the server thread; keep UUIDs unchanged in the saved evidence.
@@ -119,6 +156,13 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
         try{
             checkServer();
             openEngine();
+            try{
+                capture=new CaptureController(this,sessions::get,this::now);
+                observations.setCapture(capture::accept);
+                getCommand("acdata").setExecutor(capture);
+            }catch(Exception captureError){
+                getLogger().log(Level.SEVERE,"Raw capture unavailable; detection remains active",captureError);
+            }
             packets = new PacketObserver(
                 this,
                 this::now,
@@ -138,7 +182,7 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
                 join(player);
             }
 
-            getLogger().info("C++ detection engine loaded. Java adapter: Spigot 1.8.8. Combat schema 2. Report-only; no enforcement.");
+            getLogger().info("C++ engine loaded. Spigot 1.8.8, schema 3. Timer baseline policy active; other checks report-only.");
         }catch(Exception | LinkageError error){
             getLogger().log(
                 Level.SEVERE,
@@ -375,6 +419,7 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
         }
 
         sessions.clear();
+        if(capture!=null){capture.close();capture=null;}
 
         if(engine != null){
             try{
@@ -397,5 +442,6 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
             findings.close();
             findings = null;
         }
+        if(timerStore!=null){timerStore.close();timerStore=null;}
     }
 }

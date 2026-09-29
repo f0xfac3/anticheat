@@ -27,6 +27,7 @@ add_library(anticheat_engine STATIC
     engine/src/checks/reach.cpp
     engine/src/checks/autoclicker.cpp
     engine/src/checks/movement_checks.cpp
+    engine/src/checks/timer_baseline.cpp
     engine/src/checks/velocity.cpp
     engine/src/checks/hitboxes.cpp
     engine/src/checks/builtins.cpp)
@@ -51,6 +52,10 @@ if(BUILD_TESTING)
     add_executable(movement_tests tests/movement_tests.cpp)
     target_link_libraries(movement_tests PRIVATE anticheat_wire)
     add_test(NAME movement_tests COMMAND movement_tests)
+    add_executable(timer_baseline_tests tests/timer_baseline_tests.cpp)
+    target_include_directories(timer_baseline_tests PRIVATE engine/src/checks)
+    target_link_libraries(timer_baseline_tests PRIVATE anticheat_wire)
+    add_test(NAME timer_baseline_tests COMMAND timer_baseline_tests)
 endif()
 
 if(AC_BUILD_JNI)
@@ -84,6 +89,7 @@ if(AC_BUILD_JNI)
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/NativeSmokeTest.java"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/CombatSmokeTest.java")
     list(APPEND java_sources "${CMAKE_CURRENT_SOURCE_DIR}/tests/MovementSmokeTest.java")
+    list(APPEND java_sources "${java_root}/capture/CaptureRecorder.java" "${CMAKE_CURRENT_SOURCE_DIR}/tests/CaptureRecorderTest.java")
     set(jni_header "${CMAKE_CURRENT_BINARY_DIR}/generated/dev_fox_anticheat_bridge_NativeBridge.h")
     add_custom_command(OUTPUT "${jni_header}"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/generated" "${CMAKE_CURRENT_BINARY_DIR}/java"
@@ -109,5 +115,7 @@ if(AC_BUILD_JNI)
         add_test(NAME movement_jni COMMAND "${Java_JAVA_EXECUTABLE}" -Xcheck:jni
             -cp "${CMAKE_CURRENT_BINARY_DIR}/java" dev.fox.anticheat.bridge.MovementSmokeTest
             "$<TARGET_FILE:anticheat_native>")
+        add_test(NAME capture_journal COMMAND "${Java_JAVA_EXECUTABLE}"
+            -cp "${CMAKE_CURRENT_BINARY_DIR}/java" dev.fox.anticheat.capture.CaptureRecorderTest)
     endif()
 endif()

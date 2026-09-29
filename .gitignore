@@ -29,3 +29,13 @@ CMakeFiles/
 cmake_install.cmake
 CTestTestfile.cmake
 compile_commands.json
+
+# Local collection/training output
+__pycache__/
+*.pyc
+.venv/
+/datasets/
+/models/
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm

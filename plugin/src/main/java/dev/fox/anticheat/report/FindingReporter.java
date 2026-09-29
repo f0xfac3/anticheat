@@ -64,6 +64,16 @@ public final class FindingReporter implements Consumer<String>, AutoCloseable{
         if(level.equals("trace"))
             return;
 
+        if(finding.field("check").equals("timer.baseline.v1")){
+            String name=playerName.apply(finding.field("player"));
+            if(name==null || name.isEmpty())name=finding.field("player");
+            logger.info("Timer | " + clean(name,48)
+                + " | rate=" + clean(finding.evidence.getOrDefault("score_pps","?"),24)
+                + " | tail=" + clean(finding.evidence.getOrDefault("tail_p","?"),24)
+                + " | " + clean(finding.field("message"),64));
+            return;
+        }
+
         // Unknown future levels remain visible instead of being silently discarded.
         String label = level.equals("suspicious") ? "SUSPICIOUS" : "FINDING";
         String name = playerName.apply(finding.field("player"));

@@ -1,0 +1,5 @@
+name: AutoSampleLab
+version: 1.0.0
+main: lab.AutoSampleLab
+depend: [FoxAntiCheat]
+description: Local automated sample control and independent server observation.

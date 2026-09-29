@@ -8,6 +8,7 @@
 #include "reach.hpp"
 #include "autoclicker.hpp"
 #include "movement_checks.hpp"
+#include "timer_baseline.hpp"
 #include "velocity.hpp"
 #include "hitboxes.hpp"
 #include <cmath>
@@ -33,7 +34,7 @@ namespace ac{
     }
 
     EngineSetup builtin_checks(std::string_view configuration){
-        if(configuration.size() > 16384)
+        if(configuration.size() > 131072)
             throw std::invalid_argument("Configuration too large");
 
         std::istringstream input{std::string(configuration)};
@@ -248,6 +249,35 @@ namespace ac{
         timer.uncertain_gap_ms=number("timer.uncertain_gap_ms",timer.uncertain_gap_ms);
         (void)TimerCheck(timer);
         if(timer_enabled) setup.factories.push_back([timer]{return std::make_unique<TimerCheck>(timer);});
+
+        // SQLite publishes this immutable reference at plugin startup.
+        auto text = [&](const std::string& key) {
+            auto found=values.find(key);
+            if(found==values.end()) return std::string{};
+            auto value=found->second; values.erase(found); return value;
+        };
+        bool baseline_enabled=boolean("timer.baseline.enabled",false);
+        TimerBaseline baseline;
+        baseline.model=text("timer.baseline.model");
+        baseline.alpha=number("timer.baseline.alpha",baseline.alpha);
+        std::string reference=text("timer.baseline.reference");
+        if(baseline_enabled) {
+            std::istringstream scores(reference); scores.imbue(std::locale::classic());
+            std::string token;
+            while(std::getline(scores,token,',')) {
+                std::istringstream value(token); value.imbue(std::locale::classic());
+                double score{}; value>>score;
+                if(!value || !std::isfinite(score))
+                    throw std::invalid_argument("Invalid baseline score");
+                value>>std::ws;
+                if(!value.eof()) throw std::invalid_argument("Trailing baseline score data");
+                baseline.reference.push_back(score);
+            }
+            (void)TimerBaselineCheck(baseline);
+            setup.factories.push_back([baseline]{return std::make_unique<TimerBaselineCheck>(baseline);});
+        } else if(!baseline.model.empty() || !reference.empty()) {
+            throw std::invalid_argument("Baseline supplied while disabled");
+        }
 
         const std::pair<const char*,MovementKind> movements[]{
             {"speed",MovementKind::speed},{"fly",MovementKind::fly},{"noslow",MovementKind::noslow},

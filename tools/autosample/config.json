@@ -1,0 +1,16 @@
+{
+  "server": "C:/anticheat-lab/demo/server",
+  "datasets": "C:/anticheat-lab/datasets",
+  "collector_tools": "C:/anticheat-lab/demo/collection",
+  "java": "C:/Program Files/Eclipse Adoptium/jdk-8.0.504.1-hotspot/bin/java.exe",
+  "port": 25565,
+  "bridge_url": "http://127.0.0.1:8769",
+  "trials": 40,
+  "trial_seconds": 180,
+  "warmup_seconds": 10,
+  "seed_base": 240925,
+  "screenshot_seconds": 0,
+  "timer_tools": "C:/anticheat-lab/demo/source/anticheat/tools/timer",
+  "database": "C:/anticheat-lab/demo/server/plugins/FoxAntiCheat/anticheat.sqlite",
+  "disconnect_when_done": true
+}

@@ -9,7 +9,7 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 if(-not $ServerJar){
-    $ServerJar = Join-Path $PSScriptRoot "..\server-1.8\spigot-1.8.8.jar"
+    $ServerJar = Join-Path $PSScriptRoot "..\..\server\spigot-1.8.8.jar"
 }
 
 function Invoke-Checked([string]$Program, [string[]]$Arguments){
@@ -71,7 +71,8 @@ try{
         "@$argFile",
         "tests/SessionSmokeTest.java",
         "tests/MovementPacketTest.java",
-        "tests/FindingReporterTest.java"
+        "tests/FindingReporterTest.java",
+        "tests/TimerStoreTest.java"
     )
     Invoke-Checked (Join-Path $Jdk "bin\java.exe") @(
         "-Xcheck:jni",
@@ -89,6 +90,11 @@ try{
     Invoke-Checked (Join-Path $Jdk "bin\java.exe") @(
         "-cp", "$testClasses;$classes;$ServerJar",
         "dev.fox.anticheat.report.FindingReporterTest"
+    )
+
+    Invoke-Checked (Join-Path $Jdk "bin\java.exe") @(
+        "-cp", "$testClasses;$classes;$ServerJar;plugin/src/main/resources",
+        "dev.fox.anticheat.report.TimerStoreTest"
     )
 
     $pluginJar = Join-Path $libs "anticheat.jar"

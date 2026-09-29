@@ -67,7 +67,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM*, void*){
 extern "C" JNIEXPORT jlong JNICALL
 Java_dev_fox_anticheat_bridge_NativeBridge_nCreate(JNIEnv* env, jclass, jstring configuration){
     try{
-        if(!configuration || env->GetStringLength(configuration) > 16384){
+        if(!configuration || env->GetStringLength(configuration) > 131072){
             throw std::invalid_argument("Missing or oversized configuration");
         }
 

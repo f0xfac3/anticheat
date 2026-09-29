@@ -1,228 +1,84 @@
 # anticheat
 
-Detection engine is written in C++, Java 8-compatible Spigot 1.8.8 is the adapter, in-process JNI bridge.
-
-## Vape-derived research checks
-
-Timer, Reach, HitBoxes, Velocity, NoSlowdown, NoFall, Speed and Fly are integrated
-with packet collection, per-session C++ checks and evidence reporting. KeepSprint
-is available as an opt-in conditional experiment. The existing FastBreak and
-AutoClicker checks remain available. All findings are report-only.
-
-Start with [the source-to-detection reasoning](docs/VAPE_DETECTIONS.md), including
-recovered code/hash references, equations, exclusions, unsupported modules and the
-off/on/off validation procedure. [Validation](docs/VALIDATION.md) distinguishes
-synthetic test coverage from outstanding original-client gameplay trials. These
-checks do not identify a particular client or establish production reliability.
-
-New telemetry uses [bridge schema 3](bridge/README.md), with old recording support.
-Velocity collection emits an ordered transaction marker after relevant outgoing
-impulses; coordinate its IDs with other packet-probing plugins before live trials.
-
-## Architecture
-
-```
-/anticheat
-
-  engine/                              . C++ detection engine
-    include/anticheat/
-      event.hpp                        . normalized observation types
-      finding.hpp                      . detection results and evidence
-      check.hpp                        . check interface and CheckManager
-      engine.hpp                       . central engine and player sessions
-      builtins.hpp                     . built-in check creation interface
-
-    src/
-      engine.cpp                       . processes observations through the engine
-      finding.cpp                      . serializes Findings for Java
-
-      checks/
-        exampleCheat.hpp               . specific cheat detector definition and state
-        exampleCheat.cpp               . specific cheat detection logic
-        builtins.cpp                   . configures and creates built-in checks
-
-  bridge/                              . C++ side of Java <-> C++ communication
-    jni.cpp                            . receives JNI calls from Java
-    wire.hpp                           . observation decoding declarations
-    wire.cpp                           . decodes serialized observations into C++ Events
-    README.md                          . explains the Java <-> C++ data format
-
-  plugin/                              . integration between our anticheat and the Minecraft/Spigot server
-    src/main/
-      java/dev/fox/anticheat/
-        AntiCheatPlugin.java           . starts, stops, and connects plugin components
-        Session.java                   . Java-side player session tracking
-
-        packet/
-          PacketObserver.java          . captures packets and queues observations
-          PacketHandlers.java          . routes packet types to registered collectors
-          PacketInfo.java              . packet ordering and timing metadata
-
-        observation/
-          ObservationModule.java       . per-session collection interface
-          ObservationModules.java      . creates the per-session collection modules
-          MiningObservations.java      . digging requests and periodic mining snapshots
-
-        version/
-          MiningSampler.java           . samples relevant Spigot/NMS mining state
-
-        event/
-          DigEvent.java                . Java digging observation
-          MiningContext.java           . sampled mining-state snapshot
-
-        bridge/                        . Java side of Java ↔ C++ communication
-          EventWriter.java             . serializes observations into bytes
-          NativeBridge.java            . calls the C++ engine through JNI
-          ObservationSink.java         . shared event submission and finding output
-
-      resources/
-        plugin.yml                     . tells Spigot how to load the plugin
-        engine.conf                    . detection configuration
-
-  tests/                               . automated testing
-    engine_tests.cpp                   . tests C++ engine and detection behavior
-    NativeSmokeTest.java               . tests Java → JNI → C++ → Java
-    PacketHandlersTest.java            . tests collection routing and isolation
-    SessionSmokeTest.java              . tests session numbering and JNI submission
-
-  CMakeLists.txt                       . C++/JNI build configuration
-  build.ps1                            . Windows build/package script
-  .gitignore                           . files excluded from Git
-  README.md                            . project documentation
-```
-
-## Boundaries
-
-```
-Java: decoded packets + main-thread server snapshots
-  -> versioned, copied observations
-  -> JNI bridge
-  -> C++: per-session state -> typed check handler registrations -> findings
-  -> Java: log returned findings
-```
-
-### Java plugin
-
-Decode and analyze packets, collect snapshots of the server state, handle player connections and plugin lifecycle, and then log returned findings.
-
-`/plugin/` contains the entire Java side of the anticheat, responsible for integrating Minecraft/Spigot with the C++ detection engine.
-
-### JNI bridge
-
-The JNI framework allows Java code running inside the JVM to call and be called by C++ code. This will allow us to transfer normalized observations into C++ and return results.
-
-`/plugin/.../bridge/` contains specifically the Java <-> C++ communication code: serializing normalized observations and calling the C++ engine through JNI.
-
-### C++ detection engine
-
-Manages player sessions and state, routes observations to checks, and collects their findings.
-
-`engine/` does not depend on JNI, Bukkit, or Netty. It can run in native tests without Java or Minecraft.
-
-### C++ checks
-
-Individual detection mechanisms within the engine that evaluate behavior and report supporting evidence. For instance, FastBreak checks whether the client claimed to finish mining at an impluasible speed.
-
-`Check` and `CheckManager` are in `engine/include/anticheat/check.hpp`. Checks register handlers for any number of typed observations. Multiple checks may consume the same observation. Each connected session gets fresh check instances. `Finding` is generic; mining evidence is not required by its interface.
-
-Check registration/settings are in `engine/src/checks/builtins.cpp`, the composition root. Disabling a check does not disable telemetry or the engine. Mining, combat and movement collectors register typed observations without modifying the generic check interface.
-
-## Windows build
-
-Requirements: x64 MSVC with C++17 support, CMake 3.24+, Ninja, a build JDK (11+), and `spigot-1.8.8.jar`.
-
-**x64 Native Tools Command Prompt for Visual Studio**:
-
-```bat
-cd /d C:\anticheat-lab\anticheat
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Jdk "C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot"
-```
-
-Build output:
-
-```
-build/libs/anticheat.jar
-build/libs/anticheat_native.dll
-```
-
-The build runs native, packet-routing, and JNI tests, then compiles the full adapter against your server JAR and tests Java session submission through JNI.
-
-### Deploy with Spigot STOPPED
-
-Run `stop` in the server console first. From PowerShell in this source folder:
-
-```powershell
-New-Item -ItemType Directory -Force ..\server-1.8\plugins\FoxAntiCheat | Out-Null
-Copy-Item .\build\libs\anticheat.jar ..\server-1.8\plugins\anticheat.jar -Force
-Copy-Item .\build\libs\anticheat_native.dll ..\server-1.8\plugins\FoxAntiCheat\anticheat_native.dll -Force
-```
-
-Joining should also report `Packet observer attached: session=...`.
-Mine ordinary stone in Survival while standing on solid ground. The default trace
-prints JSON records for `dig_start`, `dig_finish_normal_sample`, aborts, or skipped attempts.
-Normal mining should NOT need to generate a suspicious finding to prove the
-pipeline works. The synthetic tests exercise early completion requests.
-
-Runtime settings are copied on first enable to:
-
-```
-server-1.8/plugins/FoxAntiCheat/engine.conf
-```
-
-Edit that copy, then restart.
-Set `trace=false` to suppress ordinary trace records. Suspicious reports remain.
-
-## Adding checks
-
-To add a check using existing observations, implement `Check`, register handlers for the
-needed types, register its factory in `builtins.cpp`, and add its source to CMake.
-Do not modify `Check`, `CheckManager`, or another check.
-For new telemetry, implement an `ObservationModule` and register it in
-`ObservationModules.create()`. Register packet copiers and server-thread receivers
-with `PacketHandlers.on()`. Add payload serialization to `EventWriter` and decoding
-to `wire.cpp` when the C++ event format needs new data.
-Mining tracking belongs to `MiningObservations`, not `Session` or `AntiCheatPlugin`.
-Detection rules still belong in C++; a Java collection module is not a detector.
-
-## Standalone engine build
-
-In a compiler-configured shell (no JDK needed):
+C++ detection engine. Java 8 adapter for Spigot 1.8.8. SQLite evidence store.
+Timer is the worked example: recovered behavior, recorded trials, a legitimate
+baseline, native comparison and auditable enforcement.
 
 ```text
-cmake -S . -B build/core -G Ninja -DAC_BUILD_JNI=OFF -DCMAKE_BUILD_TYPE=Debug
+packet -> Java observation -> JNI -> C++ check -> SQLite decision -> Bukkit action
+raw trial -> audit -> SQLite reference -> frozen model loaded at server startup
+```
+
+## Read the code
+
+| Path | Responsibility |
+|---|---|
+| `engine/src/checks/timer_baseline.cpp` | Episode scoring, empirical tail rank, decision |
+| `engine/src/checks/movement_checks.cpp` | Mechanistic Timer budget and movement checks |
+| `tools/timer/model.py` | Matching offline episode extractor |
+| `tools/timer/timer.py` | Audited import, baseline publication, text status |
+| `plugin/.../report/TimerStore.java` | Frozen reference, asynchronous SQLite, durable action gate |
+| `plugin/.../AntiCheatPlugin.java` | Session checks, Bukkit ban and disconnect |
+| `plugin/src/main/resources/timer-schema.sql` | Trials, windows, models and decisions |
+| `tools/autosample/` | Optional Windows collection controller |
+
+[Timer design and measured results](docs/TIMER.md) explains the equations, raw queries
+and enforcement boundary. [Reverse-engineering notes](docs/VAPE_DETECTIONS.md)
+link recovered methods to the existing movement/combat checks.
+
+## Current evidence
+
+17 real three-minute trials, nine legitimate route seeds, eight matched Timer pairs.
+Legitimate episode score: **20.0 packets/s**. Declared Timer 1.07: **21.4 packets/s**.
+Python and native replay agree on all 17 recordings.
+
+[The portable example](examples/timer/README.md) includes the SQLite reference and
+original packet recordings. Replay it without starting Minecraft.
+
+The empirical tail rank is not a calibrated cheating probability. This small local
+dataset cannot authorize high-confidence bans: the live policy explicitly abstains.
+The ban path is implemented and tested; production accuracy is not established.
+
+## Build and test
+
+Requires x64 MSVC, CMake, Ninja, JDK 11+ and a local Spigot 1.8.8 JAR.
+From a Visual Studio x64 developer PowerShell:
+
+```powershell
+.\build.ps1 -Jdk 'C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot' -ServerJar 'C:\anticheat-lab\demo\server\spigot-1.8.8.jar'
+python -m unittest discover -s tools/timer -p test_timer.py
+```
+
+Builds `build/libs/anticheat.jar` and `anticheat_native.dll`; runs native, JNI,
+adapter, recording, reporting and SQLite enforcement tests. Python Timer tools use
+the standard library. Optional input automation uses psutil and Pillow.
+
+Native-only build:
+
+```text
+cmake -S . -B build/core -G Ninja -DAC_BUILD_JNI=OFF
 cmake --build build/core
 ctest --test-dir build/core --output-on-failure
 ```
 
-On Linux with a JDK and C++ compiler, the normal CMake build also builds the JNI
-library and smoke test. It does not build the Spigot adapter; `build.ps1` does that
-on Windows against your local server JAR.
+## Run
 
-## Scope and limitations
+Stop the server before replacing binaries. Install the JAR under `plugins/` and the
+DLL under `plugins/FoxAntiCheat/`. Import recordings with `tools/timer/timer.py`;
+restart to load the published reference. `enforcement.properties` controls Timer
+actions and the allowed world. Other checks report findings.
 
-The C++ check reconstructs matching START/FINISH requests. Under a fixed sampled context it estimates `ceil(1 / damage_per_tick) * 50 ms`, then applies the configured ratio/grace threshold. Repeated short intervals can produce a **suspicious request** finding. All duration comparisons and verdicts are native code.
+In the prepared local lab:
 
-The Java version adapter samples the existing NMS mining-strength primitive;
-this is not a full client simulator. The check discards changed or unavailable
-contexts, missing starts, aborted attempts, observation gaps, stale samples, and
-same-read-batch comparisons. Periodic context snapshots are not continuous
-observation of every game-state transition. Receive timing is not client timing.
-No inference is made about whether the server actually removed the block.
-There are false-negative paths and unmeasured false-positive rates. No probability
-or production accuracy claim is attached to the heuristic.
+```powershell
+C:\anticheat-lab\analyze_samples.cmd --collection-date 2026-09-28
+C:\anticheat-lab\timer_status.cmd
+```
 
-The networking callback only copies fields and queues bounded work. World reads
-and JNI calls occur on the main server thread. The queue-before-forward ordering
-is specifically for the pinned 1.8.8 implementation and must be re-audited for new
-versions. Native handles are checked registry IDs, not exposed pointers. JNI
-exceptions are contained at entry points. A native access violation can STILL
-terminate the JVM; this is not crash isolation.
+Each new audited 180-second automated trial enters SQLite. The raw recordings stay
+immutable. Collection sessions are exempt from punishment. No HTML dashboards,
+opaque serialized model objects or online training are needed.
 
-Do not run expensive model training, disk IO, or unbounded analysis on this live
-synchronous path. This version has no dataset importer, ML model or punishment
-system. Combat and movement model scope is documented in `docs/VAPE_DETECTIONS.md`.
-
-- https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/design.html
-- https://docs.oracle.com/en/java/javase/21/docs/specs/man/javac.html
-- https://netty.io/4.0/api/io/netty/channel/ChannelPipeline.html
-- https://hub.spigotmc.org/javadocs/spigot/org/bukkit/scheduler/BukkitScheduler.html
+The adapter is pinned to direct protocol-47 clients and `v1_8_R3`. Protocol
+translation, human false-positive rates and broad network/terrain coverage remain
+outside the measured example. See [bridge schema](bridge/README.md) for the wire format.

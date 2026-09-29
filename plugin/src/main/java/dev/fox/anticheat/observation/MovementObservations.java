@@ -33,9 +33,22 @@ public final class MovementObservations implements ObservationModule {
     private final Field ez = field(PacketPlayOutExplosion.class, "h", float.class);
     private final Field transactionWindow = field(PacketPlayOutTransaction.class, "a", int.class);
     private final Field transactionId = field(PacketPlayOutTransaction.class, "b", short.class);
+    private final Field chunkX = field(PacketPlayOutMapChunk.class, "a", int.class);
+    private final Field chunkZ = field(PacketPlayOutMapChunk.class, "b", int.class);
+    private final Field bulkX = field(PacketPlayOutMapChunkBulk.class, "a", int[].class);
+    private final Field bulkZ = field(PacketPlayOutMapChunkBulk.class, "b", int[].class);
     private double x, y, z;
     private long graceUntil, lastTick;
     private String world = "";
+    private final java.util.Map<String, Integer> boundaryCounts = new java.util.HashMap<>();
+
+    private void logBoundary(String type) {
+        int count = boundaryCounts.getOrDefault(type, 0) + 1;
+        boundaryCounts.put(type, count);
+        if (count == 1 || count % 200 == 0)
+            org.bukkit.Bukkit.getLogger().info("[FoxAntiCheat] movement boundary session=" + session.id
+                + " packet=" + type + " count=" + count);
+    }
 
     private static Field field(Class<?> type, String name, Class<?> expected) {
         try {
@@ -69,11 +82,30 @@ public final class MovementObservations implements ObservationModule {
     }
     private <P> void worldBoundary(Class<P> type) {
         session.outbound.on(type, (p, i) -> new OutboundHandlers.Capture(() -> {
+            logBoundary(type.getSimpleName());
             // The current world snapshot cannot establish when the client saw new blocks.
             reset("client_world_update");
             sink.begin(EventWriter.CORRECTION, session, i.observedNanos, i.epochMillis);
             sink.send();
         }, null));
+    }
+    private static int[] coordinates(Field f, Object packet) {
+        try {
+            int[] values = (int[])f.get(packet);
+            return values == null ? null : values.clone();
+        } catch (IllegalAccessException e) { throw new IllegalStateException(e); }
+    }
+    private OutboundHandlers.Capture chunkBoundary(int[] xs, int[] zs, PacketInfo i) {
+        // Copy coordinates on Netty; inspect player state only on the server thread.
+        return new OutboundHandlers.Capture(() -> {
+            Location current = session.player.getLocation();
+            if (!ChunkBoundaryScope.relevant(xs, zs, x, z, current.getX(), current.getZ()))
+                return;
+            logBoundary("nearby_chunk_update");
+            reset("client_world_update");
+            sink.begin(EventWriter.CORRECTION, session, i.observedNanos, i.epochMillis);
+            sink.send();
+        }, null);
     }
     @Override
     public void registerHandlers(PacketHandlers h) {
@@ -101,14 +133,17 @@ public final class MovementObservations implements ObservationModule {
         session.outbound.on(PacketPlayOutExplosion.class,
                             (p, i) -> impulse(i, value(ex, p), value(ey, p), value(ez, p), true));
         session.outbound.on(PacketPlayOutPosition.class, (p, i) -> new OutboundHandlers.Capture(() -> {
+            logBoundary("PacketPlayOutPosition");
             reset("server_position_correction");
             sink.begin(EventWriter.CORRECTION, session, i.observedNanos, i.epochMillis);
             sink.send();
         }, null));
         worldBoundary(PacketPlayOutBlockChange.class);
         worldBoundary(PacketPlayOutMultiBlockChange.class);
-        worldBoundary(PacketPlayOutMapChunk.class);
-        worldBoundary(PacketPlayOutMapChunkBulk.class);
+        session.outbound.on(PacketPlayOutMapChunk.class, (p, i) -> chunkBoundary(
+            new int[]{(int)value(chunkX, p)}, new int[]{(int)value(chunkZ, p)}, i));
+        session.outbound.on(PacketPlayOutMapChunkBulk.class,
+            (p, i) -> chunkBoundary(coordinates(bulkX, p), coordinates(bulkZ, p), i));
         worldBoundary(PacketPlayOutRespawn.class);
         session.outbound.on(PacketPlayOutTransaction.class, (p, i) -> {
             if (!barriers.owns((int)value(transactionWindow, p), (short)value(transactionId, p)))

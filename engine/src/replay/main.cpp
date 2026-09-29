@@ -21,7 +21,7 @@ int main(int argc, char** argv){
 
         if(argc == 3){
             std::ifstream config(argv[2], std::ios::binary);
-            std::array<char, 16385> bytes{};
+            std::array<char, 131073> bytes{};
 
             if(!config)
                 throw std::runtime_error("Cannot open configuration");

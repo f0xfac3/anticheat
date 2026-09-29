@@ -1,5 +1,21 @@
 # Validation record
 
+## Timer database pipeline — 2026-09-29
+
+- All 17 original recordings agree between Python import and compiled native replay:
+  episode score, packet total and nominal client-time excess.
+- Nine legitimate seed scores are 20.0/s; eight declared Timer scores are 21.4/s.
+  Tail ranks are 1.0 and 0.1 with the active reference. No real trial is ban-eligible.
+- Nine CTest suites pass, including Timer baseline precision, abstention, resets,
+  normal/coalesced traffic and per-session alpha spending.
+- Java tests verify SQLite commit before action, duplicate suppression, report mode,
+  insufficient reference and mismatched models. Synthetic data stays in temporary files.
+- Four Python Timer tests and 20 input-automation regressions pass.
+- The updated JAR/DLL loaded under the existing Java 8 Spigot server with the real
+  nine-seed SQLite model. Startup and local observer health were checked; no players
+  were connected. The server was then stopped normally.
+- [Timer design](TIMER.md) defines remaining calibration and scope limits.
+
 ## Environment
 
 - Windows x64, MSVC 19.51.36246, CMake/Ninja.
