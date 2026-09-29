@@ -3,6 +3,7 @@ package dev.fox.monitor;
 import java.awt.image.BufferedImage;
 import java.nio.file.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 
@@ -62,10 +63,38 @@ public final class MonitorUiTest {
                     throw new RuntimeException(error);
                 }
             }
+            if (window.workspaces.detections.table.getRowCount() > 0) {
+                window.selectView("Detections");
+                window.workspaces.nextExperiment();
+            }
+        });
+        if (!data.rows("detections").isEmpty()) {
+            AtomicBoolean ready = new AtomicBoolean();
+            for (int i = 0; i < 200 && !ready.get(); i++) {
+                Thread.sleep(100);
+                SwingUtilities.invokeAndWait(() -> ready.set(
+                    app.get().window.workspaces.detectionDetail.getText().startsWith("Next experiment:")));
+            }
+            MonitorTest.require(ready.get(), "Planner CLI result shown in detection detail");
+            SwingUtilities.invokeAndWait(() -> {
+                MonitorWindow window = app.get().window;
+                BufferedImage image = new BufferedImage(window.getWidth(), window.getHeight(), BufferedImage.TYPE_INT_RGB);
+                java.awt.Graphics2D graphics = image.createGraphics();
+                window.paint(graphics);
+                graphics.dispose();
+                try {
+                    ImageIO.write(image, "png", Paths.get(arguments[1] + "-Plan.png").toFile());
+                } catch (Exception error) {
+                    throw new RuntimeException(error);
+                }
+            });
+        }
+        SwingUtilities.invokeAndWait(() -> {
+            MonitorWindow window = app.get().window;
             app.get().close();
             MonitorTest.require(!window.isDisplayable(), "Replay closes without server");
             System.out.println("PASS four-workspace UI, recorded evidence, replay isolation, "
-                               + "registry, and renders");
+                               + "registry, planner CLI and renders");
         });
     }
 }

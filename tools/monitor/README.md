@@ -1,6 +1,6 @@
 # Security console
 
-A native Swing desktop console. Java 21 is recommended for Windows DPI rendering;
+A Swing desktop console. Java 21 is recommended for Windows DPI rendering;
 the managed Spigot process runs on Java 8.
 
 Run `C:\anticheat-lab\Start Monitor.cmd` in the prepared lab. It starts the server.
@@ -9,8 +9,8 @@ Do not start a second server or a collection controller at the same time.
 | Workspace | Purpose |
 |---|---|
 | Overview | Measured cadence, model-margin trends, observed sessions and confirmed responses |
-| Incidents | Native findings, durable model decisions, exact evidence and action outcomes |
-| Detections | Register recipes, compare held-out measurements, train, inspect gates, deploy or roll back |
+| Incidents | Native findings, stored model decisions, packet evidence and action outcomes |
+| Detections | Register recipes, plan the next experiment, compare results, train, deploy or roll back |
 | Validation | Declare conditions, reserve validation sessions, admit raw captures, review evidence |
 
 **Server controls**, at the top right, contains the console and command field.
@@ -28,6 +28,12 @@ The registry is polled read-only off the UI thread. Both UI and terminal workflo
 call the same `analytics/lab.py` commands. Deployment files are verified against
 registry hashes at server startup. Changes require a server restart.
 
+Select a detection and click **Next experiment** to see missing controls, a
+recording procedure and validation requirements. The plan appears in the existing
+detail pane and can be copied as text. It uses the trainer's sample eligibility
+rules and makes no changes to the registry. CLI: `plan-next <detection>`;
+add `--format json` for capture templates and affected sample IDs.
+
 ## Configuration
 
 Set `server.directory`, `analytics.framework`, `analytics.python`, and
@@ -39,3 +45,7 @@ Build with `build.ps1 -Jdk <JDK root>`. Parser, response, retention, file rotati
 subprocess and runtime tests run during the build. `MonitorUiTest` additionally
 renders each workspace against saved JSONL evidence without starting a server.
 Native checks and ML inference are implemented outside the desktop.
+
+To stage an update while the monitor is open, copy the new JAR beside it as
+`anticheat-monitor.pending.jar`. Close the monitor; the launcher applies the update
+on its next start.

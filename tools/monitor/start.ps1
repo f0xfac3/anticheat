@@ -37,6 +37,14 @@ try{
     }
 
     $jar = Join-Path $PSScriptRoot "anticheat-monitor.jar"
+    $pendingJar = Join-Path $PSScriptRoot "anticheat-monitor.pending.jar"
+    if(Test-Path -LiteralPath $pendingJar -PathType Leaf){
+        try{
+            Move-Item -LiteralPath $pendingJar -Destination $jar -Force
+        }catch{
+            throw "Close the existing monitor before applying its pending update. The update remains saved."
+        }
+    }
 
     if(-not(Test-Path -LiteralPath $jar -PathType Leaf)){
         throw "Missing anticheat-monitor.jar. Extract the complete monitor ZIP, or run build.ps1."

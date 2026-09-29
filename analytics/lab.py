@@ -4,11 +4,12 @@ import argparse
 import json
 from pathlib import Path
 import re
+import sqlite3
 import sys
 import uuid
 
 from contracts import validate
-from store import audit, canonical, connect, identity, now, ROOT
+from store import audit, canonical, connect, read_only, identity, now, ROOT
 
 
 def register(db, path):
@@ -111,6 +112,11 @@ def main():
     p = commands.add_parser("train")
     p.add_argument("detection")
     p.add_argument("--scope", choices=["pilot", "independent"], default="independent")
+    p = commands.add_parser(
+        "plan-next", help="Suggest collection from current evidence gaps"
+    )
+    p.add_argument("detection")
+    p.add_argument("--format", choices=["text", "json"], default="text")
     p = commands.add_parser("deploy")
     p.add_argument("experiment")
     p.add_argument("mode", choices=["shadow", "enforce", "disabled"])
@@ -125,6 +131,13 @@ def main():
     p.add_argument("raw", type=Path)
     commands.add_parser("status")
     args = parser.parse_args()
+    if args.command == "plan-next":
+        from planner import plan_next, render
+
+        with read_only(args.store) as db:
+            result = plan_next(db, args.detection)
+        print(render(result) if args.format == "text" else json.dumps(result, indent=2))
+        return
     with connect(args.store) as db:
         if args.command == "init":
             result = [
@@ -189,6 +202,6 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except (ValueError, OSError, KeyError) as error:
+    except (ValueError, OSError, KeyError, sqlite3.Error) as error:
         print("BLOCKED: " + str(error), file=sys.stderr)
         sys.exit(2)

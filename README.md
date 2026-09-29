@@ -1,10 +1,10 @@
 # anticheat
 
-C++ detection engine, Java server adapter, Python analysis, SQLite evidence, and a
-desktop security console for Minecraft 1.8. Two recorded studies connect recovered
-client behavior to server observations and reproducible detection results.
+C++ checks, Java packet capture, Python analysis and a desktop console for Minecraft
+1.8. Includes raw Timer and Reach recordings, reproducible comparisons and a SQLite
+registry for samples, models and decisions.
 
-## Start with the evidence
+## Recorded results
 
 | Study | Recorded result | What it demonstrates |
 |---|---|---|
@@ -22,47 +22,49 @@ does not. A conservative stationary geometry rule explains those observations.
 The current 0.1-block grid cannot distinguish the two settings' exact boundaries.
 Movement causes the rule to abstain; client-view reconstruction is not implemented.
 
-**Scope:** local development evidence, not production accuracy. Conditions were
-operator-declared; there is no independent human/network test population or trained
-bot classifier. ML runs in shadow. Enforcement defaults to report only; an apparent
-legitimate Timer-budget flag is documented in [known limitations](docs/TIMER.md#local-live-enforcement-test).
+These are local development results with operator-declared settings. Independent
+human/network validation and a trained bot classifier remain unfinished. ML runs
+in shadow; enforcement defaults to report only. An apparent legitimate Timer-budget
+flag is documented in [known limitations](docs/TIMER.md#local-live-enforcement-test).
 
 ![Recorded Timer experiment in the security console](docs/security-console.png)
 
 ## Workflow
 
 1. Register a versioned behavior recipe with its reverse-engineering source.
-2. Collect declared legitimate/cheating samples and preserve original packets.
+2. Run `plan-next <detection>` to find missing controls and validation coverage.
+   Collect the proposed conditions and preserve the original packets.
 3. Review human, client and network conditions against separate evidence.
 4. Fit on development groups; calibrate on legitimate groups; evaluate reserved
    people, opponents, script families and days. Replay transport stress cases.
-5. Deploy in shadow, inspect measured trends, and promote only if explicit gates pass.
+5. Deploy in shadow, inspect trends and enable enforcement only after validation passes.
 
 [Behavior framework](analytics/README.md) · [Desktop console](tools/monitor/README.md) ·
 [Role evidence and remaining gaps](docs/ROLE_EVIDENCE.md)
 
 ```text
 packet -> Java observation -> JNI -> C++ check -> SQLite decision -> Bukkit action
-raw trial -> audit -> SQLite reference -> frozen model loaded at server startup
+raw trial -> audit -> SQLite registry -> model loaded at server startup
 ```
 
 ## Read the code
 
 | Path | Responsibility |
 |---|---|
-| `analytics/` | Admission, reviewed labels, grouped ML, calibration, stress replay, model registry |
+| `analytics/` | Sample admission, reviews, grouped ML, calibration and model registry |
+| `analytics/planner.py` | Next experiment from eligible samples, missing controls and validation requirements |
 | `analytics/recipes/` | Configurable mechanisms, features, validation requirements and response policy |
 | `tools/research/evaluate.py` | Recorded Timer model comparison, ablation and transport stress |
 | `tools/reach/analyze.py` | Reach capture audit, original-packet joins, native replay and SQLite results |
-| `engine/src/checks/reach.cpp` | Conservative stationary geometry and explicit abstentions |
+| `engine/src/checks/reach.cpp` | Stationary geometry; skips unsupported observations |
 | `plugin/.../report/BehaviorTelemetry.java` | Live features matched exactly to the Python extractor |
-| `plugin/.../report/BehaviorRuntime.java` | Bounded inference, support checks, sequential budget, durable actions |
+| `plugin/.../report/BehaviorRuntime.java` | Live inference, feature limits, repeated testing and recorded actions |
 | `tools/monitor/` | Overview, incidents, detections and validation workflows |
 | `engine/src/checks/timer_baseline.cpp` | Episode scoring, empirical tail rank, decision |
 | `engine/src/checks/movement_checks.cpp` | Mechanistic Timer budget and movement checks |
 | `tools/timer/model.py` | Matching offline episode extractor |
 | `tools/timer/timer.py` | Audited import, baseline publication, text status |
-| `plugin/.../report/TimerStore.java` | Frozen reference, asynchronous SQLite, durable action gate |
+| `plugin/.../report/TimerStore.java` | Reference loading, asynchronous SQLite writes and action checks |
 | `plugin/.../AntiCheatPlugin.java` | Session checks, Bukkit ban and disconnect |
 | `plugin/src/main/resources/timer-schema.sql` | Trials, windows, models and decisions |
 | `tools/autosample/` | Optional Windows collection controller |
@@ -85,10 +87,28 @@ with trial summaries and individual attack observations. Raw packets and native
 traces remain unchanged. Add `--engine build/native/anticheat_replay.exe` to the
 Reach command after building to reproduce every archived native verdict.
 
-The [ML framework example](analytics/README.md#reproduce-timer) additionally fits
-a frozen, interpretable deployment candidate with legitimate calibration and
-explicit promotion gates. Java/Python feature extraction agrees on all 85 Timer
-windows. Scores and empirical tail ranks are not probabilities of cheating.
+The [ML example](analytics/README.md#reproduce-timer) fits a deployment candidate,
+calibrates it against legitimate groups and reports failed validation requirements.
+Java/Python feature extraction agrees on all 85 Timer windows. Scores and empirical
+tail ranks are not probabilities of cheating.
+
+## Choose the next experiment
+
+After importing the example into the analytics registry:
+
+```powershell
+python analytics/lab.py --store build/study.sqlite plan-next timer.cadence
+```
+
+The same command runs from **Detections → Next experiment** in the console.
+It reports missing controls, a recording procedure and independent validation
+requirements. `--format json` includes metadata templates and affected sample IDs.
+On the bundled Timer data, the next experiment is a same-client OFF/ON pair: the
+existing controls used vanilla, while the Timer trials used Vape.
+
+Recommendations use fixed rules and the trainer's eligibility checks. The planner
+reads the registry without changing it. Labels still require review, and model
+changes still require separate validation.
 
 ## Build and test
 
@@ -130,9 +150,8 @@ C:\anticheat-lab\analyze_samples.cmd --collection-date 2026-09-28
 C:\anticheat-lab\timer_status.cmd
 ```
 
-Each new audited 180-second automated trial enters SQLite. The raw recordings stay
-immutable. Collection sessions are exempt from punishment. No HTML dashboards,
-opaque serialized model objects or online training are needed.
+Each new audited 180-second automated trial enters SQLite. Original recordings
+are preserved. Collection sessions are exempt from punishment.
 
 The adapter is pinned to direct protocol-47 clients and `v1_8_R3`. Protocol
 translation, human false-positive rates and broad network/terrain coverage remain

@@ -19,8 +19,8 @@ measures attack **requests**, not damage or successful combat.
 `datasets/reach/<pair>/COMPARISON.txt` compares observed OFF/ON counts. JSON keeps
 source hashes, exact raw packet ranges, measured eye/box distance, eligibility and
 native replay findings. Audited phases enter the analytics registry as unreviewed
-development samples with manual clicks and scripted positioning declared separately. Nothing is
-trained or deployed automatically. The native stationary Reach check runs unchanged.
+development samples with manual clicks and scripted positioning declared separately.
+Training and deployment are separate commands. The native stationary Reach check runs unchanged.
 Moving combat and independent human/network validation are separate experiments.
 
 For smaller Reach settings, use `reach_edge_off.cmd` first. It samples center
@@ -30,8 +30,8 @@ fixed value, chance to 100%, then run `reach_edge_on.cmd 3.3 <pair-folder>`.
 Several ON settings can share the same OFF control when the measurement contract,
 accounts, engine, configuration and fixture plugin match. This reuse does not create
 additional independent controls. The ON artifact filename includes the declared
-setting. A setting which never produces safely out-of-bound requests is a
-valid abstention result, not a failed experiment.
+setting. Retain trials that produce no out-of-bound requests; they describe the
+tested boundary even when the check has no reason to flag.
 
 The [portable Reach study](../../examples/reach/REPORT.md) includes the completed
 recordings and exact SQL queries. Reproduce it with `tools/reach/analyze.py`; further

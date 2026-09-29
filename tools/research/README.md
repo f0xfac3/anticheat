@@ -1,7 +1,7 @@
 # Research evaluation
 
 Evaluate the original audited Timer recordings without changing live enforcement.
-Outputs are plain Markdown and JSON; no web dashboard or opaque model file.
+Outputs are Markdown, JSON and JSONL.
 
 ```powershell
 python -m pip install -r tools/research/requirements.txt
@@ -12,12 +12,12 @@ python tools/research/evaluate.py --database examples/timer/anticheat.sqlite --o
 `features.jsonl`: source hashes, operator labels, route grouping and exact features.
 `results.json`: every fold, excluded calibration seed, predictions, weights, metrics,
 paired differences, dependency versions and local extraction timing.
-`REPORT.md`: concise review artifact linked from the repository README.
+`REPORT.md`: measured results, comparisons and limitations.
 
 The database opens read-only. The extractor audits original packets, checks the
 manifest hash, matches imported episode counts/scores, rejects malformed trials,
 checks capture provenance and processes at most 50,000 events in one trial.
-Missing attack intervals are explicitly ineligible; zero does not mean human.
+Missing attack intervals are ineligible for attack-cadence analysis.
 Feature names are allowlisted: player IDs, route seeds, labels, client names,
 timestamps, verdicts and evidence IDs cannot become predictor inputs.
 

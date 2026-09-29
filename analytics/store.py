@@ -48,3 +48,20 @@ def audit(db, operation, subject, detail):
         "INSERT INTO audit(created_ms,operation,subject,detail_json) VALUES(?,?,?,?)",
         (now(), operation, subject, canonical(detail)),
     )
+
+
+@contextmanager
+def read_only(path):
+    """One consistent registry snapshot; never create or migrate the database."""
+    path = Path(path).resolve()
+    if not path.is_file():
+        raise ValueError(
+            "Registry does not exist; run init and import recordings first"
+        )
+    db = sqlite3.connect(path.as_uri() + "?mode=ro", uri=True, timeout=5)
+    db.row_factory = sqlite3.Row
+    try:
+        db.execute("BEGIN")
+        yield db
+    finally:
+        db.close()

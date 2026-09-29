@@ -3,6 +3,7 @@
 import json
 import math
 import hashlib
+from collections import Counter
 from pathlib import Path
 
 import numpy as np
@@ -11,6 +12,13 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
 from store import audit, canonical, identity, now, ROOT
+
+
+def implementation_hashes():
+    return {
+        p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in sorted(ROOT.glob("*.py"))
+    }
 
 
 def groups(samples):
@@ -76,24 +84,17 @@ def sustained(values, count):
     return max(min(values[i : i + count]) for i in range(len(values) - count + 1))
 
 
-def train(db, detection, scope):
-    row = db.execute(
-        "SELECT spec_json FROM detections WHERE id=?", (detection,)
-    ).fetchone()
-    if not row:
-        raise ValueError("Register the detection recipe first")
-    spec = json.loads(row[0])
+def select_samples(db, spec, scope):
+    """Shared eligibility rules for training and collection planning."""
     candidates = [
         dict(r)
         for r in db.execute(
             "SELECT * FROM samples WHERE review!='rejected' ORDER BY id"
         )
     ]
-    samples, labels, values = [], {}, {}
+    samples, labels, values, excluded = [], {}, {}, Counter()
     scanned_windows = 0
     for s in candidates:
-        if scope == "independent" and s["review"] != "reviewed":
-            continue
         if spec["target"] == "automation":
             if s["input_source"] == "human" and s["label"] == "legit":
                 label = 0
@@ -103,14 +104,20 @@ def train(db, detection, scope):
             ):
                 label = 1
             else:
+                excluded["unrelated_label_or_input"] += 1
                 continue
         elif s["label"] == "legit":
             label = 0
         elif s["behavior"] == spec["positive_behavior"]:
             label = 1
         else:
+            excluded["unrelated_behavior"] += 1
+            continue
+        if scope == "independent" and s["review"] != "reviewed":
+            excluded["needs_review"] += 1
             continue
         if scope == "independent" and label == 0 and s["input_source"] != "human":
+            excluded["negative_input_not_human"] += 1
             continue
         s["opponent_groups"] = json.loads(s["metadata_json"]).get("opponent_groups", [])
         raw = [
@@ -127,16 +134,30 @@ def train(db, detection, scope):
             )
         # A missing/ineligible combat window breaks the sustained run; it must not be stitched over.
         if not raw or any(w["attacks"] < spec["minimum_attacks"] for w in raw):
+            excluded["insufficient_attacks_or_windows"] += 1
             continue
         if len({w["segment"] for w in raw}) != 1:
+            excluded["observation_discontinuity"] += 1
             continue
         if len(raw) < spec["consecutive_windows"]:
+            excluded["too_few_consecutive_windows"] += 1
             continue
         x = [[w[f] for f in spec["features"]] for w in raw]
         if not all(math.isfinite(v) for line in x for v in line):
             raise ValueError("Nonfinite feature data")
         samples.append(s)
         labels[s["id"]], values[s["id"]] = label, x
+    return samples, labels, values, dict(excluded)
+
+
+def train(db, detection, scope):
+    row = db.execute(
+        "SELECT spec_json FROM detections WHERE id=?", (detection,)
+    ).fetchone()
+    if not row:
+        raise ValueError("Register the detection recipe first")
+    spec = json.loads(row[0])
+    samples, labels, values, _ = select_samples(db, spec, scope)
     assignment, group = partition(samples, scope)
     for part in ("train", "calibration", "test"):
         if {labels[s["id"]] for s in samples if assignment[s["id"]] == part} != {0, 1}:
@@ -272,10 +293,7 @@ def train(db, detection, scope):
     import sklearn
     import scipy
 
-    implementation = {
-        p.name: hashlib.sha256(p.read_bytes()).hexdigest()
-        for p in sorted(ROOT.glob("*.py"))
-    }
+    implementation = implementation_hashes()
     feature_summary = {}
     for column, feature in enumerate(spec["features"]):
         feature_summary[feature] = {}

@@ -18,8 +18,7 @@ python tools/reach/analyze.py --study examples/reach --output build/reach-study
 ```
 
 After building, add `--engine build/native/anticheat_replay.exe` to verify every
-native verdict. No Minecraft client, proprietary cheat binary or server JAR is
-needed to inspect the evidence. These are manual clicks with scripted positions,
+native verdict. Analysis runs offline on the included captures. These are manual clicks with scripted positions,
 operator-declared module settings, one attacking account, one target and localhost.
 The reused OFF control is included once. These are not independent human/network
 validation samples and do not train a Reach classifier.

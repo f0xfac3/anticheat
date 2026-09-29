@@ -12,8 +12,8 @@ The Java wrapper guards closed handles and thread misuse. Native entry points
 validate independently and translate C++ exceptions into Java exceptions.
 Native faults such as access violations are NOT recoverable through this mechanism.
 
-This is our own transport representation of normalized events, not raw Minecraft
-packets. There is no packed struct cast: the reader checks each field explicitly.
+The internal format carries normalized observations. The reader decodes and checks
+each field individually.
 All scalars are little endian. Text is `u16 length + ASCII bytes`, maximum 1024
 bytes. Events are capped at 8192 bytes. Unknown schemas/types, trailing bytes,
 truncation, invalid booleans/enums, and non-ASCII identifiers are rejected.
@@ -85,7 +85,7 @@ clients hidden behind a translator or distinguish 1.8.x patches sharing a protoc
 When adding telemetry, update the typed event and both schema ends together and
 add a cross-language smoke test. The public Check interface and generic dispatcher
 do not change. Batched transfers or an out-of-process transport can be added later;
-this starter makes one synchronous call per normalized observation.
+the adapter makes one synchronous call per normalized observation.
 
 The decoder accepts schema 1 (types 1-6), schema 2 (types 1-10), and schema 3.
 Schema-2 CombatContext ends after `available`; its missing rotation/sprint/target

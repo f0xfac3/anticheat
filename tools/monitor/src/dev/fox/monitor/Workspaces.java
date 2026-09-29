@@ -25,7 +25,7 @@ final class Workspaces {
     JPanel detectionPanel() {
         JPanel panel = Theme.panel(new BorderLayout(0, 16));
         panel.add(heading("Detections",
-                      "Versioned hypotheses, reproducible experiments, explicit promotion gates."),
+                      "Detection settings, model results and collection plans."),
             BorderLayout.NORTH);
         detectionDetail.setLineWrap(true);
         detectionDetail.setWrapStyleWord(true);
@@ -34,6 +34,7 @@ final class Workspaces {
         left.add(comparison, BorderLayout.SOUTH);
         panel.add(split(left, Theme.scroll(detectionDetail), .53), BorderLayout.CENTER);
         panel.add(actions(button("Register recipe", this::registerRecipe),
+                      button("Next experiment", this::nextExperiment),
                       button("Train / validate", this::train),
                       button("Set deployment", this::deploy), button("Rollback", this::rollback)),
             BorderLayout.SOUTH);
@@ -47,8 +48,7 @@ final class Workspaces {
         JPanel panel = Theme.panel(new BorderLayout(0, 16));
         JPanel top = Theme.panel(new BorderLayout(0, 12));
         top.add(heading("Validation",
-                    "Raw captures retain provenance. Human labels and validation groups are "
-                        + "reviewed separately."),
+                    "Record declared conditions, inspect packets and review labels."),
             BorderLayout.NORTH);
         datasetSummary.setForeground(Theme.MUTED);
         top.add(datasetSummary, BorderLayout.SOUTH);
@@ -211,6 +211,22 @@ final class Workspaces {
         if (mode != null)
             window.run(Arrays.asList("train", s(row, "id"), "--scope", mode.toString()),
                 "Experiment saved");
+    }
+    void nextExperiment() {
+        Map<String, Object> row = selected(detections, detectionRows);
+        if (row == null) {
+            window.message("Select a detection first.");
+            return;
+        }
+        String id = s(row, "id");
+        window.footer.setText("Reading collection gaps for " + id + "…");
+        window.framework.run(Arrays.asList("plan-next", id), output -> {
+            if (selection(detections, detectionRows).equals(id)) {
+                detectionDetail.setText(output);
+                detectionDetail.setCaretPosition(0);
+            }
+            window.footer.setText("Collection plan ready for " + id);
+        }, window::message);
     }
     private void deploy() {
         Map<String, Object> row = selected(detections, detectionRows);
