@@ -2,6 +2,8 @@
 
 Native Windows desktop monitor for the local Spigot anticheat. No HTML server or
 additional libraries. Uses the engine's original findings and server response logs.
+The desktop launcher requires Java 17+ for Windows DPI scaling (Java 21 recommended).
+The Minecraft server continues to run separately on Java 8.
 
 ## Run
 

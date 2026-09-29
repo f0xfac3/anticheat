@@ -28,16 +28,14 @@ final class Theme{
     static final Color WHITE = new Color(237, 238, 240);
     static final Color MUTED = new Color(154, 159, 165);
     static final Color SELECTED = new Color(48, 51, 56);
-    static final Font NORMAL = new Font("SansSerif", Font.PLAIN, 13);
-    static final Font SMALL = new Font("SansSerif", Font.PLAIN, 11);
-    static final Font MONO = new Font("Monospaced", Font.PLAIN, 12);
+    static final Font NORMAL = new Font("Segoe UI", Font.PLAIN, 14);
+    static final Font SMALL = new Font("Segoe UI", Font.PLAIN, 12);
+    static final Font MONO = new Font("Consolas", Font.PLAIN, 14);
 
     static void install(){
-        System.setProperty("awt.useSystemAAFontSettings", "on");
-        System.setProperty("swing.aatext", "true");
-
         try{
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            // Use desktop font smoothing and native DPI metrics instead of forcing grayscale AA.
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }catch(Exception ignored){}
 
         for(String key : new String[]{"Panel.background", "OptionPane.background", "Viewport.background"})
@@ -65,7 +63,7 @@ final class Theme{
     static JLabel label(String text, int size, boolean bold){
         JLabel label = new JLabel(text);
         label.putClientProperty("html.disable", Boolean.TRUE);
-        label.setFont(NORMAL.deriveFont(bold ? Font.BOLD : Font.PLAIN, (float)size));
+        label.setFont(NORMAL.deriveFont(bold ? Font.BOLD : Font.PLAIN, (float)Math.max(12, size)));
         label.setForeground(WHITE);
         return label;
     }

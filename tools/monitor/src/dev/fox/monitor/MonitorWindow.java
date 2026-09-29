@@ -153,7 +153,7 @@ final class MonitorWindow extends JFrame{
         name.setAlignmentX(Component.LEFT_ALIGNMENT);
         stack.add(name);
         stack.add(Box.createVerticalStrut(8));
-        JLabel tag = Theme.label(app.replay ? "SAVED LOG / REPLAY" : "LIVE / DETECTION & RESPONSE", 10, false);
+        JLabel tag = Theme.label(app.replay ? "REPLAY" : "LIVE SECURITY", 12, false);
         tag.setForeground(Theme.MUTED);
         stack.add(tag);
         stack.add(Box.createVerticalStrut(42));
@@ -267,7 +267,7 @@ final class MonitorWindow extends JFrame{
         evidence.add(evidenceHeading, BorderLayout.NORTH);
         detail.setLineWrap(true);
         detail.setWrapStyleWord(true);
-        detail.setFont(Theme.NORMAL.deriveFont(12f));
+        detail.setFont(Theme.NORMAL);
         evidence.add(Theme.scroll(detail), BorderLayout.CENTER);
         evidence.add(copy, BorderLayout.SOUTH);
         evidence.setMinimumSize(new Dimension(290, 160));
