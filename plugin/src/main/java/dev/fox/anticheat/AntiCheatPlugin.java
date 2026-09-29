@@ -106,11 +106,12 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
         enforcementWorld=settings.getProperty("world","ac_auto_samples");
         if(enforcementWorld.trim().isEmpty())throw new IllegalArgumentException("Set an explicit enforcement world");
         try{
-            timerStore=new TimerStore(new File(getDataFolder(),"anticheat.sqlite"),getLogger(),mode.equals("ban"),
+            timerStore=new TimerStore(new File(getDataFolder(),"anticheat.sqlite"),getLogger(),mode.equals("ban"), Boolean.parseBoolean(settings.getProperty("timer.budget.ban","false")),
                 task->getServer().getScheduler().runTask(this,task),this::banTimer);
         }catch(Exception error){
             getLogger().log(Level.SEVERE,"Timer database unavailable; model enforcement disabled",error);
         }
+        getLogger().info("Timer budget enforcement: " + settings.getProperty("timer.budget.ban","false") + " | world=" + enforcementWorld);
         engine = new NativeBridge(configuration+(timerStore==null?"":timerStore.nativeConfiguration()));
         findings = new FindingReporter(
             getLogger(),
@@ -134,10 +135,10 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
             return "skipped_session_changed";
         if(!session.player.getWorld().getName().equals(enforcementWorld))return "skipped_outside_scope";
         if(capture!=null && capture.isCollectionSession(session.player.getUniqueId()))return "skipped_collection";
-        String reason="Timer: sustained excess client time. Evidence "+assessment.id;
+        String reason="Timer: sustained excess client time ("+assessment.model+"). Evidence "+assessment.id;
         Bukkit.getBanList(BanList.Type.NAME).addBan(session.player.getName(),reason,null,"FoxAntiCheat");
         session.player.kickPlayer(reason);
-        getLogger().warning("BAN | "+session.player.getName()+" | Timer | evidence="+assessment.id);
+        getLogger().warning("BAN | "+session.player.getName()+" | "+assessment.model+" | evidence="+assessment.id);
         return "banned";
     }
 

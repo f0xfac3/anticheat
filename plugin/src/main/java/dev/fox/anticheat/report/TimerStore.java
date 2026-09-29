@@ -38,6 +38,25 @@ public final class TimerStore implements Consumer<String>, AutoCloseable {
                 episode < 1 || score < 0)
                 throw new IllegalArgumentException("Invalid Timer evidence");
         }
+        Assessment(String id, FindingRecord f, boolean budget) {
+            this.id = id;
+            player = f.field("player");
+            UUID.fromString(player);
+            session = f.field("session");
+            if (Long.parseLong(session) < 1) throw new IllegalArgumentException("session");
+            model = "timer.budget.v1";
+            reason = f.field("message");
+            excess = number(f, "lead_ms");
+            double elapsed = number(f, "elapsed_ms");
+            double packets = number(f, "counted_packets");
+            if (elapsed < 2000 || packets < 40 || excess < 250 ||
+                number(f, "tick_cost_ms") != 50) throw new IllegalArgumentException("Invalid budget evidence");
+            score = packets * 1000 / elapsed;
+            tail = spent = Double.NaN; // A budget rule has no statistical probability.
+            references = 0;
+            episode = 0;
+            eligible = true;
+        }
         private static double number(FindingRecord f, String key) {
             double n = Double.parseDouble(f.evidence.get(key));
             if (!Double.isFinite(n))
@@ -55,6 +74,7 @@ public final class TimerStore implements Consumer<String>, AutoCloseable {
     private final Consumer<Runnable> schedule;
     private final Function<Assessment, String> apply;
     private final boolean ban;
+    private final boolean budgetBan;
     private final String run = UUID.randomUUID().toString();
     private String model;
     private double alpha;
@@ -64,6 +84,12 @@ public final class TimerStore implements Consumer<String>, AutoCloseable {
 
     public TimerStore(File file, Logger log, boolean ban, Consumer<Runnable> schedule,
                       Function<Assessment, String> apply) throws Exception {
+        this(file, log, ban, false, schedule, apply);
+    }
+
+    public TimerStore(File file, Logger log, boolean ban, boolean budgetBan,
+                      Consumer<Runnable> schedule, Function<Assessment, String> apply) throws Exception {
+        this.budgetBan = budgetBan;
         this.file = file;
         this.log = log;
         this.ban = ban;
@@ -165,11 +191,17 @@ public final class TimerStore implements Consumer<String>, AutoCloseable {
 
     @Override
     public void accept(String json) {
-        if (model == null || !accepting || !healthy)
+        if (!accepting || !healthy)
             return;
         try {
             FindingRecord f = FindingRecord.read(json);
-            if (!f.field("check").equals("timer.baseline.v1"))
+            if (budgetBan && f.field("check").equals("timer.budget.v1") &&
+                f.field("level").equals("suspicious") &&
+                f.field("message").equals("sustained_excess_client_tick_budget")) {
+                acceptBudget(json, f);
+                return;
+            }
+            if (model == null || !f.field("check").equals("timer.baseline.v1"))
                 return;
             Assessment a =
                 new Assessment(run + ":" + f.field("session") + ":" + f.field("event"), f);
@@ -231,6 +263,42 @@ public final class TimerStore implements Consumer<String>, AutoCloseable {
             healthy = false;
             log.severe("Invalid Timer assessment; enforcement disabled: " + error.getMessage());
         }
+    }
+
+    private void acceptBudget(String json, FindingRecord f) {
+        Assessment a = new Assessment(run + ":budget:" + f.field("session") + ":" + f.field("event"), f, true);
+        offer(db -> {
+            try (PreparedStatement p = db.prepareStatement(
+                "INSERT OR IGNORE INTO timer_budget_decisions VALUES (?,?,?,?,?,?,?,?,?)")) {
+                p.setString(1, a.id);
+                p.setLong(2, System.currentTimeMillis());
+                p.setString(3, a.player);
+                p.setString(4, a.session);
+                p.setDouble(5, a.excess);
+                p.setDouble(6, a.score);
+                p.setString(7, "pending");
+                p.setString(8, a.reason);
+                p.setString(9, json);
+                if (p.executeUpdate() == 0) return;
+            }
+            // Same durable-before-action contract; no model probability is fabricated.
+            schedule.accept(() -> {
+                String result = "skipped_store_unavailable";
+                if (accepting && healthy) {
+                    try { result = apply.apply(a); }
+                    catch (RuntimeException error) { result = "action_failed"; log.severe(error.toString()); }
+                }
+                final String outcome = result;
+                offer(c -> {
+                    try (PreparedStatement p = c.prepareStatement(
+                        "UPDATE timer_budget_decisions SET action=? WHERE id=?")) {
+                        p.setString(1, outcome);
+                        p.setString(2, a.id);
+                        p.executeUpdate();
+                    }
+                });
+            });
+        });
     }
 
     private void write() {

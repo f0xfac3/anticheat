@@ -37,7 +37,8 @@ original packet recordings. Replay it without starting Minecraft.
 
 The empirical tail rank is not a calibrated cheating probability. This small local
 dataset cannot authorize high-confidence bans: the live policy explicitly abstains.
-The ban path is implemented and tested; production accuracy is not established.
+The baseline ban path is implemented and tested; production accuracy is not established.
+An optional deterministic Timer budget rule supports a [local live ban test](docs/TIMER.md#local-live-enforcement-test).
 
 ## Build and test
 

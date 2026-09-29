@@ -117,6 +117,37 @@ public final class TimerStoreTest {
             store.accept(finding(1999, true, MODEL));
         }
         require(rows(report, "report") == 1 && tasks.isEmpty(), "report mode failed");
+        File budget = database(9);
+        String budgetEvent = "{\"level\":\"suspicious\",\"check\":\"timer.budget.v1\","
+            + "\"player\":\"00000000-0000-0000-0000-000000000001\",\"session\":\"1\",\"event\":\"101\","
+            + "\"message\":\"sustained_excess_client_tick_budget\",\"evidence\":{"
+            + "\"lead_ms\":\"350\",\"elapsed_ms\":\"10000\",\"counted_packets\":\"214\",\"tick_cost_ms\":\"50\"}}";
+        try (TimerStore store = new TimerStore(budget, log, true, tasks::add, a -> "unexpected")) {
+            store.accept(budgetEvent);
+        }
+        require(tasks.isEmpty(), "budget rule must default off");
+        try (TimerStore store = new TimerStore(budget, log, false, true, tasks::add, a -> {
+            try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + budget);
+                 Statement st = c.createStatement();
+                 ResultSet r = st.executeQuery("SELECT action,lead_ms FROM timer_budget_decisions")) {
+                require(r.next() && r.getString(1).equals("pending") && r.getDouble(2)==350,
+                        "budget action before durable evidence");
+                require(Double.isNaN(a.tail), "budget must not claim probability");
+            } catch (Exception e) { throw new RuntimeException(e); }
+            return "banned";
+        })) {
+            store.accept(budgetEvent);
+            store.accept(budgetEvent);
+            Runnable task = tasks.poll(5, TimeUnit.SECONDS);
+            require(task != null, "budget action missing with small baseline");
+            task.run();
+            require(tasks.poll(200, TimeUnit.MILLISECONDS) == null, "duplicate budget action");
+        }
+        try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + budget);
+             Statement st = c.createStatement();
+             ResultSet r = st.executeQuery("SELECT action FROM timer_budget_decisions")) {
+            require(r.next() && r.getString(1).equals("banned"), "budget result missing");
+        }
         System.out.println("PASS Timer SQLite: durable evidence, one action, small baseline " +
                            "abstention, mismatched model, report mode");
     }

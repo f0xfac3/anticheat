@@ -35,3 +35,9 @@ CREATE TABLE IF NOT EXISTS timer_decisions (
  eligible INTEGER NOT NULL, action TEXT NOT NULL, reason TEXT NOT NULL, evidence_json TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS timer_decisions_player ON timer_decisions(player_uuid,created_ms);
+
+CREATE TABLE IF NOT EXISTS timer_budget_decisions (
+ id TEXT PRIMARY KEY, created_ms INTEGER NOT NULL, player_uuid TEXT NOT NULL,
+ session_id TEXT NOT NULL, lead_ms REAL NOT NULL, measured_pps REAL NOT NULL,
+ action TEXT NOT NULL, reason TEXT NOT NULL, evidence_json TEXT NOT NULL
+);

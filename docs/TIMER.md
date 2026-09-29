@@ -121,3 +121,19 @@ Native regressions cover ordinary/coalesced cadence, stale context, partial-epis
 resets, insufficient reference data and alpha spending. Java SQLite tests verify
 durable evidence before an action, deduplication, model mismatch and report mode.
 Synthetic tests use temporary databases; no synthetic data enters the real baseline.
+
+## Local live enforcement test
+
+`timer.budget.ban=true` in `enforcement.properties` independently enables bans from
+`timer.budget.v1`, the deterministic native client-time budget check. Default is false.
+It does not relax the baseline cutoff or claim a calibrated cheating probability.
+Each native suspicious budget finding is committed to `timer_budget_decisions`
+before the main-thread session/world/collection checks and Bukkit ban. Collection
+sessions remain exempt. The configured `world` applies to both enforcement paths.
+
+For the installed manual test, use `world=ac_collection_lab`, join without collection
+scripts, and run `acdata arena PLAYER` in the server console. With Timer off, move
+normally first. Then enable only Timer 1.07 and keep moving. The console prints the
+native suspicious finding and then a ban if its evidence persists successfully.
+Use `pardon PLAYER` in the server console to repeat. Network uncertainty can reset
+the check; this local test is not a production false-positive evaluation.
