@@ -23,6 +23,8 @@ final class MonitorConfig{
     final String javaHome;
     final String minimumHeap;
     final String maximumHeap;
+    final Path framework, registry, raw;
+    final String python;
 
     MonitorConfig(Path home) throws IOException{
         this.home = home.toAbsolutePath().normalize();
@@ -41,6 +43,10 @@ final class MonitorConfig{
         javaHome = values.getProperty("java.home", "auto").trim();
         minimumHeap = heap(values.getProperty("heap.minimum", "1G"));
         maximumHeap = heap(values.getProperty("heap.maximum", "2G"));
+        framework = home.resolve(values.getProperty("analytics.framework", "../..")).toAbsolutePath().normalize();
+        registry = server.resolve("plugins/FoxAntiCheat/analytics.sqlite");
+        raw = home.resolve(values.getProperty("analytics.raw", "../../datasets/raw")).toAbsolutePath().normalize();
+        python = values.getProperty("analytics.python", "python");
     }
 
     private String heap(String value){

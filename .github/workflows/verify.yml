@@ -1,0 +1,38 @@
+name: verify
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Native and JNI regression
+        run: |
+          cmake -S . -B build/ci -DAC_BUILD_JNI=ON
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cmake --build build/ci --config Release
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          ctest --test-dir build/ci -C Release --output-on-failure
+      - name: Shared features and immutable dataset replay
+        run: |
+          python -m pip install -r analytics/requirements.txt
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python -m unittest discover -s analytics -p 'test_*.py'
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          New-Item -ItemType Directory -Path build/adapter-test-classes -Force | Out-Null
+          javac --release 8 -d build/adapter-test-classes plugin/src/main/java/dev/fox/anticheat/report/BehaviorTelemetry.java tests/BehaviorReplayTest.java
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python analytics/replay.py --java java
+      - name: Desktop regression
+        run: ./tools/monitor/build.ps1 -Jdk $env:JAVA_HOME

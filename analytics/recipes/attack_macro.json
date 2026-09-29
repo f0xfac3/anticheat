@@ -1,0 +1,24 @@
+{
+  "id": "macro.attack",
+  "version": 1,
+  "name": "Attack automation",
+  "mechanism": "Repeated attack timing may differ between human input and scripted input; cadence alone is insufficient evidence.",
+  "source": "hypothesis:requires independently reviewed human and script-family controls",
+  "features": ["attack_cv", "attack_repeat", "attack_pps"],
+  "positive_behavior": "attack_macro",
+  "target": "automation",
+  "minimum_attacks": 100,
+  "window_seconds": 30,
+  "minimum_margin": 0.0,
+  "tail_cutoff": 0.01,
+  "consecutive_windows": 3,
+  "validation": {
+    "minimum_human_players": 5,
+    "minimum_days": 3,
+    "minimum_network_conditions": 3,
+    "minimum_legit_hours": 20,
+    "maximum_fpr_upper_95": 0.01,
+    "minimum_recall": 0.8,
+    "require_same_client_control": false
+  }
+}

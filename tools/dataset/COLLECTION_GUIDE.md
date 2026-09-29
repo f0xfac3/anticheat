@@ -161,39 +161,13 @@ an earlier export. Exported identifiers are stable HMAC groups; keep
 and positions; share reviewed exports where possible. Chat and IP addresses are
 not fields in this normalized observation format.
 
-## Offline baseline after enough independent runs
+## Train and validate
 
-Recording, auditing and exporting work without ML libraries. Before training, run
-`Setup-Training.cmd` to install scikit-learn in the local virtual environment.
-Keep the resulting `requirements-lock.txt` with experiment metadata. The baseline uses 17 fixed
-server-observation features, fits preprocessing on training data, chooses a
-conservative threshold on validation controls, and evaluates the untouched test set.
-
-For the two-tester pilot, collect at least **five balanced server runs**, then:
-
-```powershell
-.\.venv\Scripts\python.exe train_baseline.py ..\datasets\derived\pilot.jsonl --module timer --split run --out ..\datasets\models\timer-pilot-01
-```
-
-`--split run` evaluates new runs of the known testers, not unseen players. By default,
-the trainer uses connected participant/opponent groups; that requires at least five
-independent groups and keeps duel opponents on the same side of the split. Do not
-randomly split adjacent windows or search seeds until a score looks good. Collect
-both legitimate and relevant positive trials in every planned cohort/run.
-
-Outputs include `model.joblib` and `report.json` with split groups, data hash,
-legitimate exposure hours, precision-recall area, positive-window recall and false
-positive **windows** per hour. These are not deduplicated alerts or ban rates. Only
-load model files you produced. The in-memory pilot trainer caps input at 200,000
-windows; larger studies should use documented shards/columnar storage and a separate
-scale evaluation. Raw recording/export are streaming and are not limited to that cap.
-
-No training command automatically deploys the model. Server-side feature parity,
-latency budgeting and independent live validation are separate deployment gates.
-
-The group-splitting and preprocessing approach follows the primary
-[scikit-learn cross-validation guide](https://scikit-learn.org/stable/modules/cross_validation.html)
-and [data-leakage guidance](https://scikit-learn.org/stable/common_pitfalls.html).
+The old joblib trainer has been replaced by the [behavior registry](../../analytics/README.md).
+Recording and auditing still use the standard library. Use the desktop Validation
+workspace or `analytics/lab.py` to admit captures, attach independent review evidence,
+reserve validation groups, train, and publish a shadow model. Live and offline feature
+arithmetic is checked against the original raw recordings. A pilot cannot enable ML bans.
 
 ## Layout and recovery
 

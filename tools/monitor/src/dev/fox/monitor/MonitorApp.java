@@ -34,6 +34,10 @@ public final class MonitorApp{
         return thread;
     });
     private final Timer timer;
+    private final ScheduledExecutorService analytics = Executors.newSingleThreadScheduledExecutor(task->{
+        Thread thread = new Thread(task, "anticheat-registry"); thread.setDaemon(true); return thread;
+    });
+    private final Registry registry;
     private volatile boolean closed;
     private volatile boolean startupComplete;
     private volatile String lastNotice = "";
@@ -58,6 +62,11 @@ public final class MonitorApp{
         );
         process.state = replay ? "Not started" : "Starting";
         window = new MonitorWindow(this);
+        registry = new Registry(config);
+        if(!replay) analytics.scheduleWithFixedDelay(()->{
+            Registry.Snapshot snapshot = registry.read();
+            SwingUtilities.invokeLater(()->{ if(!closed) window.registry(snapshot); });
+        }, 0, 2, TimeUnit.SECONDS);
         timer = new Timer(250, event->drain());
         timer.start();
         window.setVisible(true);
@@ -216,6 +225,8 @@ public final class MonitorApp{
         closed = true;
         timer.stop();
         watcher.shutdownNow();
+        analytics.shutdownNow();
+        registry.close();
         window.dispose();
     }
 

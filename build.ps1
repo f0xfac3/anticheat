@@ -72,7 +72,9 @@ try{
         "tests/SessionSmokeTest.java",
         "tests/MovementPacketTest.java",
         "tests/FindingReporterTest.java",
-        "tests/TimerStoreTest.java"
+        "tests/TimerStoreTest.java",
+        "tests/BehaviorReplayTest.java",
+        "tests/BehaviorRuntimeTest.java"
     )
     Invoke-Checked (Join-Path $Jdk "bin\java.exe") @(
         "-Xcheck:jni",
@@ -98,6 +100,10 @@ try{
     )
 
     $pluginJar = Join-Path $libs "anticheat.jar"
+    Invoke-Checked (Join-Path $Jdk "bin\java.exe") @(
+        "-cp", "$testClasses;$classes;$ServerJar",
+        "dev.fox.anticheat.report.BehaviorRuntimeTest"
+    )
     Invoke-Checked $jar @("cf", $pluginJar, "-C", $classes, ".", "-C", "plugin/src/main/resources", ".")
     Copy-Item "build\native\anticheat_native.dll" (Join-Path $libs "anticheat_native.dll") -Force
     Write-Host ""

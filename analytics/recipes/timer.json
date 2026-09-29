@@ -1,0 +1,24 @@
+{
+  "id": "timer.cadence",
+  "version": 1,
+  "name": "Timer cadence",
+  "mechanism": "Client tick-rate multiplier increases sustained Flying packet cadence.",
+  "source": "docs/research/vape/recovered/Timer-yG.txt",
+  "features": ["movement_pps"],
+  "positive_behavior": "timer",
+  "target": "cheat",
+  "minimum_attacks": 0,
+  "window_seconds": 30,
+  "minimum_margin": 0.0,
+  "tail_cutoff": 0.01,
+  "consecutive_windows": 3,
+  "validation": {
+    "minimum_human_players": 5,
+    "minimum_days": 3,
+    "minimum_network_conditions": 3,
+    "minimum_legit_hours": 20,
+    "maximum_fpr_upper_95": 0.01,
+    "minimum_recall": 0.8,
+    "require_same_client_control": true
+  }
+}

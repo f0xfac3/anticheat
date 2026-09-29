@@ -17,8 +17,10 @@ public final class ObservationSink{
     private final LongSupplier tick;
     private final Consumer<String> report;
     private Consumer<ByteBuffer> capture = buffer -> {};
+    private Consumer<ByteBuffer> telemetry = buffer -> {};
 
     public void setCapture(Consumer<ByteBuffer> capture){checkThread();this.capture=capture;}
+    public void setTelemetry(Consumer<ByteBuffer> telemetry){checkThread();this.telemetry=telemetry;}
 
     public ObservationSink(
         NativeBridge engine,
@@ -60,6 +62,7 @@ public final class ObservationSink{
         checkThread();
         ByteBuffer event=writer.finish();
         capture.accept(event.asReadOnlyBuffer());
+        telemetry.accept(event.asReadOnlyBuffer());
         String[] records = engine.submit(event);
 
         if(records == null)

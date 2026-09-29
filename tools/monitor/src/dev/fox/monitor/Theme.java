@@ -42,6 +42,11 @@ final class Theme{
         // flat painters for buttons while retaining desktop text and DPI settings.
         UIManager.put("ButtonUI", "javax.swing.plaf.basic.BasicButtonUI");
         UIManager.put("ToggleButtonUI", "javax.swing.plaf.basic.BasicToggleButtonUI");
+        UIManager.put("ComboBoxUI", "javax.swing.plaf.basic.BasicComboBoxUI");
+        UIManager.put("ComboBox.background", new ColorUIResource(RAISED));
+        UIManager.put("ComboBox.foreground", new ColorUIResource(WHITE));
+        UIManager.put("ComboBox.selectionBackground", new ColorUIResource(SELECTED));
+        UIManager.put("ComboBox.selectionForeground", new ColorUIResource(WHITE));
         UIManager.put("Button.select", new ColorUIResource(SELECTED));
         UIManager.put("Button.disabledText", new ColorUIResource(MUTED));
         UIManager.put("ToggleButton.background", new ColorUIResource(RAISED));

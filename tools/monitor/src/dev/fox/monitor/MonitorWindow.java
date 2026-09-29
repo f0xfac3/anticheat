@@ -1,663 +1,458 @@
-/**
- * MonitorWindow.java displays alerts, activity, players, and the full server console.
- * The interface reads Finding fields; detection decisions remain in C++.
- */
-
 package dev.fox.monitor;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
+import java.awt.event.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
-final class MonitorWindow extends JFrame{
+/** Observe and investigate. Registry workflows live in Workspaces; decisions stay in the server. */
+final class MonitorWindow extends JFrame {
     final MonitorApp app;
     final MonitorModel model;
-    final JLabel serverStatus = Theme.label("Server  |  starting", 12, false);
-    final JLabel engineStatus = Theme.label("Engine  |  waiting", 12, false);
-    final JLabel alertCount = Theme.label("0", 32, false);
-    final JLabel playerCount = Theme.label("0", 32, false);
-    final JLabel banCount = Theme.label("0", 32, false);
-    final JLabel recordCount = Theme.label("0", 32, false);
-    final JLabel footer = Theme.label("Waiting for observations", 11, false);
-    final JLabel title = Theme.label("Alerts", 22, false);
-    final JLabel subtitle = Theme.label("Only findings marked suspicious by the C++ engine.", 12, false);
-    final JLabel selectionTitle = Theme.label("No finding selected", 15, true);
-    final JLabel selectionSub = Theme.label("Select an alert to inspect its evidence.", 11, false);
-    final JTextField search = Theme.field();
-    final JTextArea detail = Theme.area();
-    final JTextArea serverLog = Theme.area();
-    final JTextArea research = Theme.area();
+    final Framework framework;
+    final JLabel serverStatus = Theme.label("Starting", 12, false),
+                 footer = Theme.label("Loading registry", 12, false);
+    final JButton stop = Theme.button("Stop server");
+    final JTextArea serverLog = Theme.area(), detail = Theme.area();
     final JTextField command = Theme.field();
     final CardLayout cards = new CardLayout();
     final JPanel pages = Theme.panel(cards);
-    String view = "Alerts";
-    List<String[]> responseRows = new ArrayList<>();
-    List<Finding> rows = new ArrayList<>();
-    List<MonitorModel.Player> playerRows = new ArrayList<>();
-    final RecordTable tableModel = new RecordTable();
-    final JTable table = new JTable(tableModel);
-    final JButton stop = Theme.button("Stop server");
-    final JButton forceStop = Theme.button("Force stop");
-    final JButton copy = Theme.button("Copy JSON");
-    final List<JButton> navigation = new ArrayList<>();
-    final JToggleButton follow = new JToggleButton("Follow log", true);
-    Finding selected;
-    private long lastRecordVersion = -1;
-    private long lastLogVersion = -1;
-    private String lastQuery = "";
-    private String lastLogQuery = "";
+    final Map<String, JButton> navigation = new LinkedHashMap<>();
+    final Map<String, JLabel> counts = new LinkedHashMap<>();
+    final TrendChart cadence =
+        new TrendChart("Movement cadence", "Packets / second · 30-second windows", true);
+    final TrendChart risk = new TrendChart(
+        "Detection trend", "Timer margin above threshold · not a probability", false);
+    final Grid sessions =
+        new Grid("PLAYER / SESSION", "LAST WINDOW", "MOVE / S", "ATTACK / S", "LATEST MODEL STATE");
+    final Grid incidents = new Grid("TIME", "PLAYER", "DETECTION", "OUTCOME");
+    final Workspaces workspaces;
+    Registry.Snapshot snapshot = new Registry.Snapshot();
+    String view = "Overview";
+    private String evidence = "";
+    private JDialog console;
     private boolean closing;
-    private long stoppingSince;
+    private long lastRecords = -1, lastLog = -1;
+    private final List<String> incidentEvidence = new ArrayList<>();
 
-    MonitorWindow(MonitorApp app){
-        super("anticheat / " + (app.replay ? "replay" : "security console"));
+    MonitorWindow(MonitorApp app) {
+        super("anticheat / security operations");
         this.app = app;
         model = app.model;
+        framework = new Framework(app.config);
+        workspaces = new Workspaces(this);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        setMinimumSize(new Dimension(1060, 640));
-        setSize(1320, 820);
+        setMinimumSize(new Dimension(1160, 760));
+        setSize(1450, 900);
         setLocationRelativeTo(null);
-        getContentPane().setBackground(Theme.BACKGROUND);
         setLayout(new BorderLayout());
+        getContentPane().setBackground(Theme.BACKGROUND);
         add(sidebar(), BorderLayout.WEST);
-        add(content(), BorderLayout.CENTER);
-
-        addWindowListener(new WindowAdapter(){
-            @Override
-            public void windowClosing(WindowEvent event){
+        JPanel main = Theme.panel(new BorderLayout(0, 22));
+        main.setBorder(BorderFactory.createEmptyBorder(24, 28, 18, 28));
+        JPanel header = Theme.panel(new BorderLayout());
+        header.add(serverStatus, BorderLayout.WEST);
+        header.add(actions(button("Server controls", this::openConsole)), BorderLayout.EAST);
+        main.add(header, BorderLayout.NORTH);
+        pages.add(overview(), "Overview");
+        pages.add(incidentPanel(), "Incidents");
+        pages.add(workspaces.detectionPanel(), "Detections");
+        pages.add(workspaces.validationPanel(), "Validation");
+        main.add(pages, BorderLayout.CENTER);
+        footer.setForeground(Theme.MUTED);
+        main.add(footer, BorderLayout.SOUTH);
+        add(main, BorderLayout.CENTER);
+        stop.addActionListener(e -> app.process.stop());
+        stop.setEnabled(!app.replay);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
                 requestClose();
             }
         });
-
-        search.getDocument().addDocumentListener(new DocumentListener(){
-            public void insertUpdate(DocumentEvent event){
-                refreshRows(true);
-                updateLog(true);
-            }
-
-            public void removeUpdate(DocumentEvent event){
-                refreshRows(true);
-                updateLog(true);
-            }
-
-            public void changedUpdate(DocumentEvent event){
-                refreshRows(true);
-                updateLog(true);
-            }
-        });
-
-        stop.addActionListener(event->{
-            if(app.process.alive() || app.process.starting()){
-                app.process.stop();
-            }else if(!app.replay){
-                message("Close this monitor and reopen start.bat for a fresh server run.");
-            }
-        });
-        forceStop.addActionListener(event->{
-            int result = JOptionPane.showConfirmDialog(
-                this,
-                "Force stop skips world saving and can lose data. Continue?",
-                "Force stop",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
-            );
-
-            if(result == JOptionPane.YES_OPTION)
-                app.process.forceStop();
-        });
-        forceStop.setVisible(false);
-        copy.addActionListener(event->{
-            if(selected != null){
-                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
-                    new StringSelection(selected.json), null
-                );
-            }
-        });
-        copy.setEnabled(false);
+        selectView("Overview");
     }
-
-    private JPanel sidebar(){
-        JPanel bar = Theme.panel(new BorderLayout());
-        bar.setPreferredSize(new Dimension(182, 0));
-        bar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Theme.LINE));
-        JPanel stack = Theme.panel(null);
-        stack.setLayout(new BoxLayout(stack, BoxLayout.Y_AXIS));
-        stack.setBorder(BorderFactory.createEmptyBorder(28, 20, 20, 18));
-        JLabel name = Theme.label("anticheat", 21, true);
-        name.setAlignmentX(Component.LEFT_ALIGNMENT);
-        stack.add(name);
-        stack.add(Box.createVerticalStrut(8));
-        JLabel tag = Theme.label(app.replay ? "REPLAY" : "LIVE SECURITY", 12, false);
-        tag.setForeground(Theme.MUTED);
-        stack.add(tag);
-        stack.add(Box.createVerticalStrut(42));
-
-        for(String nameText : new String[]{"Alerts", "Responses", "Research", "Activity", "Players", "Server log"}){
-            JButton button = Theme.button(nameText);
-            button.setHorizontalAlignment(JButton.LEFT);
-            button.setAlignmentX(Component.LEFT_ALIGNMENT);
-            button.setMaximumSize(new Dimension(150, 40));
-            button.setBackground(nameText.equals(view) ? Theme.SELECTED : Theme.BACKGROUND);
-            button.addActionListener(event->selectView(nameText));
-            navigation.add(button);
-            stack.add(button);
-            stack.add(Box.createVerticalStrut(8));
+    private JPanel sidebar() {
+        JPanel panel = Theme.panel(new BorderLayout());
+        panel.setPreferredSize(new Dimension(205, 0));
+        panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Theme.LINE));
+        JPanel list = Theme.panel(null);
+        list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
+        list.setBorder(BorderFactory.createEmptyBorder(30, 22, 24, 22));
+        list.add(Theme.label("anticheat", 25, true));
+        list.add(Box.createVerticalStrut(6));
+        JLabel sub = Theme.label("SECURITY OPERATIONS", 11, false);
+        sub.setForeground(Theme.MUTED);
+        list.add(sub);
+        list.add(Box.createVerticalStrut(42));
+        for (String name : new String[] {"Overview", "Incidents", "Detections", "Validation"}) {
+            JButton button = button(name, () -> selectView(name));
+            button.setMaximumSize(new Dimension(175, 44));
+            button.setHorizontalAlignment(SwingConstants.LEFT);
+            button.setAlignmentX(LEFT_ALIGNMENT);
+            navigation.put(name, button);
+            list.add(button);
+            list.add(Box.createVerticalStrut(10));
         }
-
-        bar.add(stack, BorderLayout.NORTH);
-        JPanel bottom = Theme.panel(null);
-        bottom.setLayout(new BoxLayout(bottom, BoxLayout.Y_AXIS));
-        bottom.setBorder(BorderFactory.createEmptyBorder(20, 20, 26, 12));
-        JLabel checks = Theme.label("DETECTION SCOPE", 10, true);
-        checks.setForeground(Theme.MUTED);
-        bottom.add(checks);
-        bottom.add(Box.createVerticalStrut(16));
-        String[] names = {"Timer - budget", "Reach", "Movement"};
-        String[] keys = {"timer", "reach", "movement"};
-
-        for(int i = 0; i < names.length; ++i){
-            bottom.add(Theme.label(names[i], 12, true));
-            JLabel status = Theme.label(
-                app.replay ? "See recorded findings" : app.config.checkSetting(keys[i]),
-                10,
-                false
-            );
-            status.setForeground(Theme.MUTED);
-            bottom.add(status);
-            bottom.add(Box.createVerticalStrut(12));
-        }
-
-        bottom.add(Box.createVerticalStrut(27));
-        JLabel policy = Theme.label("EVIDENCE / RESPONSE", 10, true);
-        policy.setForeground(Theme.MUTED);
-        bottom.add(policy);
-        bar.add(bottom, BorderLayout.SOUTH);
-        return bar;
-    }
-
-    private JPanel content(){
-        JPanel main = Theme.panel(new BorderLayout(0, 21));
-        main.setBorder(BorderFactory.createEmptyBorder(22, 26, 16, 26));
-        JPanel top = Theme.panel(new BorderLayout(0, 20));
-        JPanel status = Theme.panel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        serverStatus.setForeground(Theme.MUTED);
-        engineStatus.setForeground(Theme.MUTED);
-        status.add(serverStatus);
-        status.add(Box.createHorizontalStrut(28));
-        status.add(engineStatus);
-
-        JPanel toolbar = Theme.panel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
-        JButton open = Theme.button("Open saved log");
-        open.addActionListener(event->openReplay());
-        JButton logs = Theme.button("Log files");
-        logs.addActionListener(event->app.openLogs());
-        toolbar.add(open);
-        toolbar.add(logs);
-        toolbar.add(forceStop);
-        toolbar.add(stop);
-        stop.setEnabled(!app.replay);
-
-        JPanel header = Theme.panel(new BorderLayout());
-        header.add(status, BorderLayout.CENTER);
-        header.add(toolbar, BorderLayout.EAST);
-        top.add(header, BorderLayout.NORTH);
-
-        JPanel stats = Theme.panel(new GridLayout(1, 4, 14, 0));
-        stats.add(stat("SUSPICIOUS FINDINGS", alertCount, "Reported by the engine"));
-        stats.add(stat("PLAYERS WITH ALERTS", playerCount, "Not a cheating probability"));
-        stats.add(stat("FINDINGS RECEIVED", recordCount, "Native evidence records"));
-        stats.add(stat("CONFIRMED BANS", banCount, "Server-reported responses"));
-        top.add(stats, BorderLayout.CENTER);
-        main.add(top, BorderLayout.NORTH);
-
-        JPanel middle = Theme.panel(new BorderLayout(0, 16));
-        JPanel heading = Theme.panel(new BorderLayout());
-        JPanel text = Theme.panel(new GridLayout(2, 1, 0, 7));
-        subtitle.setForeground(Theme.MUTED);
-        text.add(title);
-        text.add(subtitle);
-        heading.add(text, BorderLayout.CENTER);
-        search.setPreferredSize(new Dimension(225, 34));
-        search.setToolTipText("Filter player, check, message, or evidence");
-        JPanel filter = Theme.panel(new BorderLayout(0, 4));
-        JLabel filterLabel = Theme.label("FILTER", 10, false);
-        filterLabel.setForeground(Theme.MUTED);
-        filter.add(filterLabel, BorderLayout.NORTH);
-        filter.add(search, BorderLayout.CENTER);
-        heading.add(filter, BorderLayout.EAST);
-        middle.add(heading, BorderLayout.NORTH);
-        Theme.table(table);
-        table.getSelectionModel().addListSelectionListener(event->{
-            if(!event.getValueIsAdjusting())
-                showSelection();
-        });
-
-        JPanel evidence = Theme.panel(new BorderLayout(0, 10));
-        evidence.setBorder(BorderFactory.createEmptyBorder(0, 14, 0, 0));
-        JPanel evidenceHeading = Theme.panel(new GridLayout(2, 1, 0, 7));
-        selectionSub.setForeground(Theme.MUTED);
-        evidenceHeading.add(selectionTitle);
-        evidenceHeading.add(selectionSub);
-        evidence.add(evidenceHeading, BorderLayout.NORTH);
-        detail.setLineWrap(true);
-        detail.setWrapStyleWord(true);
-        detail.setFont(Theme.NORMAL);
-        evidence.add(Theme.scroll(detail), BorderLayout.CENTER);
-        evidence.add(copy, BorderLayout.SOUTH);
-        evidence.setMinimumSize(new Dimension(290, 160));
-
-        JSplitPane split = new JSplitPane(
-            JSplitPane.HORIZONTAL_SPLIT,
-            Theme.scroll(table),
-            evidence
-        );
-        split.setBorder(null);
-        split.setDividerSize(3);
-        split.setResizeWeight(0.72);
-        split.setDividerLocation(690);
-        pages.add(split, "Records");
-        pages.add(logPanel(), "Logs");
-        research.setLineWrap(true);
-        research.setWrapStyleWord(true);
-        pages.add(Theme.scroll(research), "Research");
-        middle.add(pages, BorderLayout.CENTER);
-        main.add(middle, BorderLayout.CENTER);
-        footer.setForeground(Theme.MUTED);
-        main.add(footer, BorderLayout.SOUTH);
-        resizeColumns();
-        return main;
-    }
-
-    private JPanel stat(String name, JLabel value, String note){
-        JPanel card = Theme.panel(new BorderLayout(0, 9));
-        card.setBackground(Theme.PANEL);
-        card.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(Theme.LINE),
-            BorderFactory.createEmptyBorder(16, 19, 16, 19)
-        ));
-        JLabel heading = Theme.label(name, 10, true);
-        heading.setForeground(Theme.MUTED);
-        JLabel foot = Theme.label(note, 11, false);
-        foot.setForeground(Theme.MUTED);
-        card.add(heading, BorderLayout.NORTH);
-        card.add(value, BorderLayout.CENTER);
-        card.add(foot, BorderLayout.SOUTH);
-        return card;
-    }
-
-    private JPanel logPanel(){
-        JPanel panel = Theme.panel(new BorderLayout(0, 12));
-        panel.add(Theme.scroll(serverLog), BorderLayout.CENTER);
-        JPanel input = Theme.panel(new BorderLayout(8, 0));
-        command.setToolTipText("Spigot server command, for example list or stop");
-        JButton send = Theme.button("Send command");
-        Runnable submit = ()->{
-            app.process.command(command.getText());
-            command.setText("");
-        };
-        send.addActionListener(event->submit.run());
-        command.addActionListener(event->submit.run());
-        send.setEnabled(!app.replay);
-        command.setEnabled(!app.replay);
-        follow.setBackground(Theme.RAISED);
-        follow.setForeground(Theme.WHITE);
-        follow.setFont(Theme.SMALL);
-        follow.setFocusPainted(false);
-        input.add(follow, BorderLayout.WEST);
-        input.add(command, BorderLayout.CENTER);
-        input.add(send, BorderLayout.EAST);
-        panel.add(input, BorderLayout.SOUTH);
+        panel.add(list, BorderLayout.NORTH);
+        JPanel bottom = Theme.panel(new GridLayout(3, 1, 0, 8));
+        bottom.setBorder(BorderFactory.createEmptyBorder(20, 22, 28, 12));
+        bottom.add(Theme.label(app.replay ? "OFFLINE REPLAY" : "LOCAL CONTROL PLANE", 11, true));
+        bottom.add(Theme.label("Evidence → validation", 12, false));
+        bottom.add(Theme.label("Shadow → policy → response", 12, false));
+        panel.add(bottom, BorderLayout.SOUTH);
         return panel;
     }
-
-    void selectView(String name){
-        view = name;
-        selected = null;
-        title.setText(name);
-
-        if(name.equals("Alerts"))
-            subtitle.setText("Only findings marked suspicious by the C++ engine.");
-        else if(name.equals("Responses"))
-            subtitle.setText("Observed detections and confirmed server bans. Select a response for its evidence.");
-        else if(name.equals("Research"))
-            subtitle.setText("Saved offline evaluation. Development results and coverage limits; not a live risk verdict.");
-        else if(name.equals("Activity"))
-            subtitle.setText("Starts, finishes, skips, resets, and alerts. These are Findings, not raw packets.");
-        else if(name.equals("Players"))
-            subtitle.setText("Players seen in this run. No alert does not establish legitimate play.");
-        else
-            subtitle.setText("Server output, errors, and startup messages. Full console capture is saved to disk.");
-
-        for(JButton button : navigation)
-            button.setBackground(button.getText().equals(name) ? Theme.SELECTED : Theme.BACKGROUND);
-
-        if(name.equals("Research")){
-            java.nio.file.Path report = app.config.server.resolve("plugins/FoxAntiCheat/research/REPORT.md");
-            try{
-                if(java.nio.file.Files.size(report) > 131072) throw new java.io.IOException("Report exceeds display limit");
-                research.setText(new String(java.nio.file.Files.readAllBytes(report), java.nio.charset.StandardCharsets.UTF_8));
-            }catch(java.io.IOException error){
-                research.setText("No evaluation report available. Run Evaluate Research.cmd, then reopen this tab.\n\n" + report);
-            }
-            research.setCaretPosition(0);
-        }
-        cards.show(pages, name.equals("Research") ? "Research" : name.equals("Server log") ? "Logs" : "Records");
-        tableModel.fireTableStructureChanged();
-        resizeColumns();
-        refreshRows(true);
-        updateLog(true);
+    private JPanel overview() {
+        JPanel page = Theme.panel(new BorderLayout(0, 20));
+        JPanel top = Theme.panel(new BorderLayout(0, 20));
+        top.add(heading("Overview",
+                    "Live behavior, detection candidates, and server-confirmed responses."),
+            BorderLayout.NORTH);
+        JPanel stats = Theme.panel(new GridLayout(1, 4, 12, 0));
+        stats.add(stat("PLAYERS ONLINE", "online", "Current server run"));
+        stats.add(stat("NATIVE ALERTS", "alerts", "Current server run"));
+        stats.add(stat("MODEL CANDIDATES", "candidates", "Last hour · shadow included"));
+        stats.add(stat("CONFIRMED BANS", "bans", "Persisted server responses"));
+        top.add(stats, BorderLayout.CENTER);
+        page.add(top, BorderLayout.NORTH);
+        JPanel middle = Theme.panel(new BorderLayout(0, 20));
+        JPanel charts = Theme.panel(new GridLayout(1, 2, 16, 0));
+        charts.add(cadence);
+        charts.add(risk);
+        middle.add(charts, BorderLayout.NORTH);
+        JPanel lower = Theme.panel(new BorderLayout(0, 12));
+        lower.add(Theme.label("Observed sessions", 17, true), BorderLayout.NORTH);
+        lower.add(Theme.scroll(sessions.table), BorderLayout.CENTER);
+        middle.add(lower, BorderLayout.CENTER);
+        page.add(middle, BorderLayout.CENTER);
+        return page;
     }
-
-    private void resizeColumns(){
-        int[] widths = view.equals("Players")
-            ? new int[]{170, 100, 80, 80, 110}
-            : new int[]{80, 160, 110, 285};
-
-        for(int i = 0; i < widths.length; ++i)
-            table.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
+    private JPanel stat(String name, String key, String note) {
+        JPanel card = Theme.panel(new BorderLayout(0, 8));
+        card.setBackground(Theme.PANEL);
+        card.setBorder(
+            BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Theme.LINE),
+                BorderFactory.createEmptyBorder(17, 18, 17, 18)));
+        JLabel label = Theme.label(name, 11, true);
+        label.setForeground(Theme.MUTED);
+        JLabel value = Theme.label("—", 31, false);
+        counts.put(key, value);
+        card.add(label, BorderLayout.NORTH);
+        card.add(value, BorderLayout.CENTER);
+        JLabel small = Theme.label(note, 12, false);
+        small.setForeground(Theme.MUTED);
+        card.add(small, BorderLayout.SOUTH);
+        return card;
     }
-
-    void refresh(){
-        serverStatus.setText(app.replay ? "REPLAY  |  saved log" :
-            "Server  |  " + (app.process.alive() && model.ready && !app.process.state.equals("Stopping")
-                ? "Ready" : app.process.state));
-        engineStatus.setText(app.replay ? "Offline analysis" : "Engine  |  " + model.engineState);
-        alertCount.setText(Long.toString(model.suspicious));
-        playerCount.setText(Integer.toString(model.flaggedPlayers()));
-        recordCount.setText(Long.toString(model.received));
-        banCount.setText(Long.toString(model.bans));
-        boolean stopping = app.process.state.equals("Stopping");
-        stop.setEnabled(!app.replay && !stopping && (app.process.alive() || app.process.starting()));
-        stop.setText(stopping ? "Stopping..." : "Stop server");
-
-        if(stopping && stoppingSince == 0)
-            stoppingSince = System.nanoTime();
-
-        forceStop.setVisible(app.process.alive() && stopping &&
-            System.nanoTime() - stoppingSince > 15_000_000_000L);
-        String tail = "View limits: 2,000 alerts / 5,000 activity records";
-
-        if(model.uiDropped > 0 || model.malformed > 0)
-            tail = "UI records skipped: " + model.uiDropped + " | Parse failures: " + model.malformed;
-
-        footer.setText((app.replay ? "Saved log" : model.policy) + "   .   " + tail
-            + (model.warnings > 0 ? "   .   " + model.warnings + " server warnings/errors" : ""));
-        refreshRows(false);
-        updateLog(false);
-
-        if(closing && !app.process.alive() && !app.process.starting())
-            app.close();
-    }
-
-    private void refreshRows(boolean force){
-        String query = search.getText();
-
-        if(!force && lastRecordVersion == model.recordVersion && query.equals(lastQuery)
-            && !view.equals("Players")){
-            return;
-        }
-
-        Finding previous = selected;
-        rows = model.matching(view.equals("Alerts"), query);
-        responseRows = new ArrayList<>();
-        for(String[] response : model.responses)
-            if(String.join(" ", response).toLowerCase(java.util.Locale.ROOT).contains(query.toLowerCase(java.util.Locale.ROOT)))
-                responseRows.add(response);
-        playerRows = new ArrayList<>();
-
-        for(MonitorModel.Player player : model.players.values()){
-            String text = (player.uuid + " " + player.name).toLowerCase(java.util.Locale.ROOT);
-
-            if(text.contains(query.toLowerCase(java.util.Locale.ROOT)))
-                playerRows.add(player);
-        }
-
-        tableModel.fireTableDataChanged();
-        lastRecordVersion = model.recordVersion;
-        lastQuery = query;
-        int index = previous == null ? -1 : rows.indexOf(previous);
-
-        if(view.equals("Responses")){
-            if(!responseRows.isEmpty()) table.setRowSelectionInterval(0, 0);
-            else showSelection();
-        }else if(!view.equals("Players") && !rows.isEmpty()){
-            table.setRowSelectionInterval(index < 0 ? 0 : index, index < 0 ? 0 : index);
-        }else if(view.equals("Players") && !playerRows.isEmpty()){
-            table.setRowSelectionInterval(0, 0);
-        }else{
-            showSelection();
-        }
-    }
-
-    private void showSelection(){
-        int row = table.getSelectedRow();
-
-        if(view.equals("Responses")) {
-            selected = null;
-            copy.setEnabled(false);
-            if(row < 0 || row >= responseRows.size()) { clearSelection(); return; }
-            String[] response = responseRows.get(row);
-            selectionTitle.setText(response[2] + " / " + response[1]);
-            selectionSub.setText(response[0] + " / server event");
-            StringBuilder evidence = new StringBuilder("SERVER RECORD\n" + response[4] + "\n\nEVIDENCE REFERENCE\n" + response[3]);
-            if(response[2].equals("BANNED")) {
-                String[] id = response[3].split(":");
-                for(Finding finding : model.activity) {
-                    if(id.length >= 3 && finding.field("session").equals(id[id.length-2]) &&
-                       finding.field("event").equals(id[id.length-1]) && model.playerName(finding).equals(response[1])) {
-                        evidence.append("\n\nNATIVE EVIDENCE\n").append(finding.json);
-                        selected = finding;
-                        copy.setEnabled(true);
-                        break;
-                    }
+    private JPanel incidentPanel() {
+        JPanel panel = Theme.panel(new BorderLayout(0, 16));
+        panel.add(
+            heading("Incidents",
+                "Native evidence and model candidates. A shadow candidate never authorizes a ban."),
+            BorderLayout.NORTH);
+        detail.setLineWrap(true);
+        detail.setWrapStyleWord(true);
+        JPanel right = Theme.panel(new BorderLayout(0, 10));
+        right.add(Theme.label("Evidence", 16, true), BorderLayout.NORTH);
+        right.add(Theme.scroll(detail), BorderLayout.CENTER);
+        right.add(button("Copy evidence",
+                      ()
+                          -> Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
+                              new StringSelection(evidence), null)),
+            BorderLayout.SOUTH);
+        panel.add(split(Theme.scroll(incidents.table), right, .64), BorderLayout.CENTER);
+        incidents.table.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int n = incidents.table.getSelectedRow();
+                if (n >= 0 && n < incidentEvidence.size()) {
+                    evidence = incidentEvidence.get(n);
+                    detail.setText(evidence);
+                    detail.setCaretPosition(0);
                 }
-                evidence.append("\n\nThe plugin reports a completed ban after its durable evidence gate. Full decision history remains in SQLite.");
             }
-            detail.setText(evidence.toString());
-            detail.setCaretPosition(0);
+        });
+        return panel;
+    }
+    void selectView(String name) {
+        if (name.equals("Server log")) {
+            openConsole();
             return;
         }
-        if(view.equals("Players")){
-            selected = null;
-            copy.setEnabled(false);
-
-            if(row < 0 || row >= playerRows.size()){
-                clearSelection();
-                return;
-            }
-
-            MonitorModel.Player player = playerRows.get(row);
-            selectionTitle.setText(player.name == null ? "Player" : player.name);
-            selectionSub.setText(player.alerts > 0 ? "Suspicious findings observed" : "No alerts observed");
-            detail.setText(
-                "PLAYER UUID\n" + player.uuid + "\n\n"
-                + "STATUS\n" + player.status + "\n\n"
-                + "SUSPICIOUS FINDINGS\n" + player.alerts + "\n\n"
-                + "FINDINGS RECEIVED\n" + player.records + "\n\n"
-                + "LAST FINDING\n" + player.last + "\n\n"
-                + "These counts describe the captured session, not a probability of cheating."
-            );
-            detail.setCaretPosition(0);
-            return;
+        view = name;
+        cards.show(pages, name);
+        for (Map.Entry<String, JButton> b : navigation.entrySet()) {
+            boolean active = b.getKey().equals(name);
+            b.getValue().setBackground(active ? Theme.SELECTED : Theme.BACKGROUND);
+            b.getValue().setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(
+                    0, active ? 3 : 1, 0, 0, active ? new Color(224, 88, 108) : Theme.LINE),
+                BorderFactory.createEmptyBorder(10, 13, 10, 8)));
         }
-
-        if(row < 0 || row >= rows.size()){
-            clearSelection();
-            return;
+    }
+    void registry(Registry.Snapshot value) {
+        snapshot = value;
+        try {
+            workspaces.refresh();
+            refreshBehavior();
+            refreshIncidents();
+        } catch (RuntimeException error) {
+            snapshot.error = "Invalid registry record: " + error.getMessage();
         }
-
-        Finding finding = rows.get(row);
-
-        if(finding == selected)
-            return;
-
-        selected = finding;
-        copy.setEnabled(true);
-        selectionTitle.setText(finding.detector() + "  /  " + finding.field("level").toUpperCase(java.util.Locale.ROOT));
-        selectionSub.setText(finding.time() + "   .   " + model.playerName(finding));
-        StringBuilder text = new StringBuilder();
-        java.util.Set<String> shown = new java.util.HashSet<>();
-
-        // Put the measurements first. Packet references remain available below.
-        for(String key : new String[]{
-            "lead_ms", "counted_packets", "elapsed_ms", "score_pps", "tail_p", "eligible", "observed_ms", "expected_ms", "sus_threshold_ms", "threshold_ms",
-            "samples", "block", "tool", "position", "server_break_outcome"
-        }){
-            String value = finding.evidence.get(key);
-
-            if(value != null){
-                appendEvidence(text, key, value);
-                shown.add(key);
+    }
+    private void refreshBehavior() {
+        Map<String, List<TrendChart.Point>> movement = new LinkedHashMap<>(),
+                                            margins = new LinkedHashMap<>();
+        Map<String, Map<String, Object>> newest = new LinkedHashMap<>(),
+                                         decisions = new LinkedHashMap<>();
+        for (Map<String, Object> row : snapshot.rows("decisions")) {
+            String key = s(row, "player_uuid") + ":" + s(row, "session_id");
+            decisions.putIfAbsent(key, row);
+            if (s(row, "detection_id").equals("timer.cadence")) {
+                Map<String, Object> exp = experiment(s(row, "model_id"));
+                double threshold = exp == null
+                    ? Double.NaN
+                    : Json.number(Json.object(s(exp, "model_json")), "threshold");
+                if (Double.isFinite(threshold))
+                    point(margins, player(s(row, "player_uuid")), row,
+                        Json.number(row, "margin") - threshold);
             }
         }
-
-        text.append("FINDING\n").append(finding.field("message")).append("\n\n");
-
-        for(java.util.Map.Entry<String, String> field : finding.evidence.entrySet()){
-            if(!shown.contains(field.getKey()))
-                appendEvidence(text, field.getKey(), field.getValue());
+        for (Map<String, Object> row : snapshot.rows("windows")) {
+            String key = s(row, "player_uuid") + ":" + s(row, "session_id");
+            newest.putIfAbsent(key, row);
+            point(movement, player(s(row, "player_uuid")), row,
+                Json.number(Json.object(s(row, "features_json")), "movement_pps"));
         }
-
-        text.append("SOURCE\nCheck: ").append(finding.field("check"))
-            .append("\nSession: ").append(finding.field("session"))
-            .append("\nEvent: ").append(finding.field("event"))
-            .append("\nPlayer: ").append(finding.field("player"))
-            .append("\n\nEnforcement outcomes appear in Responses. This view does not recompute the detector's verdict.");
-        detail.setText(text.toString());
-        detail.setCaretPosition(0);
-    }
-
-    private void appendEvidence(StringBuilder text, String key, String value){
-        String label = key.toUpperCase(java.util.Locale.ROOT).replace('_', ' ');
-
-        if(key.equals("sus_threshold_ms"))
-            label = "SUSPICIOUS THRESHOLD (MS)";
-
-        text.append(label).append('\n').append(value).append("\n\n");
-    }
-
-    private void clearSelection(){
-        selected = null;
-        copy.setEnabled(false);
-        selectionTitle.setText("No finding selected");
-        selectionSub.setText("Select a row to inspect its evidence.");
-        detail.setText(view.equals("Alerts")
-            ? "No suspicious findings in this view.\n\nOther native findings remain in Activity. Server messages and errors remain in Server log."
-            : "No records in this view yet.");
-    }
-
-    private void updateLog(boolean force){
-        if(!view.equals("Server log"))
-            return;
-
-        if(!force && lastLogVersion == model.logVersion && search.getText().equals(lastLogQuery))
-            return;
-
-        StringBuilder text = new StringBuilder();
-        String query = search.getText().toLowerCase(java.util.Locale.ROOT);
-
-        for(String line : model.logs){
-            if(line.toLowerCase(java.util.Locale.ROOT).contains(query))
-                text.append(line).append('\n');
+        cadence.data(movement);
+        risk.data(margins);
+        sessions.clear();
+        for (Map.Entry<String, Map<String, Object>> entry : newest.entrySet()) {
+            Map<String, Object> row = entry.getValue(),
+                                features = Json.object(s(row, "features_json")),
+                                decision = decisions.get(entry.getKey());
+            sessions.add(player(s(row, "player_uuid")) + " / " + s(row, "session_id"), time(row),
+                format(Json.number(features, "movement_pps")),
+                format(Json.number(features, "attack_pps")),
+                decision == null ? "Telemetry only" : s(decision, "action"));
         }
-
-        int caret = serverLog.getCaretPosition();
-        serverLog.setText(text.toString());
-        serverLog.setCaretPosition(follow.isSelected() ? serverLog.getDocument().getLength()
-            : Math.min(caret, serverLog.getDocument().getLength()));
-        lastLogVersion = model.logVersion;
-        lastLogQuery = search.getText();
+        counts.get("candidates").setText(Long.toString(total("totals", "candidates")));
     }
-
-    private void openReplay(){
-        JFileChooser chooser = new JFileChooser(app.config.home.resolve("logs").toFile());
-        chooser.setDialogTitle("Open a saved server log or Finding JSONL file");
-
-        if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
-            app.replay(chooser.getSelectedFile().toPath());
+    private void point(Map<String, List<TrendChart.Point>> values, String player,
+        Map<String, Object> row, double y) {
+        if (!Double.isFinite(y) || (!values.containsKey(player) && values.size() >= 8))
+            return;
+        values.computeIfAbsent(player, k -> new ArrayList<>())
+            .add(new TrendChart.Point((long) Json.number(row, "created_ms"), y));
     }
-
-    private void requestClose(){
-        if(!app.process.alive() && !app.process.starting()){
+    private void refreshIncidents() {
+        int selected = incidents.table.getSelectedRow();
+        incidents.clear();
+        incidentEvidence.clear();
+        for (String[] response : model.responses) {
+            if (!response[2].equals("BANNED"))
+                continue;
+            incidents.add(response[0], response[1], "Server response", response[2]);
+            incidentEvidence.add(response[4]);
+        }
+        for (Map<String, Object> row : snapshot.rows("native_incidents")) {
+            incidents.add(
+                time(row), player(s(row, "player_uuid")), s(row, "detection_id"), s(row, "action"));
+            incidentEvidence.add("NATIVE DECISION\n" + s(row, "id")
+                + "\nOutcome: " + s(row, "action") + "\n\n" + s(row, "evidence_json"));
+        }
+        for (Map<String, Object> row : snapshot.rows("incidents")) {
+            incidents.add(
+                time(row), player(s(row, "player_uuid")), s(row, "detection_id"), s(row, "action"));
+            incidentEvidence.add("MODEL DECISION\n" + s(row, "detection_id")
+                + "\nModel: " + s(row, "model_id") + "\nDecision: " + s(row, "id")
+                + "\nOutcome: " + s(row, "action") + "\nSustained margin: " + s(row, "margin")
+                + "\nLegitimate reference tail rank: " + s(row, "tail_p")
+                + "\nThis rank is not the probability of cheating.\n\n"
+                + s(row, "evidence_json"));
+        }
+        for (Finding finding : model.alerts) {
+            incidents.add(
+                finding.time(), model.playerName(finding), finding.detector(), "Native alert");
+            incidentEvidence.add(finding.json);
+        }
+        if (selected >= 0 && selected < incidents.table.getRowCount())
+            incidents.table.setRowSelectionInterval(selected, selected);
+    }
+    void refresh() {
+        serverStatus.setText(app.replay
+                ? "OFFLINE REPLAY   /   Saved server evidence"
+                : "SERVER  /  " + (app.process.alive() && model.ready ? "Ready" : app.process.state)
+                    + "     ENGINE  /  " + model.engineState);
+        serverStatus.setForeground(
+            app.process.alive() && model.ready ? new Color(112, 207, 177) : Theme.MUTED);
+        counts.get("online").setText(Long.toString(model.players.values()
+                .stream()
+                .filter(p -> p.status.equals("Session open") || p.status.equals("Online"))
+                .count()));
+        counts.get("alerts").setText(Long.toString(model.suspicious));
+        counts.get("bans").setText(Long.toString(
+            app.replay ? model.bans : total("totals", "bans") + total("native_totals", "bans")));
+        if (lastRecords != model.recordVersion) {
+            lastRecords = model.recordVersion;
+            refreshIncidents();
+        }
+        if (console != null && console.isVisible() && lastLog != model.logVersion) {
+            lastLog = model.logVersion;
+            serverLog.setText(String.join("\n", model.logs));
+            serverLog.setCaretPosition(serverLog.getDocument().getLength());
+        }
+        stop.setEnabled(
+            !app.replay && app.process.alive() && !app.process.state.equals("Stopping"));
+        footer.setText(!snapshot.error.isEmpty()
+                ? "Registry unavailable: " + snapshot.error
+                : (app.replay ? "Recorded evidence" : model.behaviorState)
+                    + "  ·  Last hour, up to 2,000 windows  ·  "
+                    + (model.uiDropped > 0 ? model.uiDropped + " display records dropped"
+                                           : "Raw evidence retained on disk"));
+        if (closing && !app.process.alive() && !app.process.starting())
+            app.close();
+    }
+    void openConsole() {
+        if (console == null) {
+            console = new JDialog(this, "Server controls", false);
+            console.setSize(1030, 540);
+            console.setLocationRelativeTo(this);
+            JPanel body = Theme.panel(new BorderLayout(0, 12));
+            body.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
+            body.add(Theme.scroll(serverLog), BorderLayout.CENTER);
+            JPanel bottom = Theme.panel(new BorderLayout(8, 0));
+            bottom.add(command, BorderLayout.CENTER);
+            JButton send = button("Send command", () -> {
+                app.process.command(command.getText());
+                command.setText("");
+            });
+            command.addActionListener(e -> send.doClick());
+            send.setEnabled(!app.replay);
+            command.setEnabled(!app.replay);
+            bottom.add(actions(send, stop), BorderLayout.EAST);
+            body.add(bottom, BorderLayout.SOUTH);
+            console.setContentPane(body);
+        }
+        lastLog = -1;
+        console.setVisible(true);
+        refresh();
+    }
+    private void requestClose() {
+        if (!app.process.alive() && !app.process.starting()) {
             app.close();
             return;
         }
-
-        int answer = JOptionPane.showConfirmDialog(
-            this,
-            "Stop the server normally, save the world, and close the monitor?",
-            "Stop server",
-            JOptionPane.YES_NO_OPTION
-        );
-
-        if(answer == JOptionPane.YES_OPTION){
+        if (JOptionPane.showConfirmDialog(this, "Save the world, stop the server, and close?",
+                "Close", JOptionPane.YES_NO_OPTION)
+            == JOptionPane.YES_OPTION) {
             closing = true;
             app.process.stop();
-            footer.setText("Waiting for Spigot to save and stop...");
         }
     }
-
-    void message(String text){
-        JOptionPane.showMessageDialog(this, text, "anticheat monitor", JOptionPane.INFORMATION_MESSAGE);
+    void run(List<String> args, String success) {
+        footer.setText("Running " + args.get(0) + "…");
+        framework.run(args, result -> message(success + "\n\n" + result), this::message);
     }
-
-    final class RecordTable extends AbstractTableModel{
-        public int getRowCount(){
-            return view.equals("Responses") ? responseRows.size() : view.equals("Players") ? playerRows.size() : rows.size();
-        }
-
-        public int getColumnCount(){
-            return view.equals("Players") ? 5 : 4;
-        }
-
-        public String getColumnName(int column){
-            if(view.equals("Responses")) return new String[]{"TIME", "PLAYER", "ACTION", "EVIDENCE"}[column];
-            return view.equals("Players")
-                ? new String[]{"PLAYER", "STATE", "ALERTS", "RECORDS", "LAST SEEN"}[column]
-                : new String[]{"TIME", "PLAYER", "CHECK", "SUMMARY"}[column];
-        }
-
-        public Object getValueAt(int row, int column){
-            if(view.equals("Responses")) return responseRows.get(row)[column];
-            if(view.equals("Players")){
-                MonitorModel.Player player = playerRows.get(row);
-                return new Object[]{
-                    player.name == null ? player.uuid : player.name,
-                    player.status, player.alerts, player.records, player.last
-                }[column];
+    void message(String text) {
+        JTextArea area = Theme.area();
+        area.setText(text);
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+        JScrollPane pane = Theme.scroll(area);
+        pane.setPreferredSize(new Dimension(720, 310));
+        JOptionPane.showMessageDialog(this, pane, "anticheat", JOptionPane.PLAIN_MESSAGE);
+    }
+    Map<String, Object> latest(String detection) {
+        for (Map<String, Object> row : snapshot.rows("experiments"))
+            if (s(row, "detection_id").equals(detection))
+                return row;
+        return null;
+    }
+    private long total(String table, String key) {
+        return snapshot.rows(table).isEmpty()
+            ? 0
+            : (long) Json.number(snapshot.rows(table).get(0), key);
+    }
+    Map<String, Object> experiment(String id) {
+        for (Map<String, Object> row : snapshot.rows("experiments"))
+            if (s(row, "id").equals(id))
+                return row;
+        return null;
+    }
+    private String player(String id) {
+        return model.names.getOrDefault(id, shortId(id));
+    }
+    static String s(Map<String, Object> row, String key) {
+        return Json.string(row, key);
+    }
+    static String shortId(String id) {
+        return id.length() > 16 ? id.substring(0, 16) : id;
+    }
+    static String time(Map<String, Object> row) {
+        return new SimpleDateFormat("HH:mm:ss")
+            .format(new Date((long) Json.number(row, "created_ms")));
+    }
+    static String format(double value) {
+        return String.format(Locale.ROOT, "%.2f", value);
+    }
+    static JButton button(String name, Runnable action) {
+        JButton b = Theme.button(name);
+        b.addActionListener(e -> action.run());
+        return b;
+    }
+    static JPanel actions(JButton... buttons) {
+        JPanel panel = Theme.panel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        for (JButton b : buttons)
+            panel.add(b);
+        return panel;
+    }
+    static JPanel heading(String title, String subtitle) {
+        JPanel panel = Theme.panel(new GridLayout(2, 1, 0, 7));
+        panel.add(Theme.label(title, 25, true));
+        JLabel sub = Theme.label(subtitle, 13, false);
+        sub.setForeground(Theme.MUTED);
+        panel.add(sub);
+        return panel;
+    }
+    static JSplitPane split(Component a, Component b, double ratio) {
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, a, b);
+        split.setBorder(null);
+        split.setDividerSize(12);
+        split.setResizeWeight(ratio);
+        a.setMinimumSize(new Dimension(350, 100));
+        b.setMinimumSize(new Dimension(330, 100));
+        split.addComponentListener(new ComponentAdapter() {
+            boolean first = true;
+            public void componentResized(ComponentEvent e) {
+                if (first && split.getWidth() > 700) {
+                    split.setDividerLocation(ratio);
+                    first = false;
+                }
             }
-
-            Finding finding = rows.get(row);
-            return new String[]{
-                finding.time(), model.playerName(finding), finding.detector(), finding.summary()
-            }[column];
+        });
+        return split;
+    }
+    static final class Grid {
+        final DefaultTableModel data;
+        final JTable table;
+        Grid(String... headings) {
+            data = new DefaultTableModel(headings, 0) {
+                public boolean isCellEditable(int r, int c) {
+                    return false;
+                }
+            };
+            table = new JTable(data);
+            Theme.table(table);
+        }
+        void clear() {
+            data.setRowCount(0);
+        }
+        void add(Object... row) {
+            data.addRow(row);
         }
     }
 }

@@ -54,6 +54,7 @@ final class MonitorModel{
     long uiDropped;
     int warnings;
     String engineState = "Waiting";
+    String behaviorState = "Waiting for behavior telemetry";
     String feed = "Waiting for findings";
     boolean ready;
 
@@ -121,6 +122,9 @@ final class MonitorModel{
             return;
 
         String body = plugin.group(1);
+        if(body.startsWith("Behavior telemetry ready")) behaviorState = body;
+        if(body.contains("behavior actions disabled") || body.contains("model actions disabled") || body.contains("Behavior models unavailable"))
+            behaviorState = "Behavior evaluation unavailable; inspect server controls";
 
         Matcher timestamp = TIME.matcher(line);
         String at = timestamp.find() ? timestamp.group(1) : "--:--:--";

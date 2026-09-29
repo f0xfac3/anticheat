@@ -13,6 +13,8 @@ import dev.fox.anticheat.observation.ObservationModules;
 import dev.fox.anticheat.packet.PacketObserver;
 import dev.fox.anticheat.report.FindingReporter;
 import dev.fox.anticheat.report.TimerStore;
+import dev.fox.anticheat.report.BehaviorTelemetry;
+import dev.fox.anticheat.report.BehaviorRuntime;
 import dev.fox.anticheat.capture.CaptureController;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -54,7 +56,9 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
     private PacketObserver packets;
     private CaptureController capture;
     private TimerStore timerStore;
+    private BehaviorRuntime behaviorRuntime;
     private String enforcementWorld;
+    private boolean modelBansEnabled;
     private BukkitTask ticker;
     private boolean running;
 
@@ -103,6 +107,7 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
         try(InputStream in=Files.newInputStream(policy.toPath())){settings.load(in);}
         String mode=settings.getProperty("mode","report");
         if(!mode.equals("ban") && !mode.equals("report"))throw new IllegalArgumentException("Enforcement mode must be report or ban");
+        modelBansEnabled=mode.equals("ban");
         enforcementWorld=settings.getProperty("world","ac_auto_samples");
         if(enforcementWorld.trim().isEmpty())throw new IllegalArgumentException("Set an explicit enforcement world");
         try{
@@ -125,6 +130,32 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
             this::tick,
             record->{findings.accept(record);if(timerStore!=null)timerStore.accept(record);}
         );
+        try{
+            behaviorRuntime=new BehaviorRuntime(getDataFolder(),getLogger(),
+                task->getServer().getScheduler().runTask(this,task),this::banModel);
+            BehaviorTelemetry telemetry=new BehaviorTelemetry(window->{findings.accept(window.finding());behaviorRuntime.accept(window);});
+            observations.setTelemetry(buffer->{
+                try{telemetry.accept(buffer);}catch(RuntimeException error){
+                    behaviorRuntime.disable("Telemetry failure: "+error);
+                    observations.setTelemetry(ignored->{});
+                }
+            });
+        }catch(Exception error){getLogger().log(Level.SEVERE,"Behavior models unavailable; native checks remain active",error);}
+    }
+
+    private String banModel(BehaviorRuntime.Decision decision){
+        if(!running)return "skipped_stopped";
+        if(!modelBansEnabled)return "skipped_report_policy";
+        if(!enforcementWorld.equals(decision.world))return "skipped_observation_outside_scope";
+        Session session=sessions.get(UUID.fromString(decision.player));
+        if(session==null||!session.active||!Long.toString(session.id).equals(decision.session)||!session.player.isOnline())return "skipped_session_changed";
+        if(!session.player.getWorld().getName().equals(enforcementWorld))return "skipped_outside_scope";
+        if(capture!=null&&capture.isCollectionSession(session.player.getUniqueId()))return "skipped_collection";
+        String reason=decision.detection+": sustained model evidence. Evidence "+decision.id;
+        Bukkit.getBanList(BanList.Type.NAME).addBan(session.player.getName(),reason,null,"FoxAntiCheat");
+        session.player.kickPlayer(reason);
+        getLogger().warning("BAN | "+session.player.getName()+" | "+decision.detection+" | evidence="+decision.id);
+        return "banned";
     }
 
     // A native candidate is persisted before this callback runs on the server thread.
@@ -444,5 +475,6 @@ public final class AntiCheatPlugin extends JavaPlugin implements Listener{
             findings = null;
         }
         if(timerStore!=null){timerStore.close();timerStore=null;}
+        if(behaviorRuntime!=null){behaviorRuntime.close();behaviorRuntime=null;}
     }
 }

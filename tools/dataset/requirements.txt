@@ -1,2 +1,2 @@
-scikit-learn>=1.6,<2
-joblib>=1.4,<2
+# Recording and auditing use the Python standard library.
+# Training dependencies live in analytics/requirements.txt.

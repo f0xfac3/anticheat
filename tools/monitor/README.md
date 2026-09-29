@@ -1,41 +1,41 @@
 # Security console
 
-Native Windows desktop monitor for the local Spigot anticheat. No HTML server or
-additional libraries. Uses the engine's original findings and server response logs.
-The desktop launcher requires Java 17+ for Windows DPI scaling (Java 21 recommended).
-The Minecraft server continues to run separately on Java 8.
+A native Swing desktop console. Java 21 is recommended for Windows DPI rendering;
+the managed Spigot process runs on Java 8.
 
-## Run
+Run `C:\anticheat-lab\Start Monitor.cmd` in the prepared lab. It starts the server.
+Do not start a second server or a collection controller at the same time.
 
-Stop the existing server normally (`stop` in its console), then run
-`C:\anticheat-lab\Start Monitor.cmd`. The monitor starts the server itself.
-Do not also run Start Live Test or collection scripts.
+| Workspace | Purpose |
+|---|---|
+| Overview | Measured cadence, model-margin trends, observed sessions and confirmed responses |
+| Incidents | Native findings, durable model decisions, exact evidence and action outcomes |
+| Detections | Register recipes, compare held-out measurements, train, inspect gates, deploy or roll back |
+| Validation | Declare conditions, reserve validation sessions, admit raw captures, review evidence |
 
-In **Server log**, send `acdata arena elleliska` after joining, with Timer off.
-Move normally, then enable only Timer 1.07. Watch **Alerts** and **Responses**.
-Send `pardon elleliska` in Server log to repeat. Stop server saves the world.
+**Server controls**, at the top right, contains the console and command field.
+After joining, `acdata arena <name>` prepares the lab area. Native Timer budget
+enforcement retains its own policy in `enforcement.properties`. A shadow model
+does not ban. `pardon <name>` allows a banned test account to reconnect.
 
-- **Alerts**: native suspicious findings and original JSON measurements.
-- **Responses**: observed detections and confirmed server bans, linked by evidence ID.
-- **Research**: saved model comparisons, grouped validation, timing sensitivity and data coverage.
-- **Activity**: all native findings, including baseline assessments.
-- **Players**: observed identity, session state and alert counts.
-- **Server log**: console, startup policy and operator commands.
+The charts use persisted 30-second windows from the last hour; gaps break lines.
+A model margin is not a probability. Unseen feature ranges produce explicit
+abstention records. Empty charts mean there are no eligible windows yet.
+Confirmed responses are read from durable SQLite actions, not inferred from a
+disconnect. A historical ban remains an event even after a pardon.
 
-Confirmed bans are counted only from the plugin's BAN record, not inferred from a
-flag or disconnect. Selecting a ban shows matching native evidence if still in the
-bounded live buffer; permanent decisions remain in the server's SQLite database.
-The monitor observes a fresh run, not historical ban state. A server-side pardon
-remains visible in Server log. No risk percentages or packet telemetry are invented.
-Run `C:\anticheat-lab\Evaluate Research.cmd` to refresh the offline evaluation,
-then reopen Research. It reads the active cohort without changing enforcement.
+The registry is polled read-only off the UI thread. Both UI and terminal workflows
+call the same `analytics/lab.py` commands. Deployment files are verified against
+registry hashes at server startup. Changes require a server restart.
 
-The UI holds 2,000 response events, 2,000 alerts, 5,000 findings and 6,000 console
-lines, with byte caps for full records. Dropped records and parse failures are shown.
-Console captures are saved under `logs/`; raw evidence remains in the plugin logs.
+## Configuration
 
-## Build
+Set `server.directory`, `analytics.framework`, `analytics.python`, and
+`analytics.raw` in `monitor.properties`. Paths resolve relative to that file.
+The Python environment needs `analytics/requirements.txt`. The registry lives
+under the server's `plugins/FoxAntiCheat/analytics.sqlite`.
 
-`build.ps1 -Jdk <JDK root>` compiles Java 8-compatible classes and runs the parser,
-response, retention, file rotation and subprocess tests. Edit `monitor.properties`
-for your server location and Java 8 runtime. Source requires no external libraries.
+Build with `build.ps1 -Jdk <JDK root>`. Parser, response, retention, file rotation,
+subprocess and runtime tests run during the build. `MonitorUiTest` additionally
+renders each workspace against saved JSONL evidence without starting a server.
+Native checks and ML inference are implemented outside the desktop.

@@ -61,7 +61,7 @@ public final class FindingReporter implements Consumer<String>, AutoCloseable{
 
         String level = finding.field("level");
 
-        if(level.equals("trace"))
+        if(level.equals("trace") || level.equals("telemetry"))
             return;
 
         if(finding.field("check").equals("timer.baseline.v1")){
