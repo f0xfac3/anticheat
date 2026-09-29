@@ -60,6 +60,31 @@ public final class MonitorTest{
     }
 
     public static void main(String[] arguments) throws Exception{
+        test("dark button backgrounds survive native Windows theme and button states", ()->{
+            javax.swing.SwingUtilities.invokeAndWait(()->{
+                Theme.install();
+                javax.swing.AbstractButton[] buttons = {
+                    Theme.button("Alerts"), new javax.swing.JToggleButton("Follow log", true)
+                };
+                for(javax.swing.AbstractButton button : buttons){
+                    button.setBackground(Theme.RAISED);
+                    button.setSize(180, 40);
+                    for(int state = 0; state < 3; state++){
+                        button.setEnabled(state != 2);
+                        button.getModel().setArmed(state == 1);
+                        button.getModel().setPressed(state == 1);
+                        java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(
+                            180, 40, java.awt.image.BufferedImage.TYPE_INT_RGB);
+                        java.awt.Graphics2D graphics = image.createGraphics();
+                        button.paint(graphics);
+                        graphics.dispose();
+                        java.awt.Color pixel = new java.awt.Color(image.getRGB(12, 12));
+                        require(pixel.getRed() < 80 && pixel.getGreen() < 80 && pixel.getBlue() < 80,
+                            "button background became light in state " + state);
+                    }
+                }
+            });
+        });
         test("Timer response timeline distinguishes findings from completed bans", ()->{
             MonitorModel m = new MonitorModel();
             m.log("[09:24:00 INFO]: UUID of player elleliska is cafb67ce-e238-37f9-accc-b444f4c02443");

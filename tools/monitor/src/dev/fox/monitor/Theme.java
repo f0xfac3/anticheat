@@ -38,6 +38,17 @@ final class Theme{
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }catch(Exception ignored){}
 
+        // Windows' themed button painter ignores custom backgrounds. Use Swing's
+        // flat painters for buttons while retaining desktop text and DPI settings.
+        UIManager.put("ButtonUI", "javax.swing.plaf.basic.BasicButtonUI");
+        UIManager.put("ToggleButtonUI", "javax.swing.plaf.basic.BasicToggleButtonUI");
+        UIManager.put("Button.select", new ColorUIResource(SELECTED));
+        UIManager.put("Button.disabledText", new ColorUIResource(MUTED));
+        UIManager.put("ToggleButton.background", new ColorUIResource(RAISED));
+        UIManager.put("ToggleButton.foreground", new ColorUIResource(WHITE));
+        UIManager.put("ToggleButton.select", new ColorUIResource(SELECTED));
+        UIManager.put("ToggleButton.disabledText", new ColorUIResource(MUTED));
+
         for(String key : new String[]{"Panel.background", "OptionPane.background", "Viewport.background"})
             UIManager.put(key, new ColorUIResource(PANEL));
 
