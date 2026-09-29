@@ -4,6 +4,11 @@ C++ detection engine. Java 8 adapter for Spigot 1.8.8. SQLite evidence store.
 Timer is the worked example: recovered behavior, recorded trials, a legitimate
 baseline, native comparison and auditable enforcement.
 
+[Research results](examples/timer/research/REPORT.md) compare five approaches on
+the original recordings, including failed models and timing sensitivity.
+[Role evidence](docs/ROLE_EVIDENCE.md) maps the project to the data-driven anticheat
+role and identifies the validation still missing. [Reproduce the evaluation](tools/research/README.md).
+
 ```text
 packet -> Java observation -> JNI -> C++ check -> SQLite decision -> Bukkit action
 raw trial -> audit -> SQLite reference -> frozen model loaded at server startup

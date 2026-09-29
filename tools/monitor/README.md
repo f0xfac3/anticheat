@@ -17,6 +17,7 @@ Send `pardon elleliska` in Server log to repeat. Stop server saves the world.
 
 - **Alerts**: native suspicious findings and original JSON measurements.
 - **Responses**: observed detections and confirmed server bans, linked by evidence ID.
+- **Research**: saved model comparisons, grouped validation, timing sensitivity and data coverage.
 - **Activity**: all native findings, including baseline assessments.
 - **Players**: observed identity, session state and alert counts.
 - **Server log**: console, startup policy and operator commands.
@@ -26,6 +27,8 @@ flag or disconnect. Selecting a ban shows matching native evidence if still in t
 bounded live buffer; permanent decisions remain in the server's SQLite database.
 The monitor observes a fresh run, not historical ban state. A server-side pardon
 remains visible in Server log. No risk percentages or packet telemetry are invented.
+Run `C:\anticheat-lab\Evaluate Research.cmd` to refresh the offline evaluation,
+then reopen Research. It reads the active cohort without changing enforcement.
 
 The UI holds 2,000 response events, 2,000 alerts, 5,000 findings and 6,000 console
 lines, with byte caps for full records. Dropped records and parse failures are shown.

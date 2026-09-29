@@ -53,6 +53,7 @@ final class MonitorWindow extends JFrame{
     final JTextField search = Theme.field();
     final JTextArea detail = Theme.area();
     final JTextArea serverLog = Theme.area();
+    final JTextArea research = Theme.area();
     final JTextField command = Theme.field();
     final CardLayout cards = new CardLayout();
     final JPanel pages = Theme.panel(cards);
@@ -158,7 +159,7 @@ final class MonitorWindow extends JFrame{
         stack.add(tag);
         stack.add(Box.createVerticalStrut(42));
 
-        for(String nameText : new String[]{"Alerts", "Responses", "Activity", "Players", "Server log"}){
+        for(String nameText : new String[]{"Alerts", "Responses", "Research", "Activity", "Players", "Server log"}){
             JButton button = Theme.button(nameText);
             button.setHorizontalAlignment(JButton.LEFT);
             button.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -283,6 +284,9 @@ final class MonitorWindow extends JFrame{
         split.setDividerLocation(690);
         pages.add(split, "Records");
         pages.add(logPanel(), "Logs");
+        research.setLineWrap(true);
+        research.setWrapStyleWord(true);
+        pages.add(Theme.scroll(research), "Research");
         middle.add(pages, BorderLayout.CENTER);
         main.add(middle, BorderLayout.CENTER);
         footer.setForeground(Theme.MUTED);
@@ -342,6 +346,8 @@ final class MonitorWindow extends JFrame{
             subtitle.setText("Only findings marked suspicious by the C++ engine.");
         else if(name.equals("Responses"))
             subtitle.setText("Observed detections and confirmed server bans. Select a response for its evidence.");
+        else if(name.equals("Research"))
+            subtitle.setText("Saved offline evaluation. Development results and coverage limits; not a live risk verdict.");
         else if(name.equals("Activity"))
             subtitle.setText("Starts, finishes, skips, resets, and alerts. These are Findings, not raw packets.");
         else if(name.equals("Players"))
@@ -352,7 +358,17 @@ final class MonitorWindow extends JFrame{
         for(JButton button : navigation)
             button.setBackground(button.getText().equals(name) ? Theme.SELECTED : Theme.BACKGROUND);
 
-        cards.show(pages, name.equals("Server log") ? "Logs" : "Records");
+        if(name.equals("Research")){
+            java.nio.file.Path report = app.config.server.resolve("plugins/FoxAntiCheat/research/REPORT.md");
+            try{
+                if(java.nio.file.Files.size(report) > 131072) throw new java.io.IOException("Report exceeds display limit");
+                research.setText(new String(java.nio.file.Files.readAllBytes(report), java.nio.charset.StandardCharsets.UTF_8));
+            }catch(java.io.IOException error){
+                research.setText("No evaluation report available. Run Evaluate Research.cmd, then reopen this tab.\n\n" + report);
+            }
+            research.setCaretPosition(0);
+        }
+        cards.show(pages, name.equals("Research") ? "Research" : name.equals("Server log") ? "Logs" : "Records");
         tableModel.fireTableStructureChanged();
         resizeColumns();
         refreshRows(true);
