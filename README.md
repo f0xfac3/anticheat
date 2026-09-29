@@ -83,3 +83,9 @@ opaque serialized model objects or online training are needed.
 The adapter is pinned to direct protocol-47 clients and `v1_8_R3`. Protocol
 translation, human false-positive rates and broad network/terrain coverage remain
 outside the measured example. See [bridge schema](bridge/README.md) for the wire format.
+
+## Live monitor
+
+[Desktop security console](tools/monitor/README.md): detections, response timeline,
+player state and evidence inspection. In the installed lab, stop the existing server
+and run `C:\anticheat-lab\Start Monitor.cmd`; it starts and manages the server.
