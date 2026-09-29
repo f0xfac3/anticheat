@@ -1,0 +1,26 @@
+{
+  "id": "20260929-120636-0cf35d",
+  "fixture": "stationary-reach-v1",
+  "attacker": "elleliska",
+  "target": "evilgirlscout",
+  "distances": [
+    3.0,
+    3.4,
+    3.8,
+    4.2
+  ],
+  "seconds": 45,
+  "client": "vape",
+  "target_client": "lunar-1.8.9",
+  "input_source": "scripted",
+  "script_family": "stationary-reach-v1",
+  "attack_input": "human-manual",
+  "network": "local-loopback",
+  "purpose": "development",
+  "verification": "operator_declared_unreviewed",
+  "on_setting": "reach=3.5",
+  "source_sha256": "57f84663bc8d66ae4e683f62bec716d44b1defcddd03286419529572ab85e11e",
+  "engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+  "engine_config_sha256": "e4cecc3c9a8a1c654f66b3c7ddc5f9619c09d69622d2c78a04c2f3b0b599d622",
+  "plugin_sha256": "e377adf2f9415c7ad260600b392abd2f66cbf97202929465d9a66f3d813a81f8"
+}

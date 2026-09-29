@@ -1,8 +1,33 @@
 # anticheat
 
-C++ detection engine, Java 8 server adapter, Python behavior framework, SQLite
-evidence registry, and native desktop security console. Timer is the worked
-example: recovered behavior → recorded trials → measured comparison → gated response.
+C++ detection engine, Java server adapter, Python analysis, SQLite evidence, and a
+desktop security console for Minecraft 1.8. Two recorded studies connect recovered
+client behavior to server observations and reproducible detection results.
+
+## Start with the evidence
+
+| Study | Recorded result | What it demonstrates |
+|---|---|---|
+| [Timer: ML comparison](examples/timer/research/REPORT.md) | 17 recordings, eight matched pairs; approximately 20.0 vs 21.4 movement packets/s | Logistic regression, Isolation Forest, grouped evaluation, feature ablation and transport stress |
+| [Reach: geometry](examples/reach/REPORT.md) | 23 recordings; 890 attack requests after guards; all 258 control requests within the bound | Controlled OFF/ON trials, exact packet-to-verdict joins and native replay |
+
+The Timer logistic model separates all observed conditions under route-held-out
+evaluation, but its original feature set falsely flags every legitimate recording
+after synthetic 100 ms batching. Removing cadence also destroys useful separation.
+Those failures are retained in the report. A simpler rate model survives that
+particular stress test; it still needs fresh human and network validation.
+
+Reach 3.2 and 3.3 produce requests at tested distances where the paired OFF control
+does not. A conservative stationary geometry rule explains those observations.
+The current 0.1-block grid cannot distinguish the two settings' exact boundaries.
+Movement causes the rule to abstain; client-view reconstruction is not implemented.
+
+**Scope:** local development evidence, not production accuracy. Conditions were
+operator-declared; there is no independent human/network test population or trained
+bot classifier. ML runs in shadow. Enforcement defaults to report only; an apparent
+legitimate Timer-budget flag is documented in [known limitations](docs/TIMER.md#local-live-enforcement-test).
+
+![Recorded Timer experiment in the security console](docs/security-console.png)
 
 ## Workflow
 
@@ -13,16 +38,8 @@ example: recovered behavior → recorded trials → measured comparison → gate
    people, opponents, script families and days. Replay transport stress cases.
 5. Deploy in shadow, inspect measured trends, and promote only if explicit gates pass.
 
-[Behavior framework and commands](analytics/README.md) ·
-[Desktop console](tools/monitor/README.md) ·
-[Original Timer recordings](examples/timer/README.md)
-
-![Recorded Timer experiment in the security console](docs/security-console.png)
-
-[Research results](examples/timer/research/REPORT.md) compare five approaches on
-the original recordings, including failed models and timing sensitivity.
-[Role evidence](docs/ROLE_EVIDENCE.md) maps the project to the data-driven anticheat
-role and identifies the validation still missing. [Reproduce the evaluation](tools/research/README.md).
+[Behavior framework](analytics/README.md) · [Desktop console](tools/monitor/README.md) ·
+[Role evidence and remaining gaps](docs/ROLE_EVIDENCE.md)
 
 ```text
 packet -> Java observation -> JNI -> C++ check -> SQLite decision -> Bukkit action
@@ -35,6 +52,9 @@ raw trial -> audit -> SQLite reference -> frozen model loaded at server startup
 |---|---|
 | `analytics/` | Admission, reviewed labels, grouped ML, calibration, stress replay, model registry |
 | `analytics/recipes/` | Configurable mechanisms, features, validation requirements and response policy |
+| `tools/research/evaluate.py` | Recorded Timer model comparison, ablation and transport stress |
+| `tools/reach/analyze.py` | Reach capture audit, original-packet joins, native replay and SQLite results |
+| `engine/src/checks/reach.cpp` | Conservative stationary geometry and explicit abstentions |
 | `plugin/.../report/BehaviorTelemetry.java` | Live features matched exactly to the Python extractor |
 | `plugin/.../report/BehaviorRuntime.java` | Bounded inference, support checks, sequential budget, durable actions |
 | `tools/monitor/` | Overview, incidents, detections and validation workflows |
@@ -51,22 +71,24 @@ raw trial -> audit -> SQLite reference -> frozen model loaded at server startup
 and enforcement boundary. [Reverse-engineering notes](docs/VAPE_DETECTIONS.md)
 link recovered methods to the existing movement/combat checks.
 
-## Current evidence
+## Reproduce without Minecraft
 
-17 real three-minute trials, nine legitimate route seeds, eight matched Timer pairs.
-Legitimate episode score: **20.0 packets/s**. Declared Timer 1.07: **21.4 packets/s**.
-Python and native replay agree on all 17 recordings.
-The shared ML feature extractor also agrees across Java and Python on all 85
-30-second windows. These recordings are scripted development evidence, not a
-population of independent human players. The ML deployment remains in shadow.
+```powershell
+python -m pip install -r analytics/requirements.txt
+python tools/research/evaluate.py --database examples/timer/anticheat.sqlite --output build/timer-research
+python tools/reach/analyze.py --study examples/reach --output build/reach-study
+```
 
-[The portable example](examples/timer/README.md) includes the SQLite reference and
-original packet recordings. Replay it without starting Minecraft.
+Both commands audit original captures. Timer writes exact model inputs, folds,
+coefficients and predictions. Reach writes a short report and `results.sqlite`
+with trial summaries and individual attack observations. Raw packets and native
+traces remain unchanged. Add `--engine build/native/anticheat_replay.exe` to the
+Reach command after building to reproduce every archived native verdict.
 
-The empirical tail rank is not a calibrated cheating probability. This small local
-dataset cannot authorize high-confidence bans: the live policy explicitly abstains.
-The baseline ban path is implemented and tested; production accuracy is not established.
-An optional deterministic Timer budget rule supports a [local live ban test](docs/TIMER.md#local-live-enforcement-test).
+The [ML framework example](analytics/README.md#reproduce-timer) additionally fits
+a frozen, interpretable deployment candidate with legitimate calibration and
+explicit promotion gates. Java/Python feature extraction agrees on all 85 Timer
+windows. Scores and empirical tail ranks are not probabilities of cheating.
 
 ## Build and test
 
@@ -78,6 +100,8 @@ From a Visual Studio x64 developer PowerShell:
 python -m unittest discover -s tools/timer -p test_timer.py
 python -m pip install -r analytics/requirements.txt
 python -m unittest discover -s analytics -p 'test_*.py'
+python -m unittest discover -s tools/reach -p 'test_*.py'
+python -m unittest discover -s tools/research -p test_research.py
 ```
 
 Builds `build/libs/anticheat.jar` and `anticheat_native.dll`; runs native, JNI,

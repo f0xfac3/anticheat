@@ -3,28 +3,33 @@
 Target: [Hypixel Data-Driven Anticheat Developer](https://hypixel.net/jobs/#listing-56),
 reviewed September 29, 2026. This is a coverage assessment, not a claim of qualification.
 The employer says initial reviewers will not compile or run submitted examples.
-Start with the [recorded research results](../examples/timer/research/REPORT.md),
-then show the live monitor and linked native evidence in a short video.
+Start with [Timer's ML results](../examples/timer/research/REPORT.md) and
+[Reach's measured comparison](../examples/reach/REPORT.md), then show the console
+and one original packet-to-verdict link in a short video.
 
 | Role area | Reviewable project evidence | Remaining gap |
 |---|---|---|
-| Gameplay/network analysis | Original packets, schema audit, source hashes, per-trial features, SQLite and native replay | Only one player/day and a small local corpus; no large-network scale claim |
+| Gameplay/network analysis | Original packets, schema audit, source hashes, SQLite; 17 Timer and 23 Reach recordings replayed | One attacker/day per study and localhost; no large-network scale claim |
 | Statistical outlier analysis | Grouped splits, held-out legitimate calibration, paired measurements, uncertainty bounds | Too little independent legitimate exposure for a deployment false-positive claim |
 | Machine learning | Logistic regression, Isolation Forest comparison, cadence ablation, batching sensitivity, rejected-model results | Fresh human/day/network test set and calibration; model scores are not cheating probabilities |
 | Bots and macros | Attack interval CV, entropy and repeat features with explicit minimum coverage checks | Current recordings contain insufficient attack data and no human-versus-automation labels |
-| Risk reports and tools | Research report, exact JSON predictions, live desktop Alerts/Responses/Players and evidence IDs | Risk trend validation across days and populations |
+| Risk reports and tools | Concise reports, exact JSON/SQL results, desktop Overview/Incidents/Detections/Validation and evidence IDs | Risk trend validation across days and populations |
 | Cleaning and interpretation | Reject corrupt/incomplete/inconsistent captures; bounded extraction; allowlisted features | Independently reviewed labels and realistic nuisance conditions |
-| Cheat behavior knowledge | Recovered Timer field write -> expected excess cadence -> packet measurements -> deterministic live ban | More module mechanisms and validation; one local ban is not a data-driven model evaluation |
+| Cheat behavior knowledge | Recovered Timer field write and Reach selection geometry -> OFF/ON recordings -> tested predicates | Moving-combat Reach is not reconstructed; an apparent legitimate Timer-budget flag remains unresolved |
 
-## What to say in the demonstration
+## Demonstration order
 
-"I traced Timer's effect to the client's tick rate, then measured it from received
-movement packets. I kept matched routes together when splitting the data so the
-same route could not enter training and testing. I compared a simple cadence rule
-with learned models, tested sensitivity to batched arrivals, and kept the failed
-models in the report. The live ban uses the validated code path of the deterministic
-budget rule; the research models remain experimental. The recorded data is enough
-to show the workflow, but not enough to claim production false-positive rates."
+1. Show Timer's matched 20.0/21.4 packets/s measurements and the logistic model.
+2. Show its batching failure, the cadence ablation and the simpler comparator.
+   Explain why a perfect local confusion matrix did not authorize bans.
+3. Show Reach OFF versus 3.2 at centers 3.5/3.6: 0/0 requests versus 66/68.
+   Follow one SQLite packet row to its raw capture and native geometry verdict.
+4. Show console evidence and shadow status. Explain why uncertain movement causes
+   the stationary Reach check to abstain and why promotion requires fresh evidence.
+
+The installed lab and shipped defaults are report-only. The earlier successful
+local ban demonstrates response plumbing. The [Timer incident](TIMER.md#local-live-enforcement-test)
+prevents a claim that its deterministic enforcement rule has been validated.
 
 ## Evidence needed next
 
@@ -43,6 +48,9 @@ to show the workflow, but not enough to claim production false-positive rates."
 5. Scale evidence: replay a representative larger corpus and measure throughput,
    memory and failure behavior. Repeating the same recording measures load capacity,
    not new statistical evidence.
+
+Moving Reach also needs evidence about target updates sent to each attacker and
+client rendering uncertainty. Stationary captures cannot validate that model.
 
 Do not add fake samples, relabel automated vanilla as human, or present a 17/17
 development result as network-wide accuracy. These are remaining experiments that

@@ -185,7 +185,7 @@ def render(report):
               "- Bot/macro classification: vanilla samples are automated too. Never label them as human negatives.",
               f"- Combat macro feature coverage: {c['macro_eligible_trials']} trial(s) with sufficient unbatched attack intervals.",
               "- Large-scale performance: measured extraction throughput below is local, not a network capacity claim.",
-              "- Live bans currently use timer.budget.v1; research classifiers do not authorize bans.", "",
+              "- Research classifiers do not authorize bans. The separate Timer budget rule is report-only by default; an apparent legitimate Lunar flag remains unresolved.", "",
               "## Reproducibility", "",
               f"Run ID: `{report['run_id']}`",
               f"Extraction: {report['performance']['extraction_seconds']:.3f}s; {report['performance']['events_per_second']:.0f} audited source events/s, bounded to one trial at a time.",

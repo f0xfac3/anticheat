@@ -64,11 +64,11 @@ Abstention means insufficient trustworthy observation, not a legitimate verdict.
 - Bot/macro classification: vanilla samples are automated too. Never label them as human negatives.
 - Combat macro feature coverage: 0 trial(s) with sufficient unbatched attack intervals.
 - Large-scale performance: measured extraction throughput below is local, not a network capacity claim.
-- Live bans currently use timer.budget.v1; research classifiers do not authorize bans.
+- Research classifiers do not authorize bans. The separate Timer budget rule is report-only by default; an apparent legitimate Lunar flag remains unresolved.
 
 ## Reproducibility
 
-Run ID: `b262b4047147fd6ed043ae2b8109bdac4cd0de994db7a580ec9fb58c5ec2a2d2`
-Extraction: 1.341s; 92696 audited source events/s, bounded to one trial at a time.
+Run ID: `01e8eafdf96f90902779a741be2bf54d93416ef7447f2e38a4890f7759648d6e`
+Extraction: 1.334s; 93223 audited source events/s, bounded to one trial at a time.
 features.jsonl contains exact per-trial inputs and source hashes; results.json contains every split, prediction, coefficient and metric.
 See docs/ROLE_EVIDENCE.md for the role requirement mapping and missing evidence.

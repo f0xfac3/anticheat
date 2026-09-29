@@ -104,8 +104,8 @@ and client-time excess for **all 17 original raw recordings**. The active refere
 returns tail rank **1.0** for vanilla and **0.1** for Timer. No trial is ban-eligible.
 Leave-one-seed-out evaluation uses eight reference seeds, so Timer's rank is `1/9`.
 
-This replaces the exploratory classifier/HTML reports. It does not carry their
-classification percentages into the live decision policy. A same-client Timer-off
+The baseline is separate from the [ML comparison](../examples/timer/research/REPORT.md).
+It does not carry exploratory classification percentages into the live decision policy. A same-client Timer-off
 control and held-out human/network trials remain necessary for deployment validation.
 
 ## Reproduce
@@ -123,6 +123,14 @@ durable evidence before an action, deduplication, model mismatch and report mode
 Synthetic tests use temporary databases; no synthetic data enters the real baseline.
 
 ## Local live enforcement test
+
+**Current default: report only.** During the September 29 Reach setup, the Lunar
+target received an apparent false Timer-budget finding while the operator reported
+ordinary/idle play. Evidence ID:
+`e421d791-63d5-49e5-9ae8-50c4945a2635:budget:2:7257`.
+Its root cause has not been established. The installed lab has `mode=report` and
+`timer.budget.ban=false`; keep them for the portfolio demonstration. The earlier
+successful local ban demonstrates action plumbing, not a validated enforcement rule.
 
 `timer.budget.ban=true` in `enforcement.properties` independently enables bans from
 `timer.budget.v1`, the deterministic native client-time budget check. Default is false.

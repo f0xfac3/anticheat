@@ -31,6 +31,7 @@ public final class AutoSampleLab extends JavaPlugin implements Listener {
     private double tickMs = 50;
     private boolean recording;
     private World arena;
+    private ReachFixture reach;
     private static final String WORLD = "ac_auto_samples";
 
     @Override public void onEnable() {
@@ -47,6 +48,8 @@ public final class AutoSampleLab extends JavaPlugin implements Listener {
             // Load before logins: otherwise saved arena coordinates are restored
             // into the default world after a server restart.
             ensureArena();
+            reach = new ReachFixture(this, this::command, () -> arena);
+            getServer().getPluginManager().registerEvents(reach, this);
             http = HttpServer.create(new InetSocketAddress("127.0.0.1", 8769), 8);
             executor = Executors.newFixedThreadPool(2, r -> { Thread t = new Thread(r,"auto-sample-http"); t.setDaemon(true); return t; });
             http.setExecutor(executor); http.createContext("/", this::handle); http.start();
@@ -123,6 +126,12 @@ public final class AutoSampleLab extends JavaPlugin implements Listener {
     private String action(Map<String,String> a) {
         String op = field(a, "op"), requested = field(a, "owner");
         Map<String,Object> result = new LinkedHashMap<>();
+        if (op.startsWith("reach_")) {
+            if (!owner.isEmpty()) throw new IllegalStateException("Stop the solo controller first.");
+            result.putAll(reach.action(op, requested, a));
+            result.put("ok", true); result.put("boot", boot); return gson.toJson(result);
+        }
+        if (reach.active()) throw new IllegalStateException("Stop the Reach controller first.");
         if (op.equals("shutdown")) {
             if (!owner.isEmpty() || recording) throw new IllegalStateException("Stop the active controller before shutting down.");
             if (command("acdata status").stream().noneMatch(s -> s.contains("active=0")))
@@ -208,6 +217,7 @@ public final class AutoSampleLab extends JavaPlugin implements Listener {
 
     private void observe() {
         long now = System.nanoTime(); tick++;
+        reach.observe(now);
         if (previousTick != 0) tickMs = .95*tickMs + .05*(now-previousTick)/1e6;
         previousTick = now;
         if (!owner.isEmpty() && (now-heartbeat > 6_000_000_000L || getServer().getOnlinePlayers().size()!=1 || getServer().getPlayerExact(playerName)==null)) {
@@ -219,6 +229,7 @@ public final class AutoSampleLab extends JavaPlugin implements Listener {
         state.put("schema",1); state.put("boot",boot); state.put("epoch_ms",System.currentTimeMillis());
         state.put("tick",tick); state.put("tick_ms",tickMs); state.put("owner",owner);
         state.put("recording",recording); state.put("fault",fault);
+        state.put("reach", reach.state());
         List<Map<String,Object>> players = new ArrayList<>();
         for (Player p : getServer().getOnlinePlayers()) {
             Map<String,Object> v = new LinkedHashMap<>(); Location l = p.getLocation();
@@ -232,6 +243,7 @@ public final class AutoSampleLab extends JavaPlugin implements Listener {
     }
 
     @Override public void onDisable() {
+        if (reach != null) reach.close();
         finish(); if (http != null) http.stop(0); if (executor != null) executor.shutdownNow();
     }
 }

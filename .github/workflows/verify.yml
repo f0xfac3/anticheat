@@ -36,3 +36,15 @@ jobs:
           python analytics/replay.py --java java
       - name: Desktop regression
         run: ./tools/monitor/build.ps1 -Jdk $env:JAVA_HOME
+      - name: Recorded Reach evidence
+        run: |
+          python -m unittest discover -s tools/reach -p 'test_*.py'
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python tools/reach/analyze.py --study examples/reach --output build/reach-study --engine build/ci/Release/anticheat_replay.exe
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Timer model comparison
+        run: |
+          python -m unittest discover -s tools/research -p test_research.py
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python tools/research/evaluate.py --database examples/timer/anticheat.sqlite --output build/timer-research
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }

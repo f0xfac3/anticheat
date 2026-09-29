@@ -12,7 +12,7 @@ python tools/research/evaluate.py --database examples/timer/anticheat.sqlite --o
 `features.jsonl`: source hashes, operator labels, route grouping and exact features.
 `results.json`: every fold, excluded calibration seed, predictions, weights, metrics,
 paired differences, dependency versions and local extraction timing.
-`REPORT.md`: concise review artifact. The monitor's Research tab displays a copy.
+`REPORT.md`: concise review artifact linked from the repository README.
 
 The database opens read-only. The extractor audits original packets, checks the
 manifest hash, matches imported episode counts/scores, rejects malformed trials,

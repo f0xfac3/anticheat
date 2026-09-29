@@ -153,6 +153,41 @@ int main(){
             context.eye.z += 0.2;
             require(message(lab.attack(context), "moving_player_or_target"), "attacker motion ignored");
         }, passed);
+        test("recorded Reach boundary remains conservative", []{
+            // Raw eye/box gaps measured in the September 29 player fixtures.
+            for(double raw_gap : {2.7, 3.1, 3.2, 3.3, 3.5}){
+                Lab lab("autoclicker.enabled=false\nreach.alert_after=1");
+                const auto context = Lab::context(raw_gap - 0.1);
+                lab.warm(context);
+                const bool expected = raw_gap - 0.13125 > 3.05;
+                require((alerts(lab.attack(context), "reach.stationary.v1") > 0) == expected,
+                    "recorded geometry boundary changed");
+            }
+        }, passed);
+        test("target moving away across reach boundary abstains throughout", []{
+            Lab lab("autoclicker.enabled=false\nreach.alert_after=1");
+            lab.warm(Lab::context(2.8));
+            for(int i = 1; i <= 40; ++i){
+                const auto context = Lab::context(2.8 + i * 0.025);
+                lab.advance(50);
+                lab.frame(context);
+                auto result = lab.attack(context, 0);
+                require(alerts(result, "reach.stationary.v1") == 0, "motion became reach evidence");
+                if(i >= 2)
+                    require(message(result, "moving_player_or_target"), "motion did not abstain");
+            }
+        }, passed);
+        test("small stationary coordinate jitter does not flag an in-range target", []{
+            Lab lab("autoclicker.enabled=false\nreach.alert_after=1");
+            for(int i = 0; i < 80; ++i){
+                auto context = Lab::context(3.0 + (i % 2 ? 0.005 : -0.005));
+                context.eye.z = i % 3 * 0.004;
+                lab.advance(50);
+                lab.frame(context);
+                require(alerts(lab.attack(context, 0), "reach.stationary.v1") == 0,
+                    "bounded coordinate jitter caused a finding");
+            }
+        }, passed);
         test("high ping excludes stationary comparison", []{
             Lab lab;
             lab.warm();

@@ -17,7 +17,8 @@ There are three different claims to test:
    sessions establish actual coverage and false-positive behavior.
 
 This change supplies source evidence and reproducible synthetic tests for the first
-two layers. [Timer's local recorded example](TIMER.md) adds limited live evidence;
+two layers. [Timer's local recorded example](TIMER.md) and the
+[23-recording Reach study](../examples/reach/REPORT.md) add limited live evidence;
 broader human/network validation remains outstanding. Neither a decompiler listing nor a
 passing synthetic test proves that every setting/mode is caught, that a player uses
 Vape, or that the check is safe to punish on. Another client or a server-side plugin

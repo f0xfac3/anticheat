@@ -1,0 +1,979 @@
+{
+  "version": 1,
+  "check": "reach.stationary.v1",
+  "guard_ns": 5000000000,
+  "samples": [
+    {
+      "id": "trial-3df8f18d-0c92-4853-a1af-b45ed20c8f01",
+      "pair": "20260929-120636-0cf35d",
+      "center": 3.0,
+      "declaration": {
+        "client": "vape",
+        "configuration": "all-off",
+        "network": "local-loopback",
+        "input_source": "scripted",
+        "script_family": "stationary-reach-v1",
+        "attack_input": "human-manual",
+        "behavior": "none",
+        "label": "legit",
+        "route": "stationary-reach-v1-center-3.0",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-120636-0cf35d",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-3df8f18d-0c92-4853-a1af-b45ed20c8f01/manifest.json",
+          "sha256": "b681d9bdf7b635161b137ee905476522d9b8a8bb78ffad213dc0068c2e8d54b7"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-3df8f18d-0c92-4853-a1af-b45ed20c8f01/events-00000.acbin.gz",
+          "sha256": "405b3cf30eb4908db41e72575202e122a059e68c8637c310768397afbba1942c"
+        }
+      },
+      "native": {
+        "path": "native/trial-3df8f18d-0c92-4853-a1af-b45ed20c8f01.jsonl",
+        "sha256": "2c98d34aab377af22f6e5684d4bed7d6f775f4a8a0bc072f445395cc6e80c708"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 91,
+        "attacks": 91
+      }
+    },
+    {
+      "id": "trial-1ed04ab2-28f9-4380-96bb-70a3bf6a43ba",
+      "pair": "20260929-120636-0cf35d",
+      "center": 3.4,
+      "declaration": {
+        "client": "vape",
+        "configuration": "all-off",
+        "network": "local-loopback",
+        "input_source": "scripted",
+        "script_family": "stationary-reach-v1",
+        "attack_input": "human-manual",
+        "behavior": "none",
+        "label": "legit",
+        "route": "stationary-reach-v1-center-3.4",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-120636-0cf35d",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-1ed04ab2-28f9-4380-96bb-70a3bf6a43ba/manifest.json",
+          "sha256": "c925ca8cd5da5e696fadbc5248bfb7c194f04d066776113ec44b0dd4226de3a1"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-1ed04ab2-28f9-4380-96bb-70a3bf6a43ba/events-00000.acbin.gz",
+          "sha256": "d3d504d0445adfc57e4e65f12dd17f0075e1f3811b4c941d9d1694417c4762f7"
+        }
+      },
+      "native": {
+        "path": "native/trial-1ed04ab2-28f9-4380-96bb-70a3bf6a43ba.jsonl",
+        "sha256": "79326722c7c9d42f3bdefdd4d5342e53752bc852fdcc49e72abee58a615ee56d"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 90,
+        "attacks": 90
+      }
+    },
+    {
+      "id": "trial-4492d958-6df6-42c4-b188-3e54a6eb943d",
+      "pair": "20260929-120636-0cf35d",
+      "center": 3.8,
+      "declaration": {
+        "client": "vape",
+        "configuration": "all-off",
+        "network": "local-loopback",
+        "input_source": "scripted",
+        "script_family": "stationary-reach-v1",
+        "attack_input": "human-manual",
+        "behavior": "none",
+        "label": "legit",
+        "route": "stationary-reach-v1-center-3.8",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-120636-0cf35d",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-4492d958-6df6-42c4-b188-3e54a6eb943d/manifest.json",
+          "sha256": "5aa886d1d78c847c181f0039f42f089577d721f976312aa96165d18a2bb6ca48"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-4492d958-6df6-42c4-b188-3e54a6eb943d/events-00000.acbin.gz",
+          "sha256": "5aa0b9a4f45f50fdbd9f8ae9b689f2562ccf624c40adb5b0e16e4afb76aa00f1"
+        }
+      },
+      "native": {
+        "path": "native/trial-4492d958-6df6-42c4-b188-3e54a6eb943d.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 94,
+        "attacks": 0
+      }
+    },
+    {
+      "id": "trial-a17ab5b6-d96a-4d1d-83f2-4517b7c3ce64",
+      "pair": "20260929-120636-0cf35d",
+      "center": 4.2,
+      "declaration": {
+        "client": "vape",
+        "configuration": "all-off",
+        "network": "local-loopback",
+        "input_source": "scripted",
+        "script_family": "stationary-reach-v1",
+        "attack_input": "human-manual",
+        "behavior": "none",
+        "label": "legit",
+        "route": "stationary-reach-v1-center-4.2",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-120636-0cf35d",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-a17ab5b6-d96a-4d1d-83f2-4517b7c3ce64/manifest.json",
+          "sha256": "39d54ef00874190f0300af0b0d359b60c405cae4cb9ac8ce12e613d62f49cd01"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-a17ab5b6-d96a-4d1d-83f2-4517b7c3ce64/events-00000.acbin.gz",
+          "sha256": "cb97d7d0389ae8098669c4f5d4ce6a92009a388862d226b4180119aa21ee6cae"
+        }
+      },
+      "native": {
+        "path": "native/trial-a17ab5b6-d96a-4d1d-83f2-4517b7c3ce64.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 97,
+        "attacks": 0
+      }
+    },
+    {
+      "id": "trial-bd2c07bb-4a64-435d-a7c3-bb01c1422e41",
+      "pair": "20260929-120636-0cf35d",
+      "center": 3.0,
+      "declaration": {
+        "client": "vape",
+        "configuration": "reach=3.5",
+        "network": "local-loopback",
+        "input_source": "scripted",
+        "script_family": "stationary-reach-v1",
+        "attack_input": "human-manual",
+        "behavior": "reach",
+        "label": "cheat",
+        "route": "stationary-reach-v1-center-3.0",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-120636-0cf35d",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-bd2c07bb-4a64-435d-a7c3-bb01c1422e41/manifest.json",
+          "sha256": "b0d13b4d96395a91df8e450f39fed7087a1ec782d195a89a74f14b94903bcc7d"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-bd2c07bb-4a64-435d-a7c3-bb01c1422e41/events-00000.acbin.gz",
+          "sha256": "b30e9ed8b0cd4050ebf99fc40c726e9afdce69af8a910abde652c1f508fa7f90"
+        }
+      },
+      "native": {
+        "path": "native/trial-bd2c07bb-4a64-435d-a7c3-bb01c1422e41.jsonl",
+        "sha256": "04f82bd9e4641460b2f7c75bdba0f9f3a28fe2a90c60d9091c892eb0cc7062f9"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 74,
+        "attacks": 74
+      }
+    },
+    {
+      "id": "trial-feb34a29-a592-4978-afed-e5ecc1f4e672",
+      "pair": "20260929-120636-0cf35d",
+      "center": 3.4,
+      "declaration": {
+        "client": "vape",
+        "configuration": "reach=3.5",
+        "network": "local-loopback",
+        "input_source": "scripted",
+        "script_family": "stationary-reach-v1",
+        "attack_input": "human-manual",
+        "behavior": "reach",
+        "label": "cheat",
+        "route": "stationary-reach-v1-center-3.4",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-120636-0cf35d",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-feb34a29-a592-4978-afed-e5ecc1f4e672/manifest.json",
+          "sha256": "70e5f6f44aa678f9fd3a2470d5174eb095bb96c1cfc3ef08d5ef3f5394d6373d"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-feb34a29-a592-4978-afed-e5ecc1f4e672/events-00000.acbin.gz",
+          "sha256": "f83e3012b44d55b5b1d9553c3e0a54837231d6819c6c29860ae753562d3ae9ed"
+        }
+      },
+      "native": {
+        "path": "native/trial-feb34a29-a592-4978-afed-e5ecc1f4e672.jsonl",
+        "sha256": "2a33f03f73e6037d7438a051be654aa0f4ff9e482d62c3494cc6a4b3bf5a7692"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 70,
+        "attacks": 70
+      }
+    },
+    {
+      "id": "trial-a5e2fbc7-1a22-40b4-b995-c1cb4ee71ab8",
+      "pair": "20260929-120636-0cf35d",
+      "center": 3.8,
+      "declaration": {
+        "client": "vape",
+        "configuration": "reach=3.5",
+        "network": "local-loopback",
+        "input_source": "scripted",
+        "script_family": "stationary-reach-v1",
+        "attack_input": "human-manual",
+        "behavior": "reach",
+        "label": "cheat",
+        "route": "stationary-reach-v1-center-3.8",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-120636-0cf35d",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-a5e2fbc7-1a22-40b4-b995-c1cb4ee71ab8/manifest.json",
+          "sha256": "ec996d81f2b726e09e5744a493b70d4913b8ab251fef4fa95f1bdf2007d225fc"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-a5e2fbc7-1a22-40b4-b995-c1cb4ee71ab8/events-00000.acbin.gz",
+          "sha256": "113b8a0bd72132083cb37e81f99042ef625d0ab17362c7f00bb8107156d754e3"
+        }
+      },
+      "native": {
+        "path": "native/trial-a5e2fbc7-1a22-40b4-b995-c1cb4ee71ab8.jsonl",
+        "sha256": "b35416fc6d739cd7dfe456902e61bf4f3fdfb0afefeb2a47762962ee8845638b"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 78,
+        "attacks": 62
+      }
+    },
+    {
+      "id": "trial-481bbb70-d0f2-4711-97c7-639db7f29d14",
+      "pair": "20260929-120636-0cf35d",
+      "center": 4.2,
+      "declaration": {
+        "client": "vape",
+        "configuration": "reach=3.5",
+        "network": "local-loopback",
+        "input_source": "scripted",
+        "script_family": "stationary-reach-v1",
+        "attack_input": "human-manual",
+        "behavior": "reach",
+        "label": "cheat",
+        "route": "stationary-reach-v1-center-4.2",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-120636-0cf35d",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-481bbb70-d0f2-4711-97c7-639db7f29d14/manifest.json",
+          "sha256": "8e4b80fdb84ce07b1c94b580a602e6c7c274ceb8dea9e3d04114792043247e67"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-481bbb70-d0f2-4711-97c7-639db7f29d14/events-00000.acbin.gz",
+          "sha256": "c26d05e7b3176940c64c1c2ee575b029f2b396990432dc514698699bf9b0b855"
+        }
+      },
+      "native": {
+        "path": "native/trial-481bbb70-d0f2-4711-97c7-639db7f29d14.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 76,
+        "attacks": 0
+      }
+    },
+    {
+      "id": "trial-98bdf3bf-9adf-4480-b8f1-11d7049393f9",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.4,
+      "declaration": {
+        "client": "vape",
+        "configuration": "all-off",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "none",
+        "label": "legit",
+        "route": "stationary-reach-v1-center-3.4",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-98bdf3bf-9adf-4480-b8f1-11d7049393f9/manifest.json",
+          "sha256": "bfad74954d95ea89bd50358e54b0db833baaf5620421ba444acf4bad7c066e83"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-98bdf3bf-9adf-4480-b8f1-11d7049393f9/events-00000.acbin.gz",
+          "sha256": "e3a71a9ee9f9deda98bc52b2273898dea198edb71ce988e5314f45f9e4b320f8"
+        }
+      },
+      "native": {
+        "path": "native/trial-98bdf3bf-9adf-4480-b8f1-11d7049393f9.jsonl",
+        "sha256": "152bb33f1e890c6cb926fab98b9fc9b8527425020bfb36afeaa1b729393cf3c1"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 77,
+        "attacks": 77
+      }
+    },
+    {
+      "id": "trial-20605cfa-3730-4c71-9db7-8dd9520e7598",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.5,
+      "declaration": {
+        "client": "vape",
+        "configuration": "all-off",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "none",
+        "label": "legit",
+        "route": "stationary-reach-v1-center-3.5",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-20605cfa-3730-4c71-9db7-8dd9520e7598/manifest.json",
+          "sha256": "639a270e435d3a6204a10f1c854d29a1c8ac662b8f29eacc0477e08485a6802d"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-20605cfa-3730-4c71-9db7-8dd9520e7598/events-00000.acbin.gz",
+          "sha256": "d0c872acab8b2a3417034dc39629d6d50e094103702055e77bc412234bdef2bc"
+        }
+      },
+      "native": {
+        "path": "native/trial-20605cfa-3730-4c71-9db7-8dd9520e7598.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 77,
+        "attacks": 0
+      }
+    },
+    {
+      "id": "trial-d03b894f-1ba2-4bee-bcdd-696e45c024a4",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.6,
+      "declaration": {
+        "client": "vape",
+        "configuration": "all-off",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "none",
+        "label": "legit",
+        "route": "stationary-reach-v1-center-3.6",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-d03b894f-1ba2-4bee-bcdd-696e45c024a4/manifest.json",
+          "sha256": "e4df455fa8d245fa24cc7c1073a946d6a47690432219831325ef61f04db80b4f"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-d03b894f-1ba2-4bee-bcdd-696e45c024a4/events-00000.acbin.gz",
+          "sha256": "f83de1022f78c5927c41ead2879207cee8a2edfd1f811178a77b1d1c17d17a06"
+        }
+      },
+      "native": {
+        "path": "native/trial-d03b894f-1ba2-4bee-bcdd-696e45c024a4.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 75,
+        "attacks": 0
+      }
+    },
+    {
+      "id": "trial-9946dca8-d6e5-4a8c-b431-aa0f5168a096",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.7,
+      "declaration": {
+        "client": "vape",
+        "configuration": "all-off",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "none",
+        "label": "legit",
+        "route": "stationary-reach-v1-center-3.7",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-9946dca8-d6e5-4a8c-b431-aa0f5168a096/manifest.json",
+          "sha256": "ddfaf2880a4579395944c460a40c2e0a370d692d6b5de6fd1314e4e0adf9f8e0"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-9946dca8-d6e5-4a8c-b431-aa0f5168a096/events-00000.acbin.gz",
+          "sha256": "53ebea1bf6cad4545a1809f0d97a483d388bb06af803040d39f4508057a8c8e4"
+        }
+      },
+      "native": {
+        "path": "native/trial-9946dca8-d6e5-4a8c-b431-aa0f5168a096.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 73,
+        "attacks": 0
+      }
+    },
+    {
+      "id": "trial-65194906-93a9-4506-949c-b7e28f448b2d",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.8,
+      "declaration": {
+        "client": "vape",
+        "configuration": "all-off",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "none",
+        "label": "legit",
+        "route": "stationary-reach-v1-center-3.8",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-65194906-93a9-4506-949c-b7e28f448b2d/manifest.json",
+          "sha256": "bf34566d70f53bbc8f107e9a3669cac263df61cdfb236b65321d883a15828555"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-65194906-93a9-4506-949c-b7e28f448b2d/events-00000.acbin.gz",
+          "sha256": "5d57d4df99996cd30fe0ba372b580e77a267389616525e16898fb908ca8cadc1"
+        }
+      },
+      "native": {
+        "path": "native/trial-65194906-93a9-4506-949c-b7e28f448b2d.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 78,
+        "attacks": 0
+      }
+    },
+    {
+      "id": "trial-426663ce-2365-4d1f-85ec-c9035f05be3f",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.4,
+      "declaration": {
+        "client": "vape",
+        "configuration": "reach=3.2",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "reach",
+        "label": "cheat",
+        "route": "stationary-reach-v1-center-3.4",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-426663ce-2365-4d1f-85ec-c9035f05be3f/manifest.json",
+          "sha256": "791b6931c0f5af2683859d8f2f44e2789d80f3a29a7aac46d53adf20b9cedcc9"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-426663ce-2365-4d1f-85ec-c9035f05be3f/events-00000.acbin.gz",
+          "sha256": "e810b2bca8d09f2a38c984b0682786119dfef54c092f06e7d1d9a151d4b4e5c4"
+        }
+      },
+      "native": {
+        "path": "native/trial-426663ce-2365-4d1f-85ec-c9035f05be3f.jsonl",
+        "sha256": "13d5d1ee8c7f0c7f9f94a61942c6da69f71eede1049e37e624d0966d177e87db"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 72,
+        "attacks": 72
+      }
+    },
+    {
+      "id": "trial-011e6c3f-e56d-4de7-93c7-989d61221096",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.5,
+      "declaration": {
+        "client": "vape",
+        "configuration": "reach=3.2",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "reach",
+        "label": "cheat",
+        "route": "stationary-reach-v1-center-3.5",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-011e6c3f-e56d-4de7-93c7-989d61221096/manifest.json",
+          "sha256": "8f76b5cd3d5e1c2ba8ceb188d42e81907da935561678936a67196f164d4311bc"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-011e6c3f-e56d-4de7-93c7-989d61221096/events-00000.acbin.gz",
+          "sha256": "f1f4c9771e657bdd9b7e46cfc4e7773e71cf3b8da80c9af47943a9a12bd96e2a"
+        }
+      },
+      "native": {
+        "path": "native/trial-011e6c3f-e56d-4de7-93c7-989d61221096.jsonl",
+        "sha256": "5037a28d6ebe8685230ea0dca1bc5a6a572c87c75c4a4716ceb65edaf2f62c1b"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 79,
+        "attacks": 66
+      }
+    },
+    {
+      "id": "trial-cd51659b-85ba-4434-90a6-703a53c2f4ac",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.6,
+      "declaration": {
+        "client": "vape",
+        "configuration": "reach=3.2",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "reach",
+        "label": "cheat",
+        "route": "stationary-reach-v1-center-3.6",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-cd51659b-85ba-4434-90a6-703a53c2f4ac/manifest.json",
+          "sha256": "cd8ba54044fb4f5c8bccd5b0b14aa1c865f203416e8c617564edbdfc7f029384"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-cd51659b-85ba-4434-90a6-703a53c2f4ac/events-00000.acbin.gz",
+          "sha256": "62f551283057a17f5c0af9f26d1fd9045bf448a43e23051dd74ec4dfa22fcdca"
+        }
+      },
+      "native": {
+        "path": "native/trial-cd51659b-85ba-4434-90a6-703a53c2f4ac.jsonl",
+        "sha256": "26b3025f14515880a09a231fb19506380b94df622b3dde9a57a6b0070f164d81"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 79,
+        "attacks": 68
+      }
+    },
+    {
+      "id": "trial-020d3c74-f7fc-4d3e-8e8d-b2352184ad12",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.7,
+      "declaration": {
+        "client": "vape",
+        "configuration": "reach=3.2",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "reach",
+        "label": "cheat",
+        "route": "stationary-reach-v1-center-3.7",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-020d3c74-f7fc-4d3e-8e8d-b2352184ad12/manifest.json",
+          "sha256": "a01b89820ed7864dacfa99f737850459dee6b8b0bbdf513f3a07be2eb27a053b"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-020d3c74-f7fc-4d3e-8e8d-b2352184ad12/events-00000.acbin.gz",
+          "sha256": "443c4c821853a3e61a772d76b2bf372bee3f0de54474f9c4af06a52b98407e10"
+        }
+      },
+      "native": {
+        "path": "native/trial-020d3c74-f7fc-4d3e-8e8d-b2352184ad12.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 77,
+        "attacks": 0
+      }
+    },
+    {
+      "id": "trial-4fc8803c-59d8-4fdf-9e4d-a3bc5c67e71e",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.8,
+      "declaration": {
+        "client": "vape",
+        "configuration": "reach=3.2",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "reach",
+        "label": "cheat",
+        "route": "stationary-reach-v1-center-3.8",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-4fc8803c-59d8-4fdf-9e4d-a3bc5c67e71e/manifest.json",
+          "sha256": "74ff9c4a0e8837c4863affd7605fcda237bceb18a8e5d51c46c5c310d958159c"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-4fc8803c-59d8-4fdf-9e4d-a3bc5c67e71e/events-00000.acbin.gz",
+          "sha256": "6efff500c23bc4aef8aae7dee8747674663ca2a2079fa6a33ada493e81b2beaf"
+        }
+      },
+      "native": {
+        "path": "native/trial-4fc8803c-59d8-4fdf-9e4d-a3bc5c67e71e.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 81,
+        "attacks": 0
+      }
+    },
+    {
+      "id": "trial-6214da39-67ee-4303-bb26-7f20674ee22b",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.4,
+      "declaration": {
+        "client": "vape",
+        "configuration": "reach=3.3",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "reach",
+        "label": "cheat",
+        "route": "stationary-reach-v1-center-3.4",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-6214da39-67ee-4303-bb26-7f20674ee22b/manifest.json",
+          "sha256": "930ac71b504ff05329f0563275dcf4806519e86c2cce1b85417297ddffed0b11"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-6214da39-67ee-4303-bb26-7f20674ee22b/events-00000.acbin.gz",
+          "sha256": "8aced5e1fc31328062137ce54e5d044bde3d9854687a86c0fda0b2af3187f389"
+        }
+      },
+      "native": {
+        "path": "native/trial-6214da39-67ee-4303-bb26-7f20674ee22b.jsonl",
+        "sha256": "ab063eb1298f6241c5bdda231057dd2822d4441513438ebe407b4f07fc05b272"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 84,
+        "attacks": 84
+      }
+    },
+    {
+      "id": "trial-f0021dd8-6648-454e-8f07-1f5667b0936c",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.5,
+      "declaration": {
+        "client": "vape",
+        "configuration": "reach=3.3",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "reach",
+        "label": "cheat",
+        "route": "stationary-reach-v1-center-3.5",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-f0021dd8-6648-454e-8f07-1f5667b0936c/manifest.json",
+          "sha256": "b552c8a1fd5f8e71852e3d12b76975ddb8a5f3bc0e895c3bd8fcf604050227e0"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-f0021dd8-6648-454e-8f07-1f5667b0936c/events-00000.acbin.gz",
+          "sha256": "3c5c27f2019a3a76e45cfdcebd0275af6c71bdb6e43ded9993f80cef4e6cab80"
+        }
+      },
+      "native": {
+        "path": "native/trial-f0021dd8-6648-454e-8f07-1f5667b0936c.jsonl",
+        "sha256": "ce4fc5bd460b00f161df95d9f4d6e96a1dd855ebf1a466886e0fcdab26b2709c"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 85,
+        "attacks": 68
+      }
+    },
+    {
+      "id": "trial-ad0ac5bf-e821-4571-a4c9-2fb0db60cf14",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.6,
+      "declaration": {
+        "client": "vape",
+        "configuration": "reach=3.3",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "reach",
+        "label": "cheat",
+        "route": "stationary-reach-v1-center-3.6",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-ad0ac5bf-e821-4571-a4c9-2fb0db60cf14/manifest.json",
+          "sha256": "06bdcd611674963e00a614b4632422dfac98ddd56c48983b4fb8ac03bbcb884d"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-ad0ac5bf-e821-4571-a4c9-2fb0db60cf14/events-00000.acbin.gz",
+          "sha256": "881e71d51eafe7c1a24f573c13f83afb9d22796622e6d6edb9d45236a712e522"
+        }
+      },
+      "native": {
+        "path": "native/trial-ad0ac5bf-e821-4571-a4c9-2fb0db60cf14.jsonl",
+        "sha256": "ac44dede5539dfc41c3e8e6ab53ddc4bc945ffa3b93991c919eb351f6400b020"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 87,
+        "attacks": 68
+      }
+    },
+    {
+      "id": "trial-517dc659-7319-4ce8-b0dd-d643f0a9fafe",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.7,
+      "declaration": {
+        "client": "vape",
+        "configuration": "reach=3.3",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "reach",
+        "label": "cheat",
+        "route": "stationary-reach-v1-center-3.7",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-517dc659-7319-4ce8-b0dd-d643f0a9fafe/manifest.json",
+          "sha256": "816ba6f75d50d3a92430e1439eeae46dc813892b436e2c6339e9c8c8122f9c66"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-517dc659-7319-4ce8-b0dd-d643f0a9fafe/events-00000.acbin.gz",
+          "sha256": "7c9074851eea49b37e41d9bde1a2329fd4e12b147061d9986cefcfd101e8ea5f"
+        }
+      },
+      "native": {
+        "path": "native/trial-517dc659-7319-4ce8-b0dd-d643f0a9fafe.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 80,
+        "attacks": 0
+      }
+    },
+    {
+      "id": "trial-da433501-7681-4935-8cad-2d9caa27e15c",
+      "pair": "20260929-124042-6d6b61",
+      "center": 3.8,
+      "declaration": {
+        "client": "vape",
+        "configuration": "reach=3.3",
+        "network": "local-loopback",
+        "input_source": "human",
+        "script_family": "",
+        "fixture_input": "scripted-positioning",
+        "attack_input": "human-manual",
+        "behavior": "reach",
+        "label": "cheat",
+        "route": "stationary-reach-v1-center-3.8",
+        "purpose": "development",
+        "fixture": "stationary-reach-v1",
+        "pair": "20260929-124042-6d6b61",
+        "damage_and_velocity_suppressed": true,
+        "target_client": "lunar-1.8.9"
+      },
+      "target": "evilgirlscout",
+      "files": {
+        "manifest.json": {
+          "path": "raw/trial-da433501-7681-4935-8cad-2d9caa27e15c/manifest.json",
+          "sha256": "2e1b646630271d7daa7380a75a989f29ce7ee19f0eccef196a609a5a92c96170"
+        },
+        "events-00000.acbin.gz": {
+          "path": "raw/trial-da433501-7681-4935-8cad-2d9caa27e15c/events-00000.acbin.gz",
+          "sha256": "5112c91f342abd7e02c84e7e0b093d371793fec40fbe86417bf46d0016bb365c"
+        }
+      },
+      "native": {
+        "path": "native/trial-da433501-7681-4935-8cad-2d9caa27e15c.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "original_engine_sha256": "54aa48ff32712652adaf4260c540ece3533910bb62fac65ffed53e6c1b08c201",
+      "original_counts": {
+        "swings": 86,
+        "attacks": 0
+      }
+    }
+  ],
+  "plans": [
+    {
+      "path": "plans/20260929-120636-0cf35d/plan.json",
+      "sha256": "06c9d9b0fc86a7905dff86c2d5eff8375bbb5d79360d020d74dc650330a87da6"
+    },
+    {
+      "path": "plans/20260929-124042-6d6b61/plan.json",
+      "sha256": "8f9a4c4ee1fdfb9d82600c5f52c2cd7c664e6893c02a408a934cef4def03e009"
+    }
+  ],
+  "engine_config": {
+    "path": "engine.conf",
+    "sha256": "e4cecc3c9a8a1c654f66b3c7ddc5f9619c09d69622d2c78a04c2f3b0b599d622"
+  }
+}

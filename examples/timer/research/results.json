@@ -1,8 +1,8 @@
 {
-  "run_id": "b262b4047147fd6ed043ae2b8109bdac4cd0de994db7a580ec9fb58c5ec2a2d2",
-  "created": "2026-09-29T13:59:02.070767+00:00",
+  "run_id": "01e8eafdf96f90902779a741be2bf54d93416ef7447f2e38a4890f7759648d6e",
+  "created": "2026-09-29T17:22:25.921375+00:00",
   "source_hashes": {
-    "evaluate.py": "0c2c2286710b4ffa7f6cfadddbe60c897bc9e0d371ca8177bb2f1fe26dc2e37a",
+    "evaluate.py": "e56365c0212a66cc0dcc1b96aa973092ebeea1df356653c81eac40b47ce848e1",
     "features.py": "6d67582cae21cdd80134641f5a8a1f2a52d950c10d5d149c571d863f1b89b082",
     "tools/timer/model.py": "d719ac640985f1eb888efb8e05291e8ca4d999dbad17b133fbd4439e80ddc5dd",
     "tools/dataset/dataset_tool.py": "ad63ccfaa97ac0f5185b9a53d61306b024fb98e4dca81cc0b6db81d87ede7422"
@@ -25,8 +25,8 @@
   },
   "rejected": [],
   "performance": {
-    "extraction_seconds": 1.3413682999998855,
-    "events_per_second": 92696.39069300401
+    "extraction_seconds": 1.3337877000012668,
+    "events_per_second": 93223.2318530767
   },
   "paired": {
     "pairs": [

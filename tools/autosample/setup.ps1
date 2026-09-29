@@ -7,7 +7,7 @@ $build = Join-Path $PSScriptRoot 'build'
 New-Item -ItemType Directory -Path $build -Force | Out-Null
 $classes = Join-Path $build 'classes'
 New-Item -ItemType Directory -Path $classes -Force | Out-Null
-& "$jdk/bin/javac.exe" --release 8 -encoding UTF-8 -proc:none -cp "$server/spigot-1.8.8.jar" -d $classes "$PSScriptRoot/bridge/src/lab/AutoSampleLab.java"
+& "$jdk/bin/javac.exe" --release 8 -encoding UTF-8 -proc:none -cp "$server/spigot-1.8.8.jar" -d $classes @(Get-ChildItem -LiteralPath "$PSScriptRoot/bridge/src/lab" -Filter '*.java' | ForEach-Object FullName)
 if ($LASTEXITCODE -ne 0) { throw 'Observer compilation failed.' }
 & "$jdk/bin/jar.exe" cf "$build/AutoSampleLab.jar" -C $classes . -C "$PSScriptRoot/bridge" plugin.yml
 if ($LASTEXITCODE -ne 0) { throw 'Observer packaging failed.' }
