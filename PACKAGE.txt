@@ -1,0 +1,4 @@
+Anticheat source, SQLite Timer example and 17 original packet recordings.
+See README.md, docs/TIMER.md and examples/timer/README.md.
+No Minecraft server JAR, world or local client profiles included.
+Build the Java adapter and native engine with build.ps1.
