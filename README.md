@@ -1,8 +1,40 @@
 # anticheat
 
-C++ checks, Java packet capture, Python analysis and a desktop console for Minecraft
-1.8. Includes raw Timer and Reach recordings, reproducible comparisons and a SQLite
-registry for samples, models and decisions.
+Unfinished Minecraft anticheat behavioral analysis and RE project. I've only implemented for Timer and Reach so far as they are the simplest. I reverse engineered and deobfuscated a commercial hacked client and designed the detection engine based on my analysis and stretched the lengths of what the server can actually observe in a packet. 
+
+. For Timer, the useful server side signal was sustained movement packet cadence.
+. For Reach, it was the player’s eye position, target hitbox, and attack packet timing.
+
+I recorded some controlled Timer trials with the same movement seeds under legit (vanilla) and illegitimate (vape) conditions. The raw packets are preserved so they can be converted into 30s behavior windows with metadata such as movement packets per second, movement interval variation, attack rate, click interval variation, repeated click intervals, ground fraction, and turning behavior.
+
+The model is trained offline in python. Python trains an interpretable logistic regression model using Timer and future macro detection. It calibrates against legitimate data, tests held out groups, calculates a conservative false positive confidence bound, and runs synthetic transport tests such as packet batching and pauses. That matters because a model that separates my local recordings perfectly can still fail when real network behavior changes. The server gives scores to live packets in Java, and the monitor shows the stored evidence to you.
+
+The current 17 Timer recordings are a development case study. The project deliberately blocks ML enforcement because the data is too narrow: scripted, local, single-player, and mostly one network condition. The planner reads the actual registry and says what experiment is missing next, such as a Vape client with Timer disabled under the same route, then later real human controls across separate players, days, and network conditions.
+
+```mermaid
+flowchart LR
+    A[Packet recordings] --> B[30s features]
+    B --> C[Train model]
+    C --> D[Test on held out players]
+    D --> E[Network stress tests]
+    E --> F{Safe enough?}
+    F -->|No| G[Shadow mode + collect data]
+    F -->|Yes| H[Java scores live packets]
+    H --> I[Monitor shows decisions]
+```
+
+My workflow:
+```
+Reverse a client behavior
+. write down the server-observable mechanism
+. make a versioned detection recipe
+. collect matched legitimate and cheat recordings
+. preserve packets, settings declarations, and review evidence
+. train and validate a model or implement a deterministic check
+. deploy in shadow
+. inspect false positives and unsupported conditions
+. enforce only when the collected evidence supports it
+```
 
 ## Recorded results
 
