@@ -1,9 +1,7 @@
-# From recovered Vape operations to server observations
+# Recovered Vape operations -> server observations
 
-## What this implementation establishes
-
-The engine now has executable checks for **Timer, Reach, HitBoxes, Velocity,
-NoSlowdown, NoFall, Speed, Fly, and an opt-in KeepSprint experiment**. They emit
+The engine now has executable checks for Timer, Reach, HitBoxes, Velocity,
+NoSlowdown, NoFall, Speed, Fly, and an opt-in KeepSprint experiment. They emit
 research findings. The separate [Timer baseline policy](TIMER.md) now connects
 audited recordings to a conditional ban path. Other checks remain report-only.
 
@@ -24,7 +22,7 @@ passing synthetic test proves that every setting/mode is caught, that a player u
 Vape, or that the check is safe to punish on. Another client or a server-side plugin
 can produce the same observable contradiction.
 
-## Evidence provenance
+## evidence
 
 The original captured class archive has SHA-256
 `0bba297387dc4d1dfad51553771af31ad8b7ff3019419db9329502596279854e`.
@@ -67,7 +65,7 @@ for hooks, clocks and version wrappers cannot establish original Vape parity.
 | Fly: [yp](research/vape/recovered/Fly-yp.txt) | Direct horizontal/vertical movement control | Airborne vertical steps contradict gravity/drag; `fly.airborne.v1` | Multiple reported positions in collision-free air |
 | KeepSprint: [y7](research/vape/recovered/KeepSprint-y7.txt) | Recognizes the `.6` attack slowdown, divides it out, applies retention (default `.95`) | Conditional post-attack retention envelope; `keepsprint.attack_retention.v1` | **Disabled by default:** client attack-success branch is not acknowledged |
 
-## Observation contract
+## observation
 
 The adapter is pinned to direct protocol 47 clients and Spigot **1.8.8 v1_8_R3**
 (internal model 10808). Its protocol label is configured; it cannot discover a
