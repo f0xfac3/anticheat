@@ -1,108 +1,151 @@
 # anticheat
 
-Unfinished Minecraft anticheat behavioral analysis and RE project. I reverse engineered and deobfuscated a commercial hacked client and designed the detection logic around what the server can actually observe from packets. I did not outperform production anticheats on raw packet simulation. My work goes deeper than a typical threshold check by treating, for instance, Timer detection as an evidence pipeline: raw packet preservation, controlled experiments, feature extraction, model validation, transport robustness testing, and gated live deployment.
+I built this to follow a Minecraft cheat from its implementation to the evidence it
+leaves on the server. I reverse engineered parts of Vape, worked through its
+obfuscation, and used controlled gameplay recordings to test the resulting detection
+ideas. The repo includes the packet capture tools, C++ checks, Python ML experiments
+and a Java plugin that scores live behavior.
 
-I recorded some controlled Timer trials with the same movement seeds under legit (vanilla) and illegitimate (vape) conditions. The raw packets are preserved so they can be converted into 30s behavior windows with metadata such as movement packets per second, movement interval variation, attack rate, click interval variation, repeated click intervals, ground fraction, and turning behavior.
+It's a working research prototype. Timer and Reach have recorded case studies;
+broader player and network validation is still open.
 
-The model is trained offline in python. Python trains an interpretable logistic regression model using Timer and future macro detection. It calibrates against legitimate data, tests held out groups, calculates a conservative false positive confidence bound, and runs synthetic transport tests such as packet batching and pauses. That matters because a model that separates my local recordings perfectly can still fail when real network behavior changes. The server gives scores to live packets in Java, and the monitor shows the stored evidence to you.
+[Timer experiments](examples/timer/research/REPORT.md) ·
+[Reach recordings](examples/reach/REPORT.md) ·
+[ML code](analytics/models.py) ·
+[Reverse engineering](docs/VAPE_DETECTIONS.md)
 
-The current 17 Timer recordings are a development case study. The project deliberately blocks ML enforcement because the data is too narrow: scripted, local, single-player, and mostly one network condition. The planner reads the actual registry and says what experiment is missing next, such as a Vape client with Timer disabled under the same route, then later real human controls across separate players, days, and network conditions.
+![Detection console showing the Timer model, recorded packet rates and validation requirements](docs/security-console.png)
+
+*The desktop console replaying saved evidence. Timer is in shadow mode; the displayed
+experiment uses route-based development splits. The monitor also shows live behavior
+trends, individual findings and recorded responses.*
+
+## What runs where
+
+The Java plugin observes movement and attack packets and builds 30-second feature
+windows. Python trains and evaluates models from admitted recordings. The server
+loads exported model coefficients at startup and scores new windows as people play.
+SQLite stores the features, model version, decision and response for inspection.
 
 ```mermaid
 flowchart LR
-    A[Packet recordings] --> B[30s features]
-    B --> C[Train model]
-    C --> D[Test on held out players]
-    D --> E[Network stress tests]
-    E --> F{Safe enough?}
-    F -->|No| G[Shadow mode + collect data]
-    F -->|Yes| H[Java scores live packets]
-    H --> I[Monitor shows decisions]
+    R[Recorded packets] --> T[Python: train and validate]
+    T --> M[Exported model]
+    P[Live packets] --> W[Java: 30s features]
+    W --> S[Java: score windows]
+    M --> S
+    S --> D[SQLite evidence]
+    D --> U[Monitor]
 ```
 
-My workflow:
-```
-Reverse a client behavior
-. write down the server-observable mechanism
-. make a versioned detection recipe
-. collect matched legitimate and cheat recordings
-. preserve packets, settings declarations, and review evidence
-. train and validate a model or implement a deterministic check
-. deploy in shadow
-. inspect false positives and unsupported conditions
-. enforce only when the collected evidence supports it
-```
+The native checks take a separate path through JNI into C++. Reach, for example,
+checks packet geometry directly. The [event boundary](bridge/README.md) defines
+what is copied from the packet, what comes from a server snapshot and when an
+observation is too uncertain to use.
 
-## Recorded results
+## Where I used ML
 
-| Study | Recorded result | What it demonstrates |
-|---|---|---|
-| [Timer: ML comparison](examples/timer/research/REPORT.md) | 17 recordings, eight matched pairs; approximately 20.0 vs 21.4 movement packets/s | Logistic regression, Isolation Forest, grouped evaluation, feature ablation and transport stress |
-| [Reach: geometry](examples/reach/REPORT.md) | 23 recordings; 890 attack requests after guards; all 258 control requests within the bound | Controlled OFF/ON trials, exact packet-to-verdict joins and native replay |
+The [training code](analytics/models.py) fits weighted logistic regression and
+calibrates its threshold against legitimate groups. The exported Timer candidate
+uses movement packets per second. Its coefficients, calibration references and
+feature limits are readable in the model file.
 
-The Timer logistic model separates all observed conditions under route-held-out
-evaluation, but its original feature set falsely flags every legitimate recording
-after synthetic 100 ms batching. Removing cadence also destroys useful separation.
-Those failures are retained in the report. A simpler rate model survives that
-particular stress test; it still needs fresh human and network validation.
+There are two evaluation setups. The recorded Timer study holds out entire route
+seeds. The independent-validation path groups connected players, combat opponents
+and script families together, requires reviewed labels, and checks that test days
+are separate from development. Those independent data requirements are still unmet.
 
-Reach 3.2 and 3.3 produce requests at tested distances where the paired OFF control
-does not. A conservative stationary geometry rule explains those observations.
-The current 0.1-block grid cannot distinguish the two settings' exact boundaries.
-Movement causes the rule to abstain; client-view reconstruction is not implemented.
+The [research comparison](tools/research/evaluate.py) also tries Isolation Forest,
+a fixed rate rule and feature ablation: remove cadence and see what the model can
+still learn. Reports retain the splits, coefficients, predictions and source hashes.
+Synthetic batching and pause replays test whether receive timing changes the result.
 
-These are local development results with operator-declared settings. Independent
-human/network validation and a trained bot classifier remain unfinished. ML runs
-in shadow; enforcement defaults to report only. An apparent legitimate Timer-budget
-flag is documented in [known limitations](docs/TIMER.md#local-live-enforcement-test).
+In live use, the model requires consecutive eligible windows, checks whether the
+features fall within its training range, and limits repeated statistical tests per
+session. A score or tail rank is not a probability that someone is cheating.
+Training and deployment are explicit steps; the server loads a fixed model.
 
-![Recorded Timer experiment in the security console](docs/security-console.png)
+## Timer: the useful result was the failure
 
-## Workflow
+The recovered Timer code writes a client timer multiplier and restores it to `1.0`
+when disabled. I recorded matching movement seeds under vanilla and declared Vape
+Timer `1.07` conditions: **17 recordings, eight matched pairs, 124,340 raw events**.
+The matched rate was about **20.0 movement packets/s versus 21.4**.
 
-1. Register a versioned behavior recipe with its reverse-engineering source.
-2. Run `plan-next <detection>` to find missing controls and validation coverage.
-   Collect the proposed conditions and preserve the original packets.
-3. Review human, client and network conditions against separate evidence.
-4. Fit on development groups; calibrate on legitimate groups; evaluate reserved
-   people, opponents, script families and days. Replay transport stress cases.
-5. Deploy in shadow, inspect trends and enable enforcement only after validation passes.
+The model with multiple features separated the local recordings perfectly. Then I
+replayed the receive timestamps with synthetic 100 ms batching:
 
-[Behavior framework](analytics/README.md) · [Desktop console](tools/monitor/README.md) ·
-[Role evidence and remaining gaps](docs/ROLE_EVIDENCE.md)
+| Model | Vanilla flagged | Vanilla flagged after batching | Timer detected in both cases |
+|---|---:|---:|---:|
+| Fixed rate rule | 0 / 9 | 0 / 9 | 8 / 8 |
+| Logistic, multiple features | 0 / 9 | 9 / 9 | 8 / 8 |
+| Logistic, rate only | 0 / 9 | 0 / 9 | 8 / 8 |
 
-```text
-packet -> Java observation -> JNI -> C++ check -> SQLite decision -> Bukkit action
-raw trial -> audit -> SQLite registry -> model loaded at server startup
-```
+That changed what I trusted. The extra features made the first model sensitive to
+arrival timing. The simple rule matched the rate-only model on these recordings,
+so this study doesn't establish an advantage from ML. Rate-only was a refinement
+after seeing the failure and still needs fresh validation.
 
-## Read the code
+The [full report](examples/timer/research/REPORT.md) includes the weaker Isolation
+Forest result and the cadence ablation. These are scripted recordings from one
+player on localhost, already inspected during development. They establish a local
+effect; they don't estimate reliability across a population of players.
 
-| Path | Responsibility |
-|---|---|
-| `analytics/` | Sample admission, reviews, grouped ML, calibration and model registry |
-| `analytics/planner.py` | Next experiment from eligible samples, missing controls and validation requirements |
-| `analytics/recipes/` | Configurable mechanisms, features, validation requirements and response policy |
-| `tools/research/evaluate.py` | Recorded Timer model comparison, ablation and transport stress |
-| `tools/reach/analyze.py` | Reach capture audit, original-packet joins, native replay and SQLite results |
-| `engine/src/checks/reach.cpp` | Stationary geometry; skips unsupported observations |
-| `plugin/.../report/BehaviorTelemetry.java` | Live features matched exactly to the Python extractor |
-| `plugin/.../report/BehaviorRuntime.java` | Live inference, feature limits, repeated testing and recorded actions |
-| `tools/monitor/` | Overview, incidents, detections and validation workflows |
-| `engine/src/checks/timer_baseline.cpp` | Episode scoring, empirical tail rank, decision |
-| `engine/src/checks/movement_checks.cpp` | Mechanistic Timer budget and movement checks |
-| `tools/timer/model.py` | Matching offline episode extractor |
-| `tools/timer/timer.py` | Audited import, baseline publication, text status |
-| `plugin/.../report/TimerStore.java` | Reference loading, asynchronous SQLite writes and action checks |
-| `plugin/.../AntiCheatPlugin.java` | Session checks, Bukkit ban and disconnect |
-| `plugin/src/main/resources/timer-schema.sql` | Trials, windows, models and decisions |
-| `tools/autosample/` | Optional Windows collection controller |
+## Reach: follow an attack back to the packet
 
-[Timer design and measured results](docs/TIMER.md) explains the equations, raw queries
-and enforcement boundary. [Reverse-engineering notes](docs/VAPE_DETECTIONS.md)
-link recovered methods to the existing movement/combat checks.
+The [Reach study](examples/reach/REPORT.md) has **23 stationary recordings** from
+two accounts. At center distances of 3.5 and 3.6 blocks, the OFF control sent zero
+attack requests. Declared Reach `3.2` sent **66 and 68** respectively. Each evaluated
+request can be traced through SQLite to its original packet and native verdict.
 
-## Reproduce without Minecraft
+The check measures a conservative distance from the attacker's eye history to an
+expanded target box. All **258 control requests** were within its bound. It skips
+moving or otherwise unsupported observations; reconstructing the target as the
+attacking client saw it is still unfinished. The study measures attack requests,
+so those counts aren't claims about successful damage.
+
+## Collection and the next experiment
+
+The [collection controller](tools/autosample/README.md) drives actual Minecraft
+clients through matched routes and saves the input plan alongside raw observations.
+Admission checks capture integrity and source hashes before a sample enters the
+registry. Labels come from declared conditions and evidence review.
+
+The [planner](analytics/planner.py) reads that registry and recommends the next
+experiment. For the current Timer data, it asks for Vape with Timer OFF and ON on
+the same client build and route: the existing comparison also changes the client.
+It supplies a timed procedure, metadata templates and the remaining validation
+requirements. The console exposes it through **Detections → Next experiment**.
+
+For bot and macro work, the extractor already measures attack interval variation,
+rate and repeated intervals. There is an [attack automation recipe](analytics/recipes/attack_macro.json),
+but no trained macro classifier yet. Both sides of the Timer experiment used
+automated movement, so vanilla here cannot serve as a human-input control.
+The planner uses fixed rules to identify missing evidence; it doesn't invent labels
+or choose experiments through a learned model.
+
+## What's left
+
+- Independent human, client and network validation. The current ML model stays in
+  shadow and cannot be promoted to enforcement under the default requirements.
+- A human-versus-macro recording study, with separate people and script families
+  held out. The feature and review paths are implemented; the dataset is missing.
+- Moving-combat Reach and broader version/terrain coverage. The adapter currently
+  targets direct protocol-47 clients and Spigot 1.8.8 `v1_8_R3`.
+- Larger-corpus performance measurements. These local recordings don't establish
+  capacity or accuracy for a large server network.
+- An apparent legitimate Timer-budget flag, documented in the
+  [incident notes](docs/TIMER.md#local-live-enforcement-test). That native rule has
+  its own enforcement policy and defaults to reporting only.
+
+The [validation requirements](analytics/README.md#validation-requirements) explain
+the sample counts and uncertainty bounds. More recordings help only if they add
+the kinds of independent evidence the model is missing.
+
+## Try the recorded studies
+
+Run from the repo root with Python 3.11+. The included captures can be analyzed
+without launching Minecraft:
 
 ```powershell
 python -m pip install -r analytics/requirements.txt
@@ -110,54 +153,34 @@ python tools/research/evaluate.py --database examples/timer/anticheat.sqlite --o
 python tools/reach/analyze.py --study examples/reach --output build/reach-study
 ```
 
-Both commands audit original captures. Timer writes exact model inputs, folds,
-coefficients and predictions. Reach writes a short report and `results.sqlite`
-with trial summaries and individual attack observations. Raw packets and native
-traces remain unchanged. Add `--engine build/native/anticheat_replay.exe` to the
-Reach command after building to reproduce every archived native verdict.
+The Timer command writes model inputs, fold results and a report. The Reach command
+audits captures and archived native verdicts, then writes `results.sqlite` with
+individual attack observations. Its [study report](examples/reach/REPORT.md#reproduce-and-inspect)
+also shows how to rerun the compiled check. The [analytics walkthrough](analytics/README.md#reproduce-timer)
+covers registry import, model training and `plan-next`.
 
-The [ML example](analytics/README.md#reproduce-timer) fits a deployment candidate,
-calibrates it against legitimate groups and reports failed validation requirements.
-Java/Python feature extraction agrees on all 85 Timer windows. Scores and empirical
-tail ranks are not probabilities of cheating.
+<details>
+<summary>Build the plugin, native checks and desktop console</summary>
 
-## Choose the next experiment
-
-After importing the example into the analytics registry:
+The Windows build needs x64 MSVC, CMake, Ninja, a JDK 11+ and a local Spigot 1.8.8
+JAR. Open a Visual Studio x64 developer PowerShell and set the paths for your machine:
 
 ```powershell
-python analytics/lab.py --store build/study.sqlite plan-next timer.cadence
-```
-
-The same command runs from **Detections → Next experiment** in the console.
-It reports missing controls, a recording procedure and independent validation
-requirements. `--format json` includes metadata templates and affected sample IDs.
-On the bundled Timer data, the next experiment is a same-client OFF/ON pair: the
-existing controls used vanilla, while the Timer trials used Vape.
-
-Recommendations use fixed rules and the trainer's eligibility checks. The planner
-reads the registry without changing it. Labels still require review, and model
-changes still require separate validation.
-
-## Build and test
-
-Requires x64 MSVC, CMake, Ninja, JDK 11+ and a local Spigot 1.8.8 JAR.
-From a Visual Studio x64 developer PowerShell:
-
-```powershell
-.\build.ps1 -Jdk 'C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot' -ServerJar 'C:\anticheat-lab\demo\server\spigot-1.8.8.jar'
-python -m unittest discover -s tools/timer -p test_timer.py
-python -m pip install -r analytics/requirements.txt
+.\build.ps1 -Jdk $env:JAVA_HOME -ServerJar 'C:\path\to\spigot-1.8.8.jar'
 python -m unittest discover -s analytics -p 'test_*.py'
+python -m unittest discover -s tools/research -p 'test_*.py'
 python -m unittest discover -s tools/reach -p 'test_*.py'
-python -m unittest discover -s tools/research -p test_research.py
 ```
 
-Builds `build/libs/anticheat.jar` and `anticheat_native.dll`; runs native, JNI,
-adapter, recording, reporting and SQLite enforcement tests. Python Timer tools use
-the standard library. Optional input automation uses psutil and Pillow.
+The build runs native, JNI, packet-adapter, recording and runtime tests. Install
+`build/libs/anticheat.jar` in the server's `plugins/` directory and
+`build/native/anticheat_native.dll` in `plugins/FoxAntiCheat/`. The server uses Java 8.
 
-Native-only build:
+For the desktop, build with `tools/monitor/build.ps1 -Jdk <JDK root>` using JDK 21,
+then configure paths as described in the [monitor README](tools/monitor/README.md).
+Model deployments load on server restart. Start with shadow/report mode.
+
+Native checks can also be built separately:
 
 ```text
 cmake -S . -B build/core -G Ninja -DAC_BUILD_JNI=OFF
@@ -165,29 +188,15 @@ cmake --build build/core
 ctest --test-dir build/core --output-on-failure
 ```
 
-## Run
+</details>
 
-Stop the server before replacing binaries. Install the JAR under `plugins/` and the
-DLL under `plugins/FoxAntiCheat/`. Import recordings with `tools/timer/timer.py`;
-restart to load the published reference. `enforcement.properties` controls Timer
-actions and the allowed world. Other checks report findings.
+## Files worth opening
 
-In the prepared local lab:
-
-```powershell
-C:\anticheat-lab\analyze_samples.cmd --collection-date 2026-09-28
-C:\anticheat-lab\timer_status.cmd
-```
-
-Each new audited 180-second automated trial enters SQLite. Original recordings
-are preserved. Collection sessions are exempt from punishment.
-
-The adapter is pinned to direct protocol-47 clients and `v1_8_R3`. Protocol
-translation, human false-positive rates and broad network/terrain coverage remain
-outside the measured example. See [bridge schema](bridge/README.md) for the wire format.
-
-## Live monitor
-
-[Desktop security console](tools/monitor/README.md): behavior trends, incidents,
-model deployment and evidence review. In the installed lab, stop the existing server
-and run `C:\anticheat-lab\Start Monitor.cmd`; it starts and manages the server.
+| Question | Code |
+|---|---|
+| What did the client change? | [Recovered operations and field evidence](docs/VAPE_DETECTIONS.md) |
+| How do packets become ML inputs? | [Offline features](analytics/windows.py) · [Live Java features](plugin/src/main/java/dev/fox/anticheat/report/BehaviorTelemetry.java) |
+| How is the model trained and checked? | [Training and calibration](analytics/models.py) · [Transport replay](analytics/stress.py) |
+| What runs on the live server? | [Model runtime](plugin/src/main/java/dev/fox/anticheat/report/BehaviorRuntime.java) · [Native Reach](engine/src/checks/reach.cpp) |
+| What data should be collected next? | [Planner](analytics/planner.py) · [Detection recipes](analytics/recipes/) |
+| How do I inspect a decision? | [Desktop console](tools/monitor/) · [Reach packet queries](examples/reach/REPORT.md#reproduce-and-inspect) |
