@@ -1,9 +1,6 @@
 # anticheat
 
-Unfinished Minecraft anticheat behavioral analysis and RE project. I've only implemented for Timer and Reach so far as they are the simplest. I reverse engineered and deobfuscated a commercial hacked client and designed the detection engine based on my analysis and stretched the lengths of what the server can actually observe in a packet. 
-
-. For Timer, the useful server side signal was sustained movement packet cadence.
-. For Reach, it was the player’s eye position, target hitbox, and attack packet timing.
+Unfinished Minecraft anticheat behavioral analysis and RE project. I've only implemented for Timer and Reach so far as they are the simplest. I reverse engineered and deobfuscated a commercial hacked client and designed the detection logic around what the server can actually observe from packets. I did not outperform production anticheats on raw packet simulation. My work goes deeper than a typical threshold check by treating, for instance, Timer detection as an evidence pipeline: raw packet preservation, controlled experiments, feature extraction, model validation, transport robustness testing, and gated live deployment.
 
 I recorded some controlled Timer trials with the same movement seeds under legit (vanilla) and illegitimate (vape) conditions. The raw packets are preserved so they can be converted into 30s behavior windows with metadata such as movement packets per second, movement interval variation, attack rate, click interval variation, repeated click intervals, ground fraction, and turning behavior.
 
