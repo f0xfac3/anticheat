@@ -116,15 +116,20 @@ final class ReachFixture implements Listener, AutoCloseable {
                 throw new IllegalStateException("Both players must be at the prepared positions.");
             String label = field(args, "label");
             if (!label.equals("legit") && !label.equals("cheat")) throw new IllegalArgumentException("Invalid label.");
+            String module = args.containsKey("module") ? field(args, "module")
+                : (label.equals("legit") ? "none" : "reach");
+            if (label.equals("legit") != module.equals("none"))
+                throw new IllegalArgumentException("Legit uses module=none; cheat requires a named behavior.");
             List<String> reply = command.apply("acdata start " + attacker + " " + label + " "
-                + (label.equals("legit") ? "none" : "reach") + " " + field(args,"client")
+                + module + " " + field(args,"client")
                 + " " + field(args,"setting") + " " + field(args,"scenario"));
             String message = String.join(" ", reply);
             if (!message.startsWith("Recording trial-")) throw new IllegalStateException(message);
             recording = true;
             Map<String,Object> result = state(); result.put("trial", message.split(" ")[1]);
             result.put("attacker_uuid", attackerId.toString()); result.put("target_uuid", targetId.toString());
-            player(attacker).sendMessage(ChatColor.GREEN + "Recording: click the target manually; do not walk, jump or sneak.");
+            player(attacker).sendMessage(ChatColor.GREEN + "Recording " + module
+                + ": attack the target as declared; do not walk, jump or sneak.");
             return result;
         } else throw new IllegalArgumentException("Unknown Reach action.");
         return state();

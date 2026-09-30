@@ -1,5 +1,32 @@
 # Automated collection
 
+## Human versus AutoClicker pilot
+
+The macro study uses the same two-account fixture as Reach. The attacker is the
+Vape client and the target stays still on Lunar. Keeping the client, account,
+target and geometry fixed makes input generation the intended difference.
+
+For each matched pair:
+
+1. Disable every Vape gameplay module. Run `macro_human.cmd`, confirm the
+   condition, focus the attacker and click naturally at roughly 4-7 CPS for 100
+   seconds.
+2. Enable only AutoClicker at a fixed 8 CPS. Run `macro_vape.cmd`, confirm the
+   condition, focus the attacker and hold the normal attack button for 100
+   seconds.
+
+Repeat until five pairs are complete, then run `macro_analyze.cmd`. Each capture
+must produce three uninterrupted 30-second windows with at least 100 attack
+requests per window. Raw observations, declared settings, admitted sample IDs and
+per-window features are saved under `datasets/macro/<pair>/`. The report compares
+attack rate, interval variation and repeated intervals, then fits the existing
+interpretable logistic model with whole matched routes held out.
+
+This is a development pilot. It checks that the capture, feature and model paths
+work and that the declared AutoClicker produces a measurable effect. It cannot
+support enforcement until separate people, days, networks and script families
+satisfy `analytics/recipes/attack_macro.json`.
+
 ## Stationary Reach fixture
 
 `reach_off.cmd` then `reach_on.cmd` keep two distinct accounts connected together.

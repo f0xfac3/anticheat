@@ -119,8 +119,10 @@ requirements. The console exposes it through **Detections → Next experiment**.
 
 For bot and macro work, the extractor already measures attack interval variation,
 rate and repeated intervals. There is an [attack automation recipe](analytics/recipes/attack_macro.json),
-but no trained macro classifier yet. Both sides of the Timer experiment used
-automated movement, so vanilla here cannot serve as a human-input control.
+and a [matched human/AutoClicker collection workflow](tools/autosample/README.md#human-versus-autoclicker-pilot),
+but no recorded macro dataset or trained macro classifier yet. Both sides of the
+Timer experiment used automated movement, so vanilla here cannot serve as a
+human-input control.
 The planner uses fixed rules to identify missing evidence; it doesn't invent labels
 or choose experiments through a learned model.
 
